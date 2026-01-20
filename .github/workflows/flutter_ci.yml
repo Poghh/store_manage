@@ -1,0 +1,40 @@
+name: Flutter CI
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout source code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Setup Flutter
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.19.6' # đổi đúng version mày đang dùng
+          channel: 'stable'
+          cache: true
+
+      # Check Flutter version
+      - name: Flutter version
+        run: flutter --version
+
+      # Get dependencies
+      - name: Install dependencies
+        run: flutter pub get
+
+      # Analyze code
+      - name: Analyze
+        run: flutter analyze
+
+      # Run tests (nếu có)
+      - name: Run tests
+        run: flutter test
