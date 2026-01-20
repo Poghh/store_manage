@@ -2,9 +2,9 @@
 
 ## 1) Giới thiệu dự án
 
-- Ứng dụng quản lý cửa hàng với các màn hình hiện có: Trang chủ (Home) và Nhập hàng (Stock In).
-- Các tab Giao dịch, Tồn kho, Báo cáo, Cá nhân hiện là màn hình placeholder.
-- Vấn đề chính: cung cấp giao diện nhập hàng và hiển thị thông tin tổng quan trên trang chủ.
+- Ứng dụng quản lý cửa hàng với các luồng chính: Trang chủ, Nhập hàng, Tồn kho, Bán lẻ, Chi tiết sản phẩm.
+- Tìm kiếm sản phẩm dùng chung `ProductSearchBar` với overlay autocomplete.
+- Bán lẻ có giá bán nhập tay, hiển thị giá nhập (disable), chọn phương thức thanh toán.
 
 ## 2) Công nghệ sử dụng
 
@@ -34,18 +34,27 @@
   - lib/feature
     - home
       - presentation/page: HomePage, HomeTabsPage.
-      - presentation/widgets: các widget UI.
+      - presentation/widgets: UI widgets + ProductSearchBar.
       - presentation/cubit: HomeCubit + HomeState.
+    - product
+      - data: Product model + repository.
+      - presentation/page: ProductDetailsPage, InventoryPage.
+      - presentation/widgets: product header, info row, inventory widgets.
+      - presentation/cubit: ProductSearchCubit.
     - stock_in
+      - data: StockInRepository.
       - presentation/page: StockInPage.
-      - presentation/widgets: StockInForm, StockInSearchBar.
+      - presentation/widgets: StockInBody, StockInForm, StockInSearchBar, StockInSubmitButton.
       - presentation/cubit: StockInCubit + StockInState.
+    - retail
+      - presentation/page: RetailPage.
+      - presentation/widgets: RetailContent + form widgets.
 
 ## 4) Kiến trúc quản lý state
 
-- Cubit được khai báo trong thư mục feature/\*/presentation/cubit.
-- Trang dùng BlocProvider để inject Cubit (ví dụ HomePage, StockInPage).
-- Hiện tại UI chưa dùng BlocBuilder/BlocListener; khi cần phản ứng theo state, dùng BlocBuilder/BlocListener trực tiếp trong widget tree.
+- Cubit được khai báo trong `feature/*/presentation/cubit`.
+- Trang dùng `BlocProvider`/`MultiBlocProvider` để inject Cubit.
+- `BlocListener` dùng cho phản hồi submit (Stock In), `BlocBuilder` dùng khi cần phản ứng theo state.
 
 ## 5) Hướng dẫn chạy project
 
@@ -63,16 +72,13 @@
 
 - Tên file: snake_case, class: PascalCase.
 - Thêm màn hình mới:
-  1.  Tạo page trong feature/<feature>/presentation/page.
-  2.  Gắn @RoutePage và đăng ký trong AppRouter.
-  3.  Chạy build_runner để cập nhật route.
-- Thêm Cubit mới:
-  1.  Tạo Cubit + State trong feature/<feature>/presentation/cubit.
-  2.  Inject bằng BlocProvider ở page tương ứng.
+  1. Tạo page trong feature/<feature>/presentation/page.
+  2. Gắn @RoutePage và đăng ký trong AppRouter.
+  3. Chạy build_runner để cập nhật route.
+- Thêm widget UI dùng chung: đặt trong feature/<feature>/presentation/widgets.
 - String hiển thị phải dùng AppStrings; màu sắc dùng AppColors; kích thước dùng AppNumbers/AppFontSizes.
 
 ## 7) Lưu ý quan trọng
 
-- Không tạo lại Cubit/BlocProvider thủ công; chỉ dùng flutter_bloc.
 - Không hard-code màu sắc, kích thước, text hiển thị; dùng constants trong core/constants.
 - Tuân thủ cấu trúc feature-based + layered như hiện tại.
