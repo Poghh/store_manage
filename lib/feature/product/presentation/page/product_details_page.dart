@@ -57,6 +57,9 @@ class ProductDetailsPage extends StatelessWidget {
         ? purchasePrice
         : (priceValue == null ? AppStrings.productDetailsSamplePrice : CommonFuntionUtils.formatCurrency(priceValue!));
     final displayDate = stockInDate.isEmpty ? AppStrings.productDetailsSampleDate : stockInDate;
+    final hasPrefill = productCode.isNotEmpty || productName.isNotEmpty;
+    final prefillQuantity = stockQuantityValue ?? int.tryParse(quantity.replaceAll(RegExp(r'[^0-9]'), ''));
+    final prefillPrice = priceValue ?? int.tryParse(purchasePrice.replaceAll(RegExp(r'[^0-9]'), ''));
     final infoItems = [
       _InfoItem(AppStrings.stockInProductCodeLabel, displayCode),
       _InfoItem(AppStrings.stockInProductNameLabel, displayName),
@@ -115,6 +118,15 @@ class ProductDetailsPage extends StatelessWidget {
         displayPrice: displayPrice,
         priceValue: priceValue,
         imageUrl: imageUrl,
+        productCode: hasPrefill ? productCode : null,
+        productName: hasPrefill ? productName : null,
+        category: category.isNotEmpty ? category : null,
+        platform: platform.isNotEmpty ? platform : null,
+        brand: brand.isNotEmpty ? brand : null,
+        unit: unit.isNotEmpty ? unit : null,
+        quantity: prefillQuantity,
+        purchasePrice: prefillPrice,
+        stockInDate: stockInDate.isNotEmpty ? stockInDate : null,
       ),
     );
   }

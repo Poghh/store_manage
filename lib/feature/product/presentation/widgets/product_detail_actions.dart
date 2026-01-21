@@ -1,12 +1,11 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
-import 'package:store_manage/core/constants/app_colors.dart';
-import 'package:store_manage/core/constants/app_font_sizes.dart';
-import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/navigation/app_router.dart';
+import 'package:store_manage/core/widgets/app_action_button.dart';
+import 'package:store_manage/core/constants/app_colors.dart';
 
 class ProductDetailActions extends StatelessWidget {
   final String displayCode;
@@ -15,6 +14,15 @@ class ProductDetailActions extends StatelessWidget {
   final String displayPrice;
   final int? priceValue;
   final String? imageUrl;
+  final String? productCode;
+  final String? productName;
+  final String? category;
+  final String? platform;
+  final String? brand;
+  final String? unit;
+  final int? quantity;
+  final int? purchasePrice;
+  final String? stockInDate;
 
   const ProductDetailActions({
     super.key,
@@ -24,6 +32,15 @@ class ProductDetailActions extends StatelessWidget {
     required this.displayPrice,
     required this.priceValue,
     required this.imageUrl,
+    this.productCode,
+    this.productName,
+    this.category,
+    this.platform,
+    this.brand,
+    this.unit,
+    this.quantity,
+    this.purchasePrice,
+    this.stockInDate,
   });
 
   @override
@@ -42,7 +59,7 @@ class ProductDetailActions extends StatelessWidget {
             Expanded(
               child: SizedBox(
                 height: AppNumbers.DOUBLE_48,
-                child: ElevatedButton.icon(
+                child: AppActionButton(
                   onPressed: () {
                     final parsedQuantity = int.tryParse(displayQuantity.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
                     final parsedPurchasePrice =
@@ -57,20 +74,8 @@ class ProductDetailActions extends StatelessWidget {
                       ),
                     );
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_12)),
-                  ),
-                  icon: const Icon(Icons.local_mall_outlined, color: AppColors.textOnPrimary),
-                  label: const Text(
-                    AppStrings.productDetailsSellButton,
-                    style: TextStyle(
-                      fontSize: AppFontSizes.fontSize14,
-                      fontWeight: FontWeight.w700,
-                      fontFamily: AppFonts.inter,
-                      color: AppColors.textOnPrimary,
-                    ),
-                  ),
+                  label: AppStrings.productDetailsSellButton,
+                  icon: Icons.local_mall_outlined,
                 ),
               ),
             ),
@@ -78,26 +83,25 @@ class ProductDetailActions extends StatelessWidget {
             Expanded(
               child: SizedBox(
                 height: AppNumbers.DOUBLE_48,
-                child: ElevatedButton.icon(
-                  onPressed: () => context.router.push(const StockInRoute()),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryLight,
-                    foregroundColor: AppColors.primary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_12),
-                      side: const BorderSide(color: AppColors.primary),
+                child: AppActionButton(
+                  onPressed: () => context.router.push(
+                    StockInRoute(
+                      productCode: productCode,
+                      productName: productName,
+                      category: category,
+                      platform: platform,
+                      brand: brand,
+                      unit: unit,
+                      quantity: quantity,
+                      purchasePrice: purchasePrice,
+                      stockInDate: stockInDate,
                     ),
                   ),
-                  icon: const Icon(Icons.inventory_2_outlined, color: AppColors.primary),
-                  label: const Text(
-                    AppStrings.productDetailsStockInButton,
-                    style: TextStyle(
-                      fontSize: AppFontSizes.fontSize14,
-                      fontWeight: FontWeight.w700,
-                      fontFamily: AppFonts.inter,
-                      color: AppColors.primary,
-                    ),
-                  ),
+                  label: AppStrings.productDetailsStockInButton,
+                  icon: Icons.inventory_2_outlined,
+                  backgroundColor: AppColors.primaryLight,
+                  foregroundColor: AppColors.primary,
+                  borderColor: AppColors.primary,
                 ),
               ),
             ),

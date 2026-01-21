@@ -4,6 +4,7 @@ import 'package:store_manage/core/constants/app_colors.dart';
 import 'package:store_manage/core/constants/app_font_sizes.dart';
 import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
+import 'package:store_manage/core/widgets/app_field_container.dart';
 
 class QuantitySelector extends StatelessWidget {
   final int quantity;
@@ -14,9 +15,8 @@ class QuantitySelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return AppFieldContainer(
       padding: const EdgeInsets.symmetric(horizontal: AppNumbers.DOUBLE_12, vertical: AppNumbers.DOUBLE_6),
-      decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_12)),
       child: Row(
         children: [
           _QtyButton(icon: Icons.remove, onTap: onDecrease),

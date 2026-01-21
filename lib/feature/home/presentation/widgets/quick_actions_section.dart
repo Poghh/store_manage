@@ -35,7 +35,7 @@ class QuickActionsSection extends StatelessWidget {
           ),
           SizedBox(height: AppNumbers.DOUBLE_12),
           ImageActionButton(
-            onTap: () => context.router.push(const StockInRoute()),
+            onTap: () => context.router.push(StockInRoute()),
             backgroundImage: 'assets/images/btn_stock_in.png',
             title: AppStrings.homeStockInTitle,
             subtitle: AppStrings.homeStockInSubtitle,

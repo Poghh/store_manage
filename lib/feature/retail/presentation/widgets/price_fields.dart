@@ -8,6 +8,7 @@ import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/utils/common_funtion_utils.dart';
+import 'package:store_manage/core/widgets/app_field_container.dart';
 import 'package:store_manage/feature/retail/presentation/widgets/retail_currency_input_formatter.dart';
 
 class PriceField extends StatelessWidget {
@@ -18,9 +19,7 @@ class PriceField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppNumbers.DOUBLE_12, vertical: AppNumbers.DOUBLE_12),
-      decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_12)),
+    return AppFieldContainer(
       child: Row(
         children: [
           Expanded(
@@ -72,12 +71,8 @@ class DisabledPriceField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppNumbers.DOUBLE_12, vertical: AppNumbers.DOUBLE_12),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceMuted,
-        borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_12),
-      ),
+    return AppFieldContainer(
+      backgroundColor: AppColors.surfaceMuted,
       child: Row(
         children: [
           Expanded(

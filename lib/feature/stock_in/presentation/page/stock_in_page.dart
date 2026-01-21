@@ -21,7 +21,28 @@ import 'package:store_manage/feature/stock_in/presentation/widgets/stock_in_subm
 
 @RoutePage()
 class StockInPage extends StatefulWidget {
-  const StockInPage({super.key});
+  final String? productCode;
+  final String? productName;
+  final String? category;
+  final String? platform;
+  final String? brand;
+  final String? unit;
+  final int? quantity;
+  final int? purchasePrice;
+  final String? stockInDate;
+
+  const StockInPage({
+    super.key,
+    this.productCode,
+    this.productName,
+    this.category,
+    this.platform,
+    this.brand,
+    this.unit,
+    this.quantity,
+    this.purchasePrice,
+    this.stockInDate,
+  });
 
   @override
   State<StockInPage> createState() => _StockInPageState();
@@ -35,6 +56,17 @@ class _StockInPageState extends State<StockInPage> {
   void initState() {
     super.initState();
     _formController = StockInFormController();
+    _formController.applyPrefill(
+      productCode: widget.productCode,
+      productName: widget.productName,
+      category: widget.category,
+      platform: widget.platform,
+      brand: widget.brand,
+      unit: widget.unit,
+      quantity: widget.quantity,
+      purchasePrice: widget.purchasePrice,
+      stockInDate: widget.stockInDate,
+    );
     _searchController = TextEditingController();
   }
 

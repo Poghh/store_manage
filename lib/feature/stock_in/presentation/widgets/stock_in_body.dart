@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:store_manage/core/constants/app_colors.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
+import 'package:store_manage/core/widgets/app_surface_card.dart';
 import 'package:store_manage/feature/stock_in/presentation/widgets/stock_in_form.dart';
 import 'package:store_manage/feature/stock_in/presentation/widgets/stock_in_form_controller.dart';
 import 'package:store_manage/feature/stock_in/presentation/widgets/stock_in_search_bar.dart';
@@ -33,12 +33,8 @@ class StockInBody extends StatelessWidget {
         Expanded(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: AppNumbers.DOUBLE_16, vertical: AppNumbers.DOUBLE_8),
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_12),
-                border: Border.all(color: AppColors.border),
-              ),
+            child: AppSurfaceCard(
+              padding: EdgeInsets.zero,
               child: StockInForm(controller: formController),
             ),
           ),

@@ -27,6 +27,8 @@ class AppStrings {
   static const String homeTabInventory = 'Tồn kho';
   static const String homeTabReports = 'Báo cáo';
   static const String homeTabProfile = 'Cá nhân';
+  static const String homeRevenueYesterdayLabel = 'Doanh thu hôm qua';
+  static String homeRevenueDateLabel(String date) => 'Doanh thu ngày $date';
 
   // === STOCK IN ===
   static const String stockInTitle = 'Nhập Hàng';
@@ -107,4 +109,34 @@ class AppStrings {
   static const String retailQueued = 'Đã lưu bán lẻ offline, sẽ gửi khi có internet';
   static const String retailValidationSelectProduct = 'Vui lòng chọn sản phẩm';
   static const String retailValidationPrice = 'Vui lòng nhập giá bán';
+
+  // === TRANSACTIONS ===
+  static const String transactionsSelectDate = 'Chọn ngày';
+  static const String transactionsEmptySelectDate = 'Vui lòng chọn ngày';
+  static const String transactionsEmptyNoData = 'Không có dữ liệu giao dịch trong ngày này';
+  static const String transactionsTotalRevenueLabel = 'Tổng doanh thu';
+  static const String transactionsItemQuantitySoldLabel = 'SL bán';
+  static const String transactionsItemPriceLabel = 'Giá bán';
+  static const String transactionsItemTotalLabel = 'Thành tiền';
+
+  // === REPORTS ===
+  static const String reportSummaryTitle = 'Tóm tắt doanh thu';
+  static const String reportAiTitle = 'AI phân tích & gợi ý';
+  static const String reportSuggestionTitle = 'Đề xuất';
+  static const String reportBulletPrefix = '• ';
+
+  // === PROFILE ===
+  static const String profileName = 'Thanh Phong';
+  static const String profileEmail = 'thanhphong@store.vn';
+  static const String profileSectionAccount = 'Tài khoản';
+  static const String profileSectionSettings = 'Cài đặt';
+  static const String profileSectionSupport = 'Hỗ trợ';
+  static const String profileItemPersonalInfo = 'Thông tin cá nhân';
+  static const String profileItemChangePassword = 'Đổi mật khẩu';
+  static const String profileItemNotifications = 'Thông báo';
+  static const String profileItemLanguage = 'Ngôn ngữ';
+  static const String profileItemTheme = 'Giao diện';
+  static const String profileItemHelpCenter = 'Trung tâm trợ giúp';
+  static const String profileItemContactSupport = 'Liên hệ hỗ trợ';
+  static const String profileLogout = 'Đăng xuất';
 }

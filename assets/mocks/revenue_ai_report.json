@@ -1,0 +1,16 @@
+{
+  "date": "2026-01-21",
+  "totalRevenue": 36000000,
+  "growthValue": 0.12,
+  "growthLabel": "+12% so với hôm qua",
+  "insights": [
+    "Doanh thu tăng nhờ nhóm sản phẩm thiết bị chiếm tỷ trọng cao.",
+    "Giao dịch chuyển khoản chiếm đa số, giúp giảm rủi ro tiền mặt.",
+    "Khung giờ 9:00–11:00 có lượng bán cao nhất."
+  ],
+  "suggestions": [
+    "Đẩy khuyến mãi nhẹ vào khung giờ 14:00–16:00 để cải thiện doanh số chiều.",
+    "Ưu tiên nhập thêm các mã SP001 và SP006 để tránh thiếu hàng.",
+    "Tăng hiển thị combo phụ kiện cho nhóm thiết bị mới."
+  ]
+}

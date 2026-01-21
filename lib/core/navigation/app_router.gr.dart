@@ -286,16 +286,125 @@ class RetailRouteArgs {
 
 /// generated route for
 /// [StockInPage]
-class StockInRoute extends PageRouteInfo<void> {
-  const StockInRoute({List<PageRouteInfo>? children})
-    : super(StockInRoute.name, initialChildren: children);
+class StockInRoute extends PageRouteInfo<StockInRouteArgs> {
+  StockInRoute({
+    Key? key,
+    String? productCode,
+    String? productName,
+    String? category,
+    String? platform,
+    String? brand,
+    String? unit,
+    int? quantity,
+    int? purchasePrice,
+    String? stockInDate,
+    List<PageRouteInfo>? children,
+  }) : super(
+         StockInRoute.name,
+         args: StockInRouteArgs(
+           key: key,
+           productCode: productCode,
+           productName: productName,
+           category: category,
+           platform: platform,
+           brand: brand,
+           unit: unit,
+           quantity: quantity,
+           purchasePrice: purchasePrice,
+           stockInDate: stockInDate,
+         ),
+         initialChildren: children,
+       );
 
   static const String name = 'StockInRoute';
 
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      return const StockInPage();
+      final args = data.argsAs<StockInRouteArgs>(
+        orElse: () => const StockInRouteArgs(),
+      );
+      return StockInPage(
+        key: args.key,
+        productCode: args.productCode,
+        productName: args.productName,
+        category: args.category,
+        platform: args.platform,
+        brand: args.brand,
+        unit: args.unit,
+        quantity: args.quantity,
+        purchasePrice: args.purchasePrice,
+        stockInDate: args.stockInDate,
+      );
     },
   );
+}
+
+class StockInRouteArgs {
+  const StockInRouteArgs({
+    this.key,
+    this.productCode,
+    this.productName,
+    this.category,
+    this.platform,
+    this.brand,
+    this.unit,
+    this.quantity,
+    this.purchasePrice,
+    this.stockInDate,
+  });
+
+  final Key? key;
+
+  final String? productCode;
+
+  final String? productName;
+
+  final String? category;
+
+  final String? platform;
+
+  final String? brand;
+
+  final String? unit;
+
+  final int? quantity;
+
+  final int? purchasePrice;
+
+  final String? stockInDate;
+
+  @override
+  String toString() {
+    return 'StockInRouteArgs{key: $key, productCode: $productCode, productName: $productName, category: $category, platform: $platform, brand: $brand, unit: $unit, quantity: $quantity, purchasePrice: $purchasePrice, stockInDate: $stockInDate}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! StockInRouteArgs) return false;
+    return key == other.key &&
+        productCode == other.productCode &&
+        productName == other.productName &&
+        category == other.category &&
+        platform == other.platform &&
+        brand == other.brand &&
+        unit == other.unit &&
+        quantity == other.quantity &&
+        purchasePrice == other.purchasePrice &&
+        stockInDate == other.stockInDate;
+  }
+
+  @override
+  int get hashCode =>
+      key.hashCode ^
+      productCode.hashCode ^
+      productName.hashCode ^
+      category.hashCode ^
+      platform.hashCode ^
+      brand.hashCode ^
+      unit.hashCode ^
+      quantity.hashCode ^
+      purchasePrice.hashCode ^
+      stockInDate.hashCode;
 }

@@ -6,6 +6,8 @@ import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/utils/common_funtion_utils.dart';
+import 'package:store_manage/core/widgets/app_dropdown_chip.dart';
+import 'package:store_manage/core/widgets/app_field_container.dart';
 import 'package:store_manage/feature/retail/presentation/widgets/payment_method.dart';
 
 class PaymentRow extends StatelessWidget {
@@ -33,9 +35,8 @@ class PaymentRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return AppFieldContainer(
       padding: const EdgeInsets.symmetric(horizontal: AppNumbers.DOUBLE_12, vertical: AppNumbers.DOUBLE_10),
-      decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_12)),
       child: Row(
         children: [
           PopupMenuButton<PaymentMethod>(
@@ -45,30 +46,7 @@ class PaymentRow extends StatelessWidget {
             itemBuilder: (context) => PaymentMethod.values
                 .map((method) => PopupMenuItem<PaymentMethod>(value: method, child: Text(_labelFor(method))))
                 .toList(),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: AppNumbers.DOUBLE_10, vertical: AppNumbers.DOUBLE_6),
-              decoration: BoxDecoration(
-                color: AppColors.surfaceMuted,
-                borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_20),
-                border: Border.all(color: AppColors.borderStrong),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    methodLabel,
-                    style: const TextStyle(
-                      fontSize: AppFontSizes.fontSize14,
-                      fontWeight: FontWeight.w600,
-                      fontFamily: AppFonts.inter,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(width: AppNumbers.DOUBLE_4),
-                  const Icon(Icons.keyboard_arrow_down, color: AppColors.textSecondary, size: AppNumbers.DOUBLE_18),
-                ],
-              ),
-            ),
+            child: AppDropdownChip(label: methodLabel),
           ),
           const Spacer(),
           Text(

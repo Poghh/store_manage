@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 
-import 'package:store_manage/core/constants/app_colors.dart';
 import 'package:store_manage/core/constants/app_font_sizes.dart';
-import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
+import 'package:store_manage/core/widgets/app_action_button.dart';
 
 class StockInSubmitButton extends StatelessWidget {
   final VoidCallback onPressed;
@@ -21,25 +20,10 @@ class StockInSubmitButton extends StatelessWidget {
           right: AppNumbers.DOUBLE_16,
           bottom: AppNumbers.DOUBLE_16 + MediaQuery.of(context).viewInsets.bottom,
         ),
-        child: SizedBox(
-          width: double.infinity,
-          height: AppNumbers.DOUBLE_48,
-          child: ElevatedButton(
-            onPressed: onPressed,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_12)),
-            ),
-            child: const Text(
-              AppStrings.stockInSaveButton,
-              style: TextStyle(
-                fontSize: AppFontSizes.fontSize16,
-                fontWeight: FontWeight.w700,
-                fontFamily: AppFonts.inter,
-                color: AppColors.textOnPrimary,
-              ),
-            ),
-          ),
+        child: AppActionButton(
+          onPressed: onPressed,
+          label: AppStrings.stockInSaveButton,
+          fontSize: AppFontSizes.fontSize16,
         ),
       ),
     );

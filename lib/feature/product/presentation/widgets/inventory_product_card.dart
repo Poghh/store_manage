@@ -5,6 +5,9 @@ import 'package:store_manage/core/constants/app_font_sizes.dart';
 import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
+import 'package:store_manage/core/widgets/app_pill.dart';
+import 'package:store_manage/core/widgets/app_product_thumbnail.dart';
+import 'package:store_manage/core/widgets/app_surface_card.dart';
 import 'package:store_manage/feature/product/data/models/product.dart';
 
 class InventoryProductCard extends StatelessWidget {
@@ -18,27 +21,21 @@ class InventoryProductCard extends StatelessWidget {
     return InkWell(
       borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_16),
       onTap: onTap,
-      child: Container(
+      child: AppSurfaceCard(
         padding: const EdgeInsets.all(AppNumbers.DOUBLE_12),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_16),
-          border: Border.all(color: AppColors.border),
-          boxShadow: const [BoxShadow(color: Color(0x14000000), blurRadius: 8, offset: Offset(0, 4))],
-        ),
+        borderRadius: AppNumbers.DOUBLE_16,
+        boxShadow: const [BoxShadow(color: Color(0x14000000), blurRadius: 8, offset: Offset(0, 4))],
         child: Row(
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_12),
-              child: Container(
-                width: AppNumbers.DOUBLE_56,
-                height: AppNumbers.DOUBLE_56,
-                color: AppColors.background,
-                padding: const EdgeInsets.all(AppNumbers.DOUBLE_6),
-                child: product.image == null || product.image!.isEmpty
-                    ? const Icon(Icons.inventory_2_outlined, color: AppColors.primary, size: AppNumbers.DOUBLE_28)
-                    : Image.network(product.image!, fit: BoxFit.contain),
-              ),
+            AppProductThumbnail(
+              imageUrl: product.image,
+              size: AppNumbers.DOUBLE_56,
+              borderRadius: AppNumbers.DOUBLE_12,
+              padding: AppNumbers.DOUBLE_6,
+              placeholderIcon: Icons.inventory_2_outlined,
+              placeholderColor: AppColors.primary,
+              placeholderSize: AppNumbers.DOUBLE_28,
+              backgroundColor: AppColors.background,
             ),
             const SizedBox(width: AppNumbers.DOUBLE_12),
             Expanded(
@@ -77,25 +74,7 @@ class InventoryProductCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: AppNumbers.DOUBLE_6),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppNumbers.DOUBLE_8,
-                          vertical: AppNumbers.DOUBLE_2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryLight,
-                          borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_8),
-                        ),
-                        child: Text(
-                          (product.quantity ?? 0).toString(),
-                          style: const TextStyle(
-                            fontSize: AppFontSizes.fontSize12,
-                            fontWeight: FontWeight.w700,
-                            fontFamily: AppFonts.inter,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                      ),
+                      AppPill(text: (product.quantity ?? 0).toString()),
                     ],
                   ),
                 ],

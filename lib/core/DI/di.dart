@@ -3,6 +3,7 @@ import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
 
 import 'package:store_manage/core/logger/app_logger.dart';
+import 'package:store_manage/core/navigation/home_tab_coordinator.dart';
 import 'package:store_manage/core/network/connectivity_service.dart';
 import 'package:store_manage/core/network/network_client.dart';
 import 'package:store_manage/core/offline/retail/retail_sync_service.dart';
@@ -25,6 +26,7 @@ Future<void> setupDI() async {
   di.registerLazySingleton<NetworkClient>(() => NetworkClient(di<SecureStorageImpl>()));
 
   di.registerLazySingleton<AppLogger>(() => AppLogger());
+  di.registerLazySingleton<HomeTabCoordinator>(() => HomeTabCoordinator());
 
   di.registerLazySingleton<ConnectivityService>(() => ConnectivityService(Connectivity()));
   di.registerLazySingleton<OfflineQueueStorage>(() => HiveOfflineQueueStorage(stockInBox));

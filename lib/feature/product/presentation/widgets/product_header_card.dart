@@ -5,6 +5,9 @@ import 'package:store_manage/core/constants/app_font_sizes.dart';
 import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
+import 'package:store_manage/core/widgets/app_pill.dart';
+import 'package:store_manage/core/widgets/app_product_thumbnail.dart';
+import 'package:store_manage/core/widgets/app_surface_card.dart';
 
 class ProductHeaderCard extends StatelessWidget {
   final String? imageUrl;
@@ -22,27 +25,21 @@ class ProductHeaderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return AppSurfaceCard(
       padding: const EdgeInsets.all(AppNumbers.DOUBLE_12),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_16),
-        border: Border.all(color: AppColors.border),
-        boxShadow: const [BoxShadow(color: Color(0x14000000), blurRadius: 8, offset: Offset(0, 4))],
-      ),
+      borderRadius: AppNumbers.DOUBLE_16,
+      boxShadow: const [BoxShadow(color: Color(0x14000000), blurRadius: 8, offset: Offset(0, 4))],
       child: Row(
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_12),
-            child: Container(
-              width: AppNumbers.DOUBLE_64,
-              height: AppNumbers.DOUBLE_64,
-              color: AppColors.background,
-              padding: const EdgeInsets.all(AppNumbers.DOUBLE_8),
-              child: imageUrl == null || imageUrl!.isEmpty
-                  ? const Icon(Icons.phone_iphone, color: AppColors.primary, size: AppNumbers.DOUBLE_32)
-                  : Image.network(imageUrl!, fit: BoxFit.contain),
-            ),
+          AppProductThumbnail(
+            imageUrl: imageUrl,
+            size: AppNumbers.DOUBLE_64,
+            borderRadius: AppNumbers.DOUBLE_12,
+            padding: AppNumbers.DOUBLE_8,
+            placeholderIcon: Icons.phone_iphone,
+            placeholderColor: AppColors.primary,
+            placeholderSize: AppNumbers.DOUBLE_32,
+            backgroundColor: AppColors.background,
           ),
           const SizedBox(width: AppNumbers.DOUBLE_12),
           Expanded(
@@ -81,25 +78,7 @@ class ProductHeaderCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: AppNumbers.DOUBLE_6),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppNumbers.DOUBLE_8,
-                        vertical: AppNumbers.DOUBLE_2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryLight,
-                        borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_8),
-                      ),
-                      child: Text(
-                        quantity,
-                        style: const TextStyle(
-                          fontSize: AppFontSizes.fontSize12,
-                          fontWeight: FontWeight.w700,
-                          fontFamily: AppFonts.inter,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                    ),
+                    AppPill(text: quantity),
                   ],
                 ),
               ],

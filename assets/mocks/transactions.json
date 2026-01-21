@@ -1,0 +1,75 @@
+{
+  "records": [
+    {
+      "date": "2026-01-20",
+      "items": [
+        {
+          "productCode": "SP003",
+          "productName": "Cáp sạc Type-C 1m",
+          "quantity": 3,
+          "price": 120000,
+          "total": 360000,
+          "paymentMethod": "Tiền mặt"
+        },
+        {
+          "productCode": "SP005",
+          "productName": "Ốp lưng iPhone 15 Pro Max",
+          "quantity": 2,
+          "price": 250000,
+          "total": 500000,
+          "paymentMethod": "Chuyển khoản"
+        }
+      ]
+    },
+    {
+      "date": "2026-01-21",
+      "items": [
+        {
+          "productCode": "SP001",
+          "productName": "iPhone 15 Pro Max 256GB",
+          "quantity": 1,
+          "price": 36000000,
+          "total": 36000000,
+          "paymentMethod": "Chuyển khoản"
+        },
+        {
+          "productCode": "SP004",
+          "productName": "Tai nghe AirPods Pro 2",
+          "quantity": 1,
+          "price": 5400000,
+          "total": 5400000,
+          "paymentMethod": "Tiền mặt"
+        },
+        {
+          "productCode": "SP003",
+          "productName": "Cáp sạc Type-C 1m",
+          "quantity": 2,
+          "price": 120000,
+          "total": 240000,
+          "paymentMethod": "Tiền mặt"
+        }
+      ]
+    },
+    {
+      "date": "2026-01-22",
+      "items": [
+        {
+          "productCode": "SP006",
+          "productName": "Xiaomi Redmi Note 13",
+          "quantity": 1,
+          "price": 6500000,
+          "total": 6500000,
+          "paymentMethod": "Chuyển khoản"
+        },
+        {
+          "productCode": "SP004",
+          "productName": "Tai nghe AirPods Pro 2",
+          "quantity": 2,
+          "price": 5400000,
+          "total": 10800000,
+          "paymentMethod": "Thẻ"
+        }
+      ]
+    }
+  ]
+}

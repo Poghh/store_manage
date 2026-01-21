@@ -4,6 +4,10 @@ import 'package:store_manage/core/constants/app_colors.dart';
 import 'package:store_manage/core/constants/app_font_sizes.dart';
 import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
+import 'package:store_manage/core/constants/app_strings.dart';
+import 'package:store_manage/core/widgets/app_field_container.dart';
+import 'package:store_manage/core/widgets/app_pill.dart';
+import 'package:store_manage/core/widgets/app_product_thumbnail.dart';
 
 class RetailProductCard extends StatelessWidget {
   final String name;
@@ -15,22 +19,20 @@ class RetailProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return AppFieldContainer(
       padding: const EdgeInsets.all(AppNumbers.DOUBLE_12),
-      decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_16)),
+      borderRadius: AppNumbers.DOUBLE_16,
       child: Row(
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_12),
-            child: Container(
-              width: AppNumbers.DOUBLE_56,
-              height: AppNumbers.DOUBLE_56,
-              color: AppColors.background,
-              padding: const EdgeInsets.all(AppNumbers.DOUBLE_6),
-              child: imageUrl == null || imageUrl!.isEmpty
-                  ? const Icon(Icons.phone_iphone, color: AppColors.primary, size: AppNumbers.DOUBLE_28)
-                  : Image.network(imageUrl!, fit: BoxFit.contain),
-            ),
+          AppProductThumbnail(
+            imageUrl: imageUrl,
+            size: AppNumbers.DOUBLE_56,
+            borderRadius: AppNumbers.DOUBLE_12,
+            padding: AppNumbers.DOUBLE_6,
+            placeholderIcon: Icons.phone_iphone,
+            placeholderColor: AppColors.primary,
+            placeholderSize: AppNumbers.DOUBLE_28,
+            backgroundColor: AppColors.background,
           ),
           const SizedBox(width: AppNumbers.DOUBLE_12),
           Expanded(
@@ -59,22 +61,7 @@ class RetailProductCard extends StatelessWidget {
               ],
             ),
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: AppNumbers.DOUBLE_8, vertical: AppNumbers.DOUBLE_2),
-            decoration: BoxDecoration(
-              color: AppColors.primaryLight,
-              borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_8),
-            ),
-            child: Text(
-              'Tồn $stock',
-              style: const TextStyle(
-                fontSize: AppFontSizes.fontSize12,
-                fontWeight: FontWeight.w600,
-                fontFamily: AppFonts.inter,
-                color: AppColors.primary,
-              ),
-            ),
-          ),
+          AppPill(text: '${AppStrings.productDetailsStockLabel} $stock', fontWeight: FontWeight.w600),
         ],
       ),
     );

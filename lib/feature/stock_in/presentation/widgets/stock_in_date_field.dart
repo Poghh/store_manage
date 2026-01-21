@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
-import 'package:store_manage/feature/stock_in/presentation/widgets/stock_in_input_decoration.dart';
+import 'package:store_manage/core/widgets/app_text_form_field.dart';
 import 'package:store_manage/feature/stock_in/presentation/widgets/stock_in_validators.dart';
 
 class StockInDateField extends StatelessWidget {
@@ -14,11 +14,11 @@ class StockInDateField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
+    return AppTextFormField(
       controller: controller,
       readOnly: true,
       autovalidateMode: AutovalidateMode.onUserInteraction,
-      decoration: StockInInputDecoration.build(hintText: AppStrings.stockInDatePlaceholder),
+      hintText: AppStrings.stockInDatePlaceholder,
       onTap: () => _selectDate(context),
       validator: (_) => StockInValidators.dateNotFuture(selectedDate),
     );

@@ -8,7 +8,7 @@ import 'package:store_manage/feature/stock_in/presentation/widgets/stock_in_drop
 import 'package:store_manage/feature/stock_in/presentation/widgets/stock_in_currency_input_formatter.dart';
 import 'package:store_manage/feature/stock_in/presentation/widgets/stock_in_field_label.dart';
 import 'package:store_manage/feature/stock_in/presentation/widgets/stock_in_form_controller.dart';
-import 'package:store_manage/feature/stock_in/presentation/widgets/stock_in_input_decoration.dart';
+import 'package:store_manage/core/widgets/app_text_form_field.dart';
 import 'package:store_manage/feature/stock_in/presentation/widgets/stock_in_validators.dart';
 
 class StockInForm extends StatefulWidget {
@@ -66,18 +66,18 @@ class _StockInFormState extends State<StockInForm> {
           children: [
             StockInFieldLabel(text: AppStrings.stockInProductCodeLabel),
             const SizedBox(height: AppNumbers.DOUBLE_8),
-            TextFormField(
+            AppTextFormField(
               enabled: false,
               initialValue: widget.controller.productCode,
-              decoration: StockInInputDecoration.build(hintText: widget.controller.productCode),
+              hintText: widget.controller.productCode,
             ),
             const SizedBox(height: AppNumbers.DOUBLE_16),
             StockInFieldLabel(text: AppStrings.stockInProductNameLabel),
             const SizedBox(height: AppNumbers.DOUBLE_8),
-            TextFormField(
+            AppTextFormField(
               controller: widget.controller.productNameController,
               autovalidateMode: AutovalidateMode.onUserInteraction,
-              decoration: StockInInputDecoration.build(hintText: AppStrings.stockInProductNameHint),
+              hintText: AppStrings.stockInProductNameHint,
               validator: StockInValidators.requiredField,
             ),
             const SizedBox(height: AppNumbers.DOUBLE_16),
@@ -117,22 +117,22 @@ class _StockInFormState extends State<StockInForm> {
             const SizedBox(height: AppNumbers.DOUBLE_16),
             StockInFieldLabel(text: AppStrings.stockInQuantityLabel),
             const SizedBox(height: AppNumbers.DOUBLE_8),
-            TextFormField(
+            AppTextFormField(
               controller: widget.controller.quantityController,
               keyboardType: TextInputType.number,
               autovalidateMode: AutovalidateMode.onUserInteraction,
-              decoration: StockInInputDecoration.build(hintText: AppStrings.stockInQuantityHint),
+              hintText: AppStrings.stockInQuantityHint,
               validator: StockInValidators.positiveInt,
             ),
             const SizedBox(height: AppNumbers.DOUBLE_16),
             StockInFieldLabel(text: AppStrings.stockInPurchasePriceLabel),
             const SizedBox(height: AppNumbers.DOUBLE_8),
-            TextFormField(
+            AppTextFormField(
               controller: widget.controller.priceController,
               keyboardType: TextInputType.number,
               autovalidateMode: AutovalidateMode.onUserInteraction,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly, StockInCurrencyInputFormatter()],
-              decoration: StockInInputDecoration.build(hintText: AppStrings.stockInPriceHint),
+              hintText: AppStrings.stockInPriceHint,
               validator: StockInValidators.positiveNumber,
             ),
             const SizedBox(height: AppNumbers.DOUBLE_16),

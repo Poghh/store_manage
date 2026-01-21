@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:store_manage/core/constants/app_colors.dart';
-import 'package:store_manage/core/constants/app_font_sizes.dart';
-import 'package:store_manage/core/constants/app_fonts.dart';
+import 'package:store_manage/core/widgets/app_section_label.dart';
 
 class RetailSectionLabel extends StatelessWidget {
   final String text;
@@ -11,14 +10,6 @@ class RetailSectionLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: const TextStyle(
-        fontSize: AppFontSizes.fontSize14,
-        fontWeight: FontWeight.w600,
-        fontFamily: AppFonts.inter,
-        color: AppColors.textOnPrimary,
-      ),
-    );
+    return AppSectionLabel(text: text, color: AppColors.textOnPrimary);
   }
 }

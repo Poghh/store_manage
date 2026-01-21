@@ -7,6 +7,8 @@ import 'package:store_manage/core/constants/app_font_sizes.dart';
 import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
+import 'package:store_manage/core/widgets/app_search_field.dart';
+import 'package:store_manage/core/widgets/app_product_thumbnail.dart';
 import 'package:store_manage/feature/product/data/models/product.dart';
 import 'package:store_manage/feature/product/presentation/cubit/product_search_cubit.dart';
 import 'package:store_manage/feature/product/presentation/cubit/product_search_state.dart';
@@ -61,34 +63,13 @@ class _ProductSearchBarState extends State<ProductSearchBar> {
       },
       child: CompositedTransformTarget(
         link: _layerLink,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: AppNumbers.DOUBLE_12, vertical: AppNumbers.DOUBLE_8),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_12),
-            border: Border.all(color: AppColors.border),
-          ),
-          child: Row(
-            children: [
-              Icon(Icons.search, size: AppNumbers.DOUBLE_20, color: widget.iconColor),
-              const SizedBox(width: AppNumbers.DOUBLE_8),
-              Expanded(
-                child: TextField(
-                  controller: _controller,
-                  focusNode: _focusNode,
-                  decoration: InputDecoration(hintText: widget.hintText, border: InputBorder.none, isDense: true),
-                  style: const TextStyle(
-                    fontSize: AppFontSizes.fontSize14,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textPrimary,
-                    fontFamily: AppFonts.inter,
-                  ),
-                  onChanged: (value) => context.read<ProductSearchCubit>().search(value),
-                ),
-              ),
-              Icon(Icons.qr_code_scanner, size: AppNumbers.DOUBLE_20, color: widget.iconColor),
-            ],
-          ),
+        child: AppSearchField(
+          controller: _controller,
+          focusNode: _focusNode,
+          hintText: widget.hintText,
+          iconColor: widget.iconColor,
+          onChanged: (value) => context.read<ProductSearchCubit>().search(value),
+          trailing: Icon(Icons.qr_code_scanner, size: AppNumbers.DOUBLE_20, color: widget.iconColor),
         ),
       ),
     );
@@ -204,15 +185,15 @@ class _ProductSearchBarState extends State<ProductSearchBar> {
                                       ),
                                     ),
                                     if (item.image != null && item.image!.isNotEmpty)
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_8),
-                                        child: Container(
-                                          width: AppNumbers.DOUBLE_40,
-                                          height: AppNumbers.DOUBLE_40,
-                                          color: AppColors.background,
-                                          padding: const EdgeInsets.all(AppNumbers.DOUBLE_4),
-                                          child: Image.network(item.image!, fit: BoxFit.contain),
-                                        ),
+                                      AppProductThumbnail(
+                                        imageUrl: item.image,
+                                        size: AppNumbers.DOUBLE_40,
+                                        borderRadius: AppNumbers.DOUBLE_8,
+                                        padding: AppNumbers.DOUBLE_4,
+                                        placeholderIcon: Icons.phone_iphone,
+                                        placeholderColor: AppColors.primary,
+                                        placeholderSize: AppNumbers.DOUBLE_24,
+                                        backgroundColor: AppColors.background,
                                       ),
                                   ],
                                 ),

@@ -1,15 +1,106 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 import 'package:store_manage/core/constants/app_colors.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
+import 'package:store_manage/core/DI/di.dart';
+import 'package:store_manage/core/navigation/home_tab_coordinator.dart';
+import 'package:store_manage/core/utils/common_funtion_utils.dart';
 import 'package:store_manage/feature/home/presentation/widgets/revenue_summary_card.dart';
 
-class HomeContent extends StatelessWidget {
+class HomeContent extends StatefulWidget {
   const HomeContent({super.key});
 
   @override
+  State<HomeContent> createState() => _HomeContentState();
+}
+
+class _HomeContentState extends State<HomeContent> {
+  final List<_RevenueRecord> _records = [];
+  int _currentIndex = 0;
+  bool _isFetching = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRecords();
+  }
+
+  Future<void> _loadRecords() async {
+    final raw = await rootBundle.loadString('assets/mocks/revenue.json');
+    final json = jsonDecode(raw) as Map<String, dynamic>;
+    final items = (json['records'] as List<dynamic>? ?? [])
+        .whereType<Map<String, dynamic>>()
+        .map(_RevenueRecord.fromJson)
+        .toList();
+    if (!mounted) return;
+    setState(() {
+      _records
+        ..clear()
+        ..addAll(items);
+      _currentIndex = _pickTodayIndex();
+    });
+  }
+
+  int _pickTodayIndex() {
+    if (_records.isEmpty) return 0;
+    final todayKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    final idx = _records.indexWhere((record) => record.rawDate == todayKey);
+    return idx == -1 ? (_records.length - 1) : idx;
+  }
+
+  Future<void> _fetchRecord(int nextIndex) async {
+    if (_isFetching || nextIndex == _currentIndex) return;
+    setState(() => _isFetching = true);
+    await Future.delayed(const Duration(milliseconds: 350));
+    if (!mounted) return;
+    setState(() {
+      _currentIndex = nextIndex;
+      _isFetching = false;
+    });
+  }
+
+  _RevenueRecord? get _currentRecord => _records.isEmpty ? null : _records[_currentIndex.clamp(0, _records.length - 1)];
+
+  bool _isSameDay(DateTime a, DateTime b) => a.year == b.year && a.month == b.month && a.day == b.day;
+
+  String _buildRevenueTitle(_RevenueRecord? record) {
+    if (record == null) return AppStrings.todayRevenueLabel;
+    final parsed = DateTime.tryParse(record.rawDate);
+    if (parsed == null) return AppStrings.todayRevenueLabel;
+    final today = DateTime.now();
+    if (_isSameDay(parsed, today)) {
+      return AppStrings.todayRevenueLabel;
+    }
+    final yesterday = today.subtract(const Duration(days: 1));
+    if (_isSameDay(parsed, yesterday)) {
+      return AppStrings.homeRevenueYesterdayLabel;
+    }
+    return AppStrings.homeRevenueDateLabel(record.displayDate);
+  }
+
+  void _openTransactionsForRecord(_RevenueRecord? record) {
+    final parsed = record == null ? null : DateTime.tryParse(record.rawDate);
+    if (parsed == null) return;
+    di<HomeTabCoordinator>().openTransactionsForDate(parsed);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final record = _currentRecord;
+    final parsedRecordDate = record == null ? null : DateTime.tryParse(record.rawDate);
+    final isToday = parsedRecordDate != null && _isSameDay(parsedRecordDate, DateTime.now());
+    final dateText = record == null ? AppStrings.homeDateDisplay : record.displayDate;
+    final canPrev = !_isFetching && _currentIndex > 0;
+    final canNext = !_isFetching && !isToday && _records.isNotEmpty && _currentIndex < _records.length - 1;
+    final revenueText = record == null
+        ? AppStrings.todayRevenueValue
+        : CommonFuntionUtils.formatCurrency(record.revenue);
+    final revenueTitle = _buildRevenueTitle(record);
     return Container(
       color: AppColors.background,
       child: Padding(
@@ -38,45 +129,70 @@ class HomeContent extends StatelessWidget {
                 const SizedBox(height: AppNumbers.DOUBLE_4),
                 Row(
                   children: [
-                    Material(
-                      color: AppColors.surface.withValues(alpha: 0),
-                      child: InkWell(
-                        onTap: () {},
-                        borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_16),
-                        child: Icon(
-                          Icons.arrow_circle_left,
-                          size: AppNumbers.DOUBLE_16,
-                          color: AppColors.textSecondary,
+                    if (canPrev)
+                      Material(
+                        color: AppColors.surface.withValues(alpha: 0),
+                        child: InkWell(
+                          onTap: () => _fetchRecord(_currentIndex - 1),
+                          borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_16),
+                          child: Icon(
+                            Icons.arrow_circle_left,
+                            size: AppNumbers.DOUBLE_16,
+                            color: AppColors.textSecondary,
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: AppNumbers.DOUBLE_4),
+                    if (canPrev) const SizedBox(width: AppNumbers.DOUBLE_4),
                     Text(
-                      AppStrings.homeDateDisplay,
+                      dateText,
                       style: Theme.of(context).textTheme.bodySmall!.copyWith(color: AppColors.textSecondary),
                     ),
-                    const SizedBox(width: AppNumbers.DOUBLE_4),
-                    Material(
-                      color: AppColors.surface.withValues(alpha: 0),
-                      child: InkWell(
-                        onTap: () {},
-                        borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_16),
-                        child: Icon(
-                          Icons.arrow_circle_right,
-                          size: AppNumbers.DOUBLE_16,
-                          color: AppColors.textSecondary,
+                    if (canNext) const SizedBox(width: AppNumbers.DOUBLE_4),
+                    if (canNext)
+                      Material(
+                        color: AppColors.surface.withValues(alpha: 0),
+                        child: InkWell(
+                          onTap: () => _fetchRecord(_currentIndex + 1),
+                          borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_16),
+                          child: Icon(
+                            Icons.arrow_circle_right,
+                            size: AppNumbers.DOUBLE_16,
+                            color: AppColors.textSecondary,
+                          ),
                         ),
                       ),
-                    ),
                   ],
                 ),
               ],
             ),
             const SizedBox(height: AppNumbers.DOUBLE_16),
-            RevenueSummaryCard(),
+            RevenueSummaryCard(
+              title: revenueTitle,
+              revenueText: revenueText,
+              isLoading: _isFetching,
+              onTap: _isFetching ? null : () => _openTransactionsForRecord(record),
+            ),
           ],
         ),
       ),
     );
+  }
+}
+
+class _RevenueRecord {
+  final String rawDate;
+  final int revenue;
+
+  _RevenueRecord({required this.rawDate, required this.revenue});
+
+  factory _RevenueRecord.fromJson(Map<String, dynamic> json) => _RevenueRecord(
+    rawDate: (json['date'] ?? '').toString(),
+    revenue: (json['revenue'] is int) ? json['revenue'] as int : int.tryParse('${json['revenue']}') ?? 0,
+  );
+
+  String get displayDate {
+    final parsed = DateTime.tryParse(rawDate);
+    if (parsed == null) return rawDate;
+    return DateFormat('dd/MM/yyyy').format(parsed);
   }
 }
