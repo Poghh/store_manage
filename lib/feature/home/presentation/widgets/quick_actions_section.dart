@@ -55,17 +55,17 @@ class QuickActionsSection extends StatelessWidget {
                   ProductDetailsRoute(
                     productCode: product.productCode,
                     productName: product.productName,
-                    category: product.category ?? AppStrings.productDetailsSampleCategory,
-                    platform: product.platform ?? AppStrings.productDetailsSamplePlatform,
-                    brand: product.brand ?? AppStrings.productDetailsSampleBrand,
-                    unit: product.unit ?? AppStrings.productDetailsSampleUnit,
+                    category: product.category ?? '',
+                    platform: product.platform ?? '',
+                    brand: product.brand ?? '',
+                    unit: product.unit ?? '',
                     quantity: (product.quantity ?? 0).toString(),
                     purchasePrice: product.purchasePrice == null
-                        ? AppStrings.productDetailsSamplePrice
+                        ? ''
                         : CommonFuntionUtils.formatCurrency(product.purchasePrice!),
                     stockQuantityValue: product.quantity,
                     priceValue: product.purchasePrice,
-                    stockInDate: product.stockInDate ?? AppStrings.productDetailsSampleDate,
+                    stockInDate: product.stockInDate ?? '',
                     imageUrl: product.image,
                   ),
                 );

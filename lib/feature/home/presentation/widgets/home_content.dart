@@ -94,12 +94,10 @@ class _HomeContentState extends State<HomeContent> {
     final record = _currentRecord;
     final parsedRecordDate = record == null ? null : DateTime.tryParse(record.rawDate);
     final isToday = parsedRecordDate != null && _isSameDay(parsedRecordDate, DateTime.now());
-    final dateText = record == null ? AppStrings.homeDateDisplay : record.displayDate;
+    final dateText = record == null ? '' : record.displayDate;
     final canPrev = !_isFetching && _currentIndex > 0;
     final canNext = !_isFetching && !isToday && _records.isNotEmpty && _currentIndex < _records.length - 1;
-    final revenueText = record == null
-        ? AppStrings.todayRevenueValue
-        : CommonFuntionUtils.formatCurrency(record.revenue);
+    final revenueText = record == null ? '' : CommonFuntionUtils.formatCurrency(record.revenue);
     final revenueTitle = _buildRevenueTitle(record);
     return Container(
       color: AppColors.background,

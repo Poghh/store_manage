@@ -37,7 +37,7 @@ class ReportAiInsightCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppNumbers.DOUBLE_12),
-          ...insights.map((item) => ReportBulletLine(text: item)).toList(),
+          ...insights.map((item) => ReportBulletLine(text: item)),
           const SizedBox(height: AppNumbers.DOUBLE_12),
           const Text(
             AppStrings.reportSuggestionTitle,
@@ -49,7 +49,7 @@ class ReportAiInsightCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppNumbers.DOUBLE_8),
-          ...suggestions.map((item) => ReportBulletLine(text: item)).toList(),
+          ...suggestions.map((item) => ReportBulletLine(text: item)),
         ],
       ),
     );

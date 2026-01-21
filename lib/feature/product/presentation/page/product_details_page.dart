@@ -44,19 +44,17 @@ class ProductDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final displayCode = productCode.isEmpty ? AppStrings.productDetailsSampleCode : productCode;
-    final displayName = productName.isEmpty ? AppStrings.productDetailsSampleName : productName;
-    final displayCategory = category.isEmpty ? AppStrings.productDetailsSampleCategory : category;
-    final displayPlatform = platform.isEmpty ? AppStrings.productDetailsSamplePlatform : platform;
-    final displayBrand = brand.isEmpty ? AppStrings.productDetailsSampleBrand : brand;
-    final displayUnit = unit.isEmpty ? AppStrings.productDetailsSampleUnit : unit;
-    final displayQuantity = quantity.isNotEmpty
-        ? quantity
-        : (stockQuantityValue?.toString() ?? AppStrings.productDetailsSampleQuantity);
+    final displayCode = productCode.isEmpty ? '' : productCode;
+    final displayName = productName.isEmpty ? '' : productName;
+    final displayCategory = category.isEmpty ? '' : category;
+    final displayPlatform = platform.isEmpty ? '' : platform;
+    final displayBrand = brand.isEmpty ? '' : brand;
+    final displayUnit = unit.isEmpty ? '' : unit;
+    final displayQuantity = quantity.isNotEmpty ? quantity : (stockQuantityValue?.toString() ?? '');
     final displayPrice = purchasePrice.isNotEmpty
         ? purchasePrice
-        : (priceValue == null ? AppStrings.productDetailsSamplePrice : CommonFuntionUtils.formatCurrency(priceValue!));
-    final displayDate = stockInDate.isEmpty ? AppStrings.productDetailsSampleDate : stockInDate;
+        : (priceValue == null ? '' : CommonFuntionUtils.formatCurrency(priceValue!));
+    final displayDate = stockInDate.isEmpty ? '' : stockInDate;
     final hasPrefill = productCode.isNotEmpty || productName.isNotEmpty;
     final prefillQuantity = stockQuantityValue ?? int.tryParse(quantity.replaceAll(RegExp(r'[^0-9]'), ''));
     final prefillPrice = priceValue ?? int.tryParse(purchasePrice.replaceAll(RegExp(r'[^0-9]'), ''));

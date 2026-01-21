@@ -52,8 +52,7 @@ class ProfileSectionCard extends StatelessWidget {
                     ],
                   ),
                 ),
-              )
-              .toList(),
+              ),
         ],
       ),
     );

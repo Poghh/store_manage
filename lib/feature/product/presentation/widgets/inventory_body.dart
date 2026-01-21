@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 
 import 'package:store_manage/core/constants/app_colors.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
-import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/navigation/app_router.dart';
+import 'package:store_manage/core/utils/common_funtion_utils.dart';
 import 'package:store_manage/feature/product/data/models/product.dart';
 import 'package:store_manage/feature/product/presentation/widgets/inventory_product_card.dart';
 import 'package:store_manage/feature/product/presentation/widgets/inventory_search_bar.dart';
@@ -57,15 +57,17 @@ class InventoryBody extends StatelessWidget {
                           ProductDetailsRoute(
                             productCode: product.productCode,
                             productName: product.productName,
-                            category: product.category ?? AppStrings.productDetailsSampleCategory,
-                            platform: product.platform ?? AppStrings.productDetailsSamplePlatform,
-                            brand: product.brand ?? AppStrings.productDetailsSampleBrand,
-                            unit: product.unit ?? AppStrings.productDetailsSampleUnit,
+                            category: product.category ?? '',
+                            platform: product.platform ?? '',
+                            brand: product.brand ?? '',
+                            unit: product.unit ?? '',
                             quantity: (product.quantity ?? 0).toString(),
-                            purchasePrice: AppStrings.productDetailsSamplePrice,
+                            purchasePrice: product.purchasePrice == null
+                                ? ''
+                                : CommonFuntionUtils.formatCurrency(product.purchasePrice!),
                             stockQuantityValue: product.quantity,
                             priceValue: product.purchasePrice,
-                            stockInDate: product.stockInDate ?? AppStrings.productDetailsSampleDate,
+                            stockInDate: product.stockInDate ?? '',
                             imageUrl: product.image,
                           ),
                         );

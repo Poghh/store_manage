@@ -14,14 +14,12 @@ class AppStrings {
   // === HOME ===
   static const String homeGreetingPrefix = 'Xin chào, ';
   static const String homeGreetingName = 'Thanh Phong';
-  static const String homeDateDisplay = '19/01/2026';
   static const String homeRetailTitle = 'BÁN LẺ';
   static const String homeRetailSubtitle = 'Nhập nhanh';
   static const String homeStockInTitle = 'NHẬP HÀNG';
   static const String homeStockInSubtitle = 'Tìm kiếm';
   static const String homeProductSearchPlaceholder = 'Tìm sản phẩm';
   static const String todayRevenueLabel = 'Doanh thu hôm nay';
-  static const String todayRevenueValue = '36.000.000 đ';
   static const String homeTabHome = 'Trang chủ';
   static const String homeTabTransactions = 'Giao dịch';
   static const String homeTabInventory = 'Tồn kho';
@@ -82,15 +80,6 @@ class AppStrings {
   // === PRODUCT DETAILS ===
   static const String productDetailsTitle = 'Chi Tiết Sản Phẩm';
   static const String productDetailsStockLabel = 'Tồn';
-  static const String productDetailsSampleCode = 'SP-2026011102000';
-  static const String productDetailsSampleName = 'iPhone 17';
-  static const String productDetailsSampleCategory = 'Thiết bị';
-  static const String productDetailsSamplePlatform = 'iOS';
-  static const String productDetailsSampleBrand = 'Apple';
-  static const String productDetailsSampleUnit = 'cái';
-  static const String productDetailsSampleQuantity = '1';
-  static const String productDetailsSamplePrice = '36.000.000 đ';
-  static const String productDetailsSampleDate = '19/01/2026';
   static const String productDetailsSellButton = 'BÁN HÀNG';
   static const String productDetailsStockInButton = 'NHẬP THÊM';
 
