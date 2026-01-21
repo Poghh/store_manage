@@ -1,7 +1,7 @@
 [
   {
-    "code": "SP001",
-    "name": "iPhone 15 Pro Max 256GB",
+    "productCode": "SP001",
+    "productName": "iPhone 15 Pro Max 256GB",
     "category": "Thiết bị",
     "platform": "iOS",
     "brand": "Apple",
@@ -12,8 +12,8 @@
     "image": "https://i5.walmartimages.com/asr/0024f590-e8c6-4b45-ab10-42830b514bbd.abf435a0647147d4bf3b4ecbf10f5b7d.jpeg"
   },
   {
-    "code": "SP002",
-    "name": "Samsung Galaxy S24 Ultra 512GB",
+    "productCode": "SP002",
+    "productName": "Samsung Galaxy S24 Ultra 512GB",
     "category": "Thiết bị",
     "platform": "Android",
     "brand": "Samsung",
@@ -24,8 +24,8 @@
     "image": "https://samcenter.vn/images/uploaded/24u.png"
   },
   {
-    "code": "SP003",
-    "name": "Cáp sạc Type-C 1m",
+    "productCode": "SP003",
+    "productName": "Cáp sạc Type-C 1m",
     "category": "Phụ kiện",
     "platform": "Không",
     "brand": "Khác",
@@ -36,8 +36,8 @@
     "image": "https://cdn2.fptshop.com.vn/unsafe/800x0/cap_sac_usb_c_60w_1_met_1_68ff5c55c8.jpg"
   },
   {
-    "code": "SP004",
-    "name": "Tai nghe AirPods Pro 2",
+    "productCode": "SP004",
+    "productName": "Tai nghe AirPods Pro 2",
     "category": "Phụ kiện",
     "platform": "iOS",
     "brand": "Apple",
@@ -48,8 +48,8 @@
     "image": "https://cdn.tgdd.vn/Files/2022/09/09/1466387/ap-11_1280x720-800-resize.jpg"
   },
   {
-    "code": "SP005",
-    "name": "Ốp lưng iPhone 15 Pro Max",
+    "productCode": "SP005",
+    "productName": "Ốp lưng iPhone 15 Pro Max",
     "category": "Phụ kiện",
     "platform": "iOS",
     "brand": "Apple",
@@ -60,8 +60,8 @@
     "image": "https://gomhang.vn/wp-content/uploads/2023/09/Op-lung-vien-guong-Magsafe-iPhone-15-PRO-MAX-1.jpg"
   },
   {
-    "code": "SP006",
-    "name": "Xiaomi Redmi Note 13",
+    "productCode": "SP006",
+    "productName": "Xiaomi Redmi Note 13",
     "category": "Thiết bị",
     "platform": "Android",
     "brand": "Xiaomi",

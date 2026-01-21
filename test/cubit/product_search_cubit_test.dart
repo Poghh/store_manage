@@ -34,8 +34,8 @@ void main() {
     setUp: () {
       when(() => repository.searchProducts('ip')).thenAnswer(
         (_) async => const [
-          Product(code: 'IP-01', name: 'iPhone'),
-          Product(code: 'SS-02', name: 'Samsung'),
+          Product(productCode: 'IP-01', productName: 'iPhone'),
+          Product(productCode: 'SS-02', productName: 'Samsung'),
         ],
       );
     },
@@ -47,7 +47,7 @@ void main() {
       isA<ProductSearchState>()
           .having((state) => state.isLoading, 'isLoading', false)
           .having((state) => state.results.length, 'results', 1)
-          .having((state) => state.results.first.code, 'firstCode', 'IP-01'),
+          .having((state) => state.results.first.productCode, 'firstCode', 'IP-01'),
     ],
     verify: (_) {
       verify(() => repository.searchProducts('ip')).called(1);
@@ -62,8 +62,7 @@ void main() {
     },
     act: (cubit) => cubit.search('ip'),
     expect: () => [
-      isA<ProductSearchState>()
-          .having((state) => state.isLoading, 'isLoading', true),
+      isA<ProductSearchState>().having((state) => state.isLoading, 'isLoading', true),
       isA<ProductSearchState>()
           .having((state) => state.isLoading, 'isLoading', false)
           .having((state) => state.results.length, 'results', 0)

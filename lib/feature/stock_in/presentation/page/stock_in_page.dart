@@ -8,8 +8,10 @@ import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/DI/di.dart';
+import 'package:store_manage/core/offline/stock_in/stock_in_sync_service.dart';
 import 'package:store_manage/feature/product/data/repositories/product_repository.dart';
 import 'package:store_manage/feature/product/presentation/cubit/product_search_cubit.dart';
+import 'package:store_manage/core/network/connectivity_service.dart';
 import 'package:store_manage/feature/stock_in/data/repositories/stock_in_repository.dart';
 import 'package:store_manage/feature/stock_in/presentation/cubit/stock_in_cubit.dart';
 import 'package:store_manage/feature/stock_in/presentation/cubit/stock_in_state.dart';
@@ -47,13 +49,17 @@ class _StockInPageState extends State<StockInPage> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider<StockInCubit>(create: (_) => StockInCubit(di<StockInRepository>())),
+        BlocProvider<StockInCubit>(
+          create: (_) => StockInCubit(di<StockInRepository>(), di<StockInSyncService>(), di<ConnectivityService>()),
+        ),
         BlocProvider<ProductSearchCubit>(create: (_) => ProductSearchCubit(di<ProductRepository>())..prime()),
       ],
       child: BlocListener<StockInCubit, StockInState>(
         listener: (context, state) {
           if (state is StockInLoaded) {
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppStrings.stockInSubmitSuccess)));
+          } else if (state is StockInQueued) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
           } else if (state is StockInError) {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
           }

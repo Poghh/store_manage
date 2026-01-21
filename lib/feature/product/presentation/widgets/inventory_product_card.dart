@@ -46,7 +46,7 @@ class InventoryProductCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    product.name,
+                    product.productName,
                     style: const TextStyle(
                       fontSize: AppFontSizes.fontSize14,
                       fontWeight: FontWeight.w600,
@@ -56,7 +56,7 @@ class InventoryProductCard extends StatelessWidget {
                   ),
                   const SizedBox(height: AppNumbers.DOUBLE_4),
                   Text(
-                    product.code,
+                    product.productCode,
                     style: const TextStyle(
                       fontSize: AppFontSizes.fontSize12,
                       fontWeight: FontWeight.w500,

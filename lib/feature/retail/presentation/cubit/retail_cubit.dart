@@ -6,18 +6,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:store_manage/core/constants/app_endpoints.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/network/connectivity_service.dart';
-import 'package:store_manage/core/offline/stock_in/stock_in_sync_service.dart';
-import 'package:store_manage/feature/stock_in/data/repositories/stock_in_repository.dart';
+import 'package:store_manage/core/offline/retail/retail_sync_service.dart';
+import 'package:store_manage/feature/retail/data/repositories/retail_repository.dart';
+import 'retail_state.dart';
 
-import 'stock_in_state.dart';
-
-class StockInCubit extends Cubit<StockInState> {
-  final StockInRepository _repository;
-  final StockInSyncService _syncService;
+class RetailCubit extends Cubit<RetailState> {
+  final RetailRepository _repository;
+  final RetailSyncService _syncService;
   final ConnectivityService _connectivity;
   late final StreamSubscription<ConnectivityResult> _connectivitySub;
 
-  StockInCubit(this._repository, this._syncService, this._connectivity) : super(const StockInInitial()) {
+  RetailCubit(this._repository, this._syncService, this._connectivity) : super(const RetailInitial()) {
     _connectivitySub = _connectivity.onChanged.listen((result) {
       if (result != ConnectivityResult.none) {
         _syncService.syncPending();
@@ -25,27 +24,26 @@ class StockInCubit extends Cubit<StockInState> {
     });
   }
 
-  Future<void> submitStockIn(Map<String, dynamic> payload) async {
-    emit(const StockInLoading());
+  Future<void> submitRetailSale(Map<String, dynamic> payload) async {
+    emit(const RetailLoading());
 
     if (AppEndpoints.BASE_URL.isEmpty) {
-      emit(const StockInError(AppStrings.stockInApiNotConfigured));
+      emit(const RetailError(AppStrings.stockInApiNotConfigured));
       return;
     }
 
     if (!await _connectivity.isOnline) {
       await _syncService.enqueue(payload);
-      emit(const StockInQueued(AppStrings.stockInQueued));
+      emit(const RetailQueued(AppStrings.retailQueued));
       return;
     }
 
     try {
-      await _repository.submitStockIn(payload);
-
-      emit(const StockInLoaded());
+      await _repository.submitRetailSale(payload);
+      emit(const RetailLoaded());
       await _syncService.syncPending();
     } catch (_) {
-      emit(const StockInError(AppStrings.stockInSubmitError));
+      emit(const RetailError(AppStrings.retailSubmitError));
     }
   }
 

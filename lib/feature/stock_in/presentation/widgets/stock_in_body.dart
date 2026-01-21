@@ -26,7 +26,7 @@ class StockInBody extends StatelessWidget {
           child: StockInSearchBar(
             controller: searchController,
             onSelected: (item) {
-              formController.productNameController.text = item.name;
+              formController.productNameController.text = item.productName;
             },
           ),
         ),

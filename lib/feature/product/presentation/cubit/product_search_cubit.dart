@@ -62,7 +62,7 @@ class ProductSearchCubit extends Cubit<ProductSearchState> {
   void _emitFiltered(String keyword, List<Product> source) {
     final lower = keyword.toLowerCase();
     final filtered = source.where((item) {
-      return item.code.toLowerCase().contains(lower) || item.name.toLowerCase().contains(lower);
+      return item.productCode.toLowerCase().contains(lower) || item.productName.toLowerCase().contains(lower);
     }).toList();
 
     emit(ProductSearchState(isLoading: false, results: filtered));

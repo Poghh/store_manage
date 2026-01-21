@@ -61,7 +61,8 @@ class _InventoryPageState extends State<InventoryPage> {
     }
     setState(() {
       _filteredProducts = _allProducts.where((product) {
-        return product.code.toLowerCase().contains(keyword) || product.name.toLowerCase().contains(keyword);
+        return product.productCode.toLowerCase().contains(keyword) ||
+            product.productName.toLowerCase().contains(keyword);
       }).toList();
     });
   }

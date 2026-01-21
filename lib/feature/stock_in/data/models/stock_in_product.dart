@@ -1,15 +1,12 @@
-class StockInProduct {
-  final String code;
-  final String name;
-  final String? unit;
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  const StockInProduct({required this.code, required this.name, this.unit});
+part 'stock_in_product.freezed.dart';
+part 'stock_in_product.g.dart';
 
-  factory StockInProduct.fromJson(Map<String, dynamic> json) {
-    return StockInProduct(
-      code: (json['code'] ?? json['productCode'] ?? '').toString(),
-      name: (json['name'] ?? json['productName'] ?? '').toString(),
-      unit: json['unit']?.toString(),
-    );
-  }
+@freezed
+abstract class StockInProduct with _$StockInProduct {
+  const factory StockInProduct({required String productCode, required String productName, String? unit}) =
+      _StockInProduct;
+
+  factory StockInProduct.fromJson(Map<String, dynamic> json) => _$StockInProductFromJson(json);
 }

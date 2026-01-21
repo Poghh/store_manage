@@ -13,6 +13,11 @@ import 'package:store_manage/feature/home/presentation/widgets/product_search_ba
 import 'package:store_manage/feature/product/data/models/product.dart';
 import 'package:store_manage/feature/product/data/repositories/product_repository.dart';
 import 'package:store_manage/feature/product/presentation/cubit/product_search_cubit.dart';
+import 'package:store_manage/feature/retail/presentation/cubit/retail_cubit.dart';
+import 'package:store_manage/feature/retail/presentation/cubit/retail_state.dart';
+import 'package:store_manage/feature/retail/data/repositories/retail_repository.dart';
+import 'package:store_manage/core/network/connectivity_service.dart';
+import 'package:store_manage/core/offline/retail/retail_sync_service.dart';
 import 'package:store_manage/feature/retail/presentation/widgets/payment_method.dart';
 import 'package:store_manage/feature/retail/presentation/widgets/retail_content.dart';
 
@@ -77,65 +82,82 @@ class _RetailPageState extends State<RetailPage> {
     final displayImage = _selectedImageUrl;
 
     final hasProduct = _selectedCode.isNotEmpty || _selectedName.isNotEmpty;
-    return BlocProvider<ProductSearchCubit>(
-      create: (_) => ProductSearchCubit(di<ProductRepository>())..prime(),
-      child: Scaffold(
-        backgroundColor: AppColors.primary,
-        appBar: AppBar(
-          backgroundColor: AppColors.primary,
-          elevation: AppNumbers.DOUBLE_0,
-          scrolledUnderElevation: AppNumbers.DOUBLE_0,
-          surfaceTintColor: AppColors.primary,
-          leading: IconButton(
-            onPressed: () => context.maybePop(),
-            icon: const Icon(Icons.arrow_back, color: AppColors.textOnPrimary),
-          ),
-          title: const Text(
-            AppStrings.retailTitle,
-            style: TextStyle(
-              fontSize: AppFontSizes.fontSize18,
-              fontWeight: FontWeight.w600,
-              fontFamily: AppFonts.inter,
-              color: AppColors.textOnPrimary,
-            ),
-          ),
-          actions: const [
-            Padding(
-              padding: EdgeInsets.only(right: AppNumbers.DOUBLE_12),
-              child: Icon(Icons.local_offer_outlined, color: AppColors.textOnPrimary),
-            ),
-          ],
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<ProductSearchCubit>(create: (_) => ProductSearchCubit(di<ProductRepository>())..prime()),
+        BlocProvider<RetailCubit>(
+          create: (_) => RetailCubit(di<RetailRepository>(), di<RetailSyncService>(), di<ConnectivityService>()),
         ),
-        body: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(AppNumbers.DOUBLE_16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ProductSearchBar(
-                  hintText: AppStrings.retailSearchPlaceholder,
-                  iconColor: AppColors.textMuted,
-                  onSelected: _onProductSelected,
-                ),
-                const SizedBox(height: AppNumbers.DOUBLE_12),
-                if (hasProduct)
-                  RetailContent(
-                    displayName: displayName,
-                    displayCode: displayCode,
-                    displayStock: displayStock,
-                    displayImage: displayImage,
-                    quantity: _quantity,
-                    onDecrease: () => setState(() => _quantity = _quantity > 1 ? _quantity - 1 : 1),
-                    onIncrease: () => setState(() => _quantity = _quantity + 1),
-                    priceController: _priceController,
-                    onPriceChanged: _onPriceChanged,
-                    purchasePrice: _purchasePrice,
-                    total: _total,
-                    paymentMethod: _paymentMethod,
-                    paymentMethodLabel: _paymentMethodLabel,
-                    onPaymentChanged: (value) => setState(() => _paymentMethod = value),
+      ],
+      child: BlocListener<RetailCubit, RetailState>(
+        listener: (context, state) {
+          if (state is RetailLoaded) {
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppStrings.retailSubmitSuccess)));
+          } else if (state is RetailQueued) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
+          } else if (state is RetailError) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
+          }
+        },
+        child: Scaffold(
+          backgroundColor: AppColors.primary,
+          appBar: AppBar(
+            backgroundColor: AppColors.primary,
+            elevation: AppNumbers.DOUBLE_0,
+            scrolledUnderElevation: AppNumbers.DOUBLE_0,
+            surfaceTintColor: AppColors.primary,
+            leading: IconButton(
+              onPressed: () => context.maybePop(),
+              icon: const Icon(Icons.arrow_back, color: AppColors.textOnPrimary),
+            ),
+            title: const Text(
+              AppStrings.retailTitle,
+              style: TextStyle(
+                fontSize: AppFontSizes.fontSize18,
+                fontWeight: FontWeight.w600,
+                fontFamily: AppFonts.inter,
+                color: AppColors.textOnPrimary,
+              ),
+            ),
+            actions: const [
+              Padding(
+                padding: EdgeInsets.only(right: AppNumbers.DOUBLE_12),
+                child: Icon(Icons.local_offer_outlined, color: AppColors.textOnPrimary),
+              ),
+            ],
+          ),
+          body: SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(AppNumbers.DOUBLE_16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ProductSearchBar(
+                    hintText: AppStrings.retailSearchPlaceholder,
+                    iconColor: AppColors.textMuted,
+                    onSelected: _onProductSelected,
                   ),
-              ],
+                  const SizedBox(height: AppNumbers.DOUBLE_12),
+                  if (hasProduct)
+                    RetailContent(
+                      displayName: displayName,
+                      displayCode: displayCode,
+                      displayStock: displayStock,
+                      displayImage: displayImage,
+                      quantity: _quantity,
+                      onDecrease: () => setState(() => _quantity = _quantity > 1 ? _quantity - 1 : 1),
+                      onIncrease: () => setState(() => _quantity = _quantity + 1),
+                      priceController: _priceController,
+                      onPriceChanged: _onPriceChanged,
+                      purchasePrice: _purchasePrice,
+                      total: _total,
+                      paymentMethod: _paymentMethod,
+                      paymentMethodLabel: _paymentMethodLabel,
+                      onPaymentChanged: (value) => setState(() => _paymentMethod = value),
+                      onConfirm: _submitRetail,
+                    ),
+                ],
+              ),
             ),
           ),
         ),
@@ -143,10 +165,35 @@ class _RetailPageState extends State<RetailPage> {
     );
   }
 
+  void _submitRetail() {
+    if (_selectedCode.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text(AppStrings.retailValidationSelectProduct)));
+      return;
+    }
+    if (_sellPrice <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppStrings.retailValidationPrice)));
+      return;
+    }
+
+    final payload = {
+      'productCode': _selectedCode,
+      'productName': _selectedName,
+      'quantity': _quantity,
+      'sellPrice': _sellPrice,
+      'purchasePrice': _purchasePrice,
+      'total': _total,
+      'paymentMethod': _paymentMethod.name,
+    };
+
+    context.read<RetailCubit>().submitRetailSale(payload);
+  }
+
   void _onProductSelected(Product product) {
     setState(() {
-      _selectedCode = product.code;
-      _selectedName = product.name;
+      _selectedCode = product.productCode;
+      _selectedName = product.productName;
       _selectedStock = product.quantity ?? 0;
       _selectedImageUrl = product.image;
       _purchasePrice = product.purchasePrice ?? 0;

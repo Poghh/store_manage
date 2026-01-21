@@ -4,4 +4,5 @@ class AppEndpoints {
   static String get BASE_URL => dotenv.isInitialized ? (dotenv.env['API_BASE_URL'] ?? '') : '';
   static String get STOCK_IN => '$BASE_URL/stock-in';
   static String get PRODUCT_SEARCH => '$BASE_URL/products';
+  static String get RETAIL_SALE => '$BASE_URL/retail-sale';
 }

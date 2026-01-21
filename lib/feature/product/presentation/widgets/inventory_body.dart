@@ -55,8 +55,8 @@ class InventoryBody extends StatelessWidget {
                       onTap: () {
                         context.router.push(
                           ProductDetailsRoute(
-                            productCode: product.code,
-                            productName: product.name,
+                            productCode: product.productCode,
+                            productName: product.productName,
                             category: product.category ?? AppStrings.productDetailsSampleCategory,
                             platform: product.platform ?? AppStrings.productDetailsSamplePlatform,
                             brand: product.brand ?? AppStrings.productDetailsSampleBrand,

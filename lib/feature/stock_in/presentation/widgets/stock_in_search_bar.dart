@@ -165,12 +165,12 @@ class _StockInSearchBarState extends State<StockInSearchBar> {
                             final item = state.results[index];
                             return InkWell(
                               onTap: () {
-                                widget.controller.text = item.name;
+                                widget.controller.text = item.productName;
                                 widget.onSelected?.call(item);
                                 _searchCubit?.clear();
                                 _hideOverlay();
                                 if (kDebugMode) {
-                                  print("Selected product: ${item.name}");
+                                  print("Selected product: ${item.productName}");
                                 }
                               },
                               child: Padding(
@@ -185,7 +185,7 @@ class _StockInSearchBarState extends State<StockInSearchBar> {
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            item.name,
+                                            item.productName,
                                             style: const TextStyle(
                                               fontSize: AppFontSizes.fontSize14,
                                               fontWeight: FontWeight.w600,
@@ -195,7 +195,7 @@ class _StockInSearchBarState extends State<StockInSearchBar> {
                                           ),
                                           const SizedBox(height: AppNumbers.DOUBLE_4),
                                           Text(
-                                            item.code,
+                                            item.productCode,
                                             style: const TextStyle(
                                               fontSize: AppFontSizes.fontSize12,
                                               fontWeight: FontWeight.w500,

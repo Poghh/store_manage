@@ -75,6 +75,7 @@ class AppStrings {
   static const String stockInSubmitSuccess = 'Lưu nhập hàng thành công';
   static const String stockInSubmitError = 'Lưu nhập hàng thất bại';
   static const String stockInApiNotConfigured = 'Chưa cấu hình API nhập hàng';
+  static const String stockInQueued = 'Đã lưu offline, sẽ gửi khi có internet';
 
   // === PRODUCT DETAILS ===
   static const String productDetailsTitle = 'Chi Tiết Sản Phẩm';
@@ -101,4 +102,9 @@ class AppStrings {
   static const String retailTransferLabel = 'Chuyển khoản';
   static const String retailTotalLabel = 'Tổng tiền:';
   static const String retailConfirmButton = 'XÁC NHẬN BÁN';
+  static const String retailSubmitSuccess = 'Đã lưu bán lẻ thành công';
+  static const String retailSubmitError = 'Lưu bán lẻ thất bại';
+  static const String retailQueued = 'Đã lưu bán lẻ offline, sẽ gửi khi có internet';
+  static const String retailValidationSelectProduct = 'Vui lòng chọn sản phẩm';
+  static const String retailValidationPrice = 'Vui lòng nhập giá bán';
 }
