@@ -16,8 +16,20 @@ import 'package:store_manage/feature/product/presentation/cubit/product_search_s
 class StockInSearchBar extends StatefulWidget {
   final TextEditingController controller;
   final ValueChanged<Product>? onSelected;
+  final ValueChanged<String>? onChanged;
+  final FormFieldValidator<String>? validator;
+  final AutovalidateMode? autovalidateMode;
+  final String hintText;
 
-  const StockInSearchBar({super.key, required this.controller, this.onSelected});
+  const StockInSearchBar({
+    super.key,
+    required this.controller,
+    this.onSelected,
+    this.onChanged,
+    this.validator,
+    this.autovalidateMode,
+    this.hintText = AppStrings.stockInProductNameHint,
+  });
 
   @override
   State<StockInSearchBar> createState() => _StockInSearchBarState();
@@ -57,9 +69,14 @@ class _StockInSearchBarState extends State<StockInSearchBar> {
         child: AppSearchField(
           controller: widget.controller,
           focusNode: _focusNode,
-          hintText: AppStrings.stockInSearchPlaceholder,
+          hintText: widget.hintText,
           iconColor: AppColors.textMuted,
-          onChanged: (value) => context.read<ProductSearchCubit>().search(value),
+          onChanged: (value) {
+            widget.onChanged?.call(value);
+            context.read<ProductSearchCubit>().search(value);
+          },
+          validator: widget.validator,
+          autovalidateMode: widget.autovalidateMode,
           trailing: Container(
             height: AppNumbers.DOUBLE_32,
             width: AppNumbers.DOUBLE_32,

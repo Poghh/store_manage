@@ -50,7 +50,6 @@ class StockInPage extends StatefulWidget {
 
 class _StockInPageState extends State<StockInPage> {
   late final StockInFormController _formController;
-  late final TextEditingController _searchController;
 
   @override
   void initState() {
@@ -67,13 +66,11 @@ class _StockInPageState extends State<StockInPage> {
       purchasePrice: widget.purchasePrice,
       stockInDate: widget.stockInDate,
     );
-    _searchController = TextEditingController();
   }
 
   @override
   void dispose() {
     _formController.dispose();
-    _searchController.dispose();
     super.dispose();
   }
 
@@ -117,9 +114,7 @@ class _StockInPageState extends State<StockInPage> {
               ),
             ),
           ),
-          body: SafeArea(
-            child: StockInBody(searchController: _searchController, formController: _formController),
-          ),
+          body: SafeArea(child: StockInBody(formController: _formController)),
           bottomNavigationBar: StockInSubmitButton(onPressed: () => _submitStockIn(context)),
         ),
       ),

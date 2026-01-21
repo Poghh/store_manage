@@ -8,6 +8,7 @@ import 'package:store_manage/feature/stock_in/presentation/widgets/stock_in_drop
 import 'package:store_manage/feature/stock_in/presentation/widgets/stock_in_currency_input_formatter.dart';
 import 'package:store_manage/feature/stock_in/presentation/widgets/stock_in_field_label.dart';
 import 'package:store_manage/feature/stock_in/presentation/widgets/stock_in_form_controller.dart';
+import 'package:store_manage/feature/stock_in/presentation/widgets/stock_in_search_bar.dart';
 import 'package:store_manage/core/widgets/app_text_form_field.dart';
 import 'package:store_manage/feature/stock_in/presentation/widgets/stock_in_validators.dart';
 
@@ -21,6 +22,8 @@ class StockInForm extends StatefulWidget {
 }
 
 class _StockInFormState extends State<StockInForm> {
+  bool _suppressNameChange = false;
+
   static const List<String> _categories = [
     AppStrings.stockInCategoryDevice,
     AppStrings.stockInCategoryAccessory,
@@ -64,28 +67,52 @@ class _StockInFormState extends State<StockInForm> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            StockInFieldLabel(text: AppStrings.stockInProductNameLabel),
+            const SizedBox(height: AppNumbers.DOUBLE_8),
+            StockInSearchBar(
+              controller: widget.controller.productNameController,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: StockInValidators.requiredField,
+              onChanged: (value) {
+                if (_suppressNameChange) {
+                  _suppressNameChange = false;
+                  return;
+                }
+                setState(() {
+                  widget.controller.resetSelectionForNewProduct();
+                });
+              },
+              onSelected: (item) {
+                setState(() {
+                  _suppressNameChange = true;
+                  widget.controller.applyPrefill(
+                    productCode: item.productCode,
+                    productName: item.productName,
+                    category: item.category,
+                    platform: item.platform,
+                    brand: item.brand,
+                    unit: item.unit,
+                    quantity: item.quantity,
+                    purchasePrice: item.purchasePrice,
+                    stockInDate: item.stockInDate,
+                  );
+                });
+              },
+            ),
+            const SizedBox(height: AppNumbers.DOUBLE_16),
             StockInFieldLabel(text: AppStrings.stockInProductCodeLabel),
             const SizedBox(height: AppNumbers.DOUBLE_8),
             AppTextFormField(
               enabled: false,
-              initialValue: widget.controller.productCode,
+              controller: widget.controller.productCodeController,
               hintText: widget.controller.productCode,
-            ),
-            const SizedBox(height: AppNumbers.DOUBLE_16),
-            StockInFieldLabel(text: AppStrings.stockInProductNameLabel),
-            const SizedBox(height: AppNumbers.DOUBLE_8),
-            AppTextFormField(
-              controller: widget.controller.productNameController,
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              hintText: AppStrings.stockInProductNameHint,
-              validator: StockInValidators.requiredField,
             ),
             const SizedBox(height: AppNumbers.DOUBLE_16),
             StockInFieldLabel(text: AppStrings.stockInCategoryLabel),
             const SizedBox(height: AppNumbers.DOUBLE_8),
             StockInDropdownField(
               items: _categories,
-              value: widget.controller.category,
+              value: _categories.contains(widget.controller.category) ? widget.controller.category : null,
               validator: StockInValidators.requiredField,
               onChanged: (value) => setState(() => widget.controller.category = value),
             ),
@@ -94,7 +121,7 @@ class _StockInFormState extends State<StockInForm> {
             const SizedBox(height: AppNumbers.DOUBLE_8),
             StockInDropdownField(
               items: _platforms,
-              value: widget.controller.platform,
+              value: _platforms.contains(widget.controller.platform) ? widget.controller.platform : null,
               onChanged: (value) => setState(() => widget.controller.platform = value),
             ),
             const SizedBox(height: AppNumbers.DOUBLE_16),
@@ -102,7 +129,7 @@ class _StockInFormState extends State<StockInForm> {
             const SizedBox(height: AppNumbers.DOUBLE_8),
             StockInDropdownField(
               items: _brands,
-              value: widget.controller.brand,
+              value: _brands.contains(widget.controller.brand) ? widget.controller.brand : null,
               onChanged: (value) => setState(() => widget.controller.brand = value),
             ),
             const SizedBox(height: AppNumbers.DOUBLE_16),
@@ -110,7 +137,7 @@ class _StockInFormState extends State<StockInForm> {
             const SizedBox(height: AppNumbers.DOUBLE_8),
             StockInDropdownField(
               items: _units,
-              value: widget.controller.unit,
+              value: _units.contains(widget.controller.unit) ? widget.controller.unit : null,
               validator: StockInValidators.requiredField,
               onChanged: (value) => setState(() => widget.controller.unit = value),
             ),

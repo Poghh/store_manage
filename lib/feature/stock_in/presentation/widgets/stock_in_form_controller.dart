@@ -5,6 +5,7 @@ import 'package:store_manage/core/constants/app_strings.dart';
 
 class StockInFormController {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final TextEditingController productCodeController = TextEditingController();
   final TextEditingController productNameController = TextEditingController();
   final TextEditingController quantityController = TextEditingController();
   final TextEditingController priceController = TextEditingController();
@@ -19,6 +20,7 @@ class StockInFormController {
 
   StockInFormController() {
     dateController.text = _formatDate(selectedDate);
+    productCodeController.text = productCode;
   }
 
   void applyPrefill({
@@ -34,6 +36,7 @@ class StockInFormController {
   }) {
     if (productCode != null && productCode.trim().isNotEmpty) {
       this.productCode = productCode.trim();
+      productCodeController.text = this.productCode;
     }
     if (productName != null && productName.trim().isNotEmpty) {
       productNameController.text = productName.trim();
@@ -62,7 +65,19 @@ class StockInFormController {
     }
   }
 
+  void resetSelectionForNewProduct() {
+    productCode = AppStrings.stockInAutoCodeValue;
+    productCodeController.text = productCode;
+    category = null;
+    platform = null;
+    brand = null;
+    unit = null;
+    quantityController.clear();
+    priceController.clear();
+  }
+
   void dispose() {
+    productCodeController.dispose();
     productNameController.dispose();
     quantityController.dispose();
     priceController.dispose();
