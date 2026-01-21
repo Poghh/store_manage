@@ -1,11 +1,13 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
+import 'package:store_manage/core/DI/di.dart';
 import 'package:store_manage/core/constants/app_colors.dart';
 import 'package:store_manage/core/constants/app_font_sizes.dart';
 import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
+import 'package:store_manage/core/services/inventory_adjustment_service.dart';
 import 'package:store_manage/core/utils/common_funtion_utils.dart';
 import 'package:store_manage/feature/product/presentation/widgets/info_row.dart';
 import 'package:store_manage/feature/product/presentation/widgets/product_detail_actions.dart';
@@ -44,88 +46,100 @@ class ProductDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final displayCode = productCode.isEmpty ? '' : productCode;
-    final displayName = productName.isEmpty ? '' : productName;
-    final displayCategory = category.isEmpty ? '' : category;
-    final displayPlatform = platform.isEmpty ? '' : platform;
-    final displayBrand = brand.isEmpty ? '' : brand;
-    final displayUnit = unit.isEmpty ? '' : unit;
-    final displayQuantity = quantity.isNotEmpty ? quantity : (stockQuantityValue?.toString() ?? '');
-    final displayPrice = purchasePrice.isNotEmpty
-        ? purchasePrice
-        : (priceValue == null ? '' : CommonFuntionUtils.formatCurrency(priceValue!));
-    final displayDate = stockInDate.isEmpty ? '' : stockInDate;
-    final hasPrefill = productCode.isNotEmpty || productName.isNotEmpty;
-    final prefillQuantity = stockQuantityValue ?? int.tryParse(quantity.replaceAll(RegExp(r'[^0-9]'), ''));
-    final prefillPrice = priceValue ?? int.tryParse(purchasePrice.replaceAll(RegExp(r'[^0-9]'), ''));
-    final infoItems = [
-      _InfoItem(AppStrings.stockInProductCodeLabel, displayCode),
-      _InfoItem(AppStrings.stockInProductNameLabel, displayName),
-      _InfoItem(AppStrings.stockInCategoryLabel, displayCategory),
-      _InfoItem(AppStrings.stockInPlatformLabel, displayPlatform),
-      _InfoItem(AppStrings.stockInBrandLabel, displayBrand),
-      _InfoItem(AppStrings.stockInUnitLabel, displayUnit),
-      _InfoItem(AppStrings.stockInQuantityLabel, displayQuantity),
-      _InfoItem(AppStrings.stockInPurchasePriceLabel, displayPrice),
-      _InfoItem(AppStrings.stockInDateLabel, displayDate),
-    ];
+    final inventoryService = di<InventoryAdjustmentService>();
+    return ValueListenableBuilder(
+      valueListenable: inventoryService.listenable,
+      builder: (context, box, child) {
+        final displayCode = productCode.isEmpty ? '' : productCode;
+        final displayName = productName.isEmpty ? '' : productName;
+        final displayCategory = category.isEmpty ? '' : category;
+        final displayPlatform = platform.isEmpty ? '' : platform;
+        final displayBrand = brand.isEmpty ? '' : brand;
+        final displayUnit = unit.isEmpty ? '' : unit;
+        final baseQuantity = stockQuantityValue ?? int.tryParse(quantity.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+        final adjustedQuantity = inventoryService.adjustedQuantity(
+          productCode: productCode,
+          baseQuantity: baseQuantity,
+        );
+        final hasQuantity = quantity.isNotEmpty || stockQuantityValue != null;
+        final displayQuantity = hasQuantity ? adjustedQuantity.toString() : '';
+        final displayPrice = purchasePrice.isNotEmpty
+            ? purchasePrice
+            : (priceValue == null ? '' : CommonFuntionUtils.formatCurrency(priceValue!));
+        final displayDate = stockInDate.isEmpty ? '' : stockInDate;
+        final hasPrefill = productCode.isNotEmpty || productName.isNotEmpty;
+        final prefillQuantity = hasQuantity ? adjustedQuantity : null;
+        final prefillPrice = priceValue ?? int.tryParse(purchasePrice.replaceAll(RegExp(r'[^0-9]'), ''));
+        final infoItems = [
+          _InfoItem(AppStrings.stockInProductCodeLabel, displayCode),
+          _InfoItem(AppStrings.stockInProductNameLabel, displayName),
+          _InfoItem(AppStrings.stockInCategoryLabel, displayCategory),
+          _InfoItem(AppStrings.stockInPlatformLabel, displayPlatform),
+          _InfoItem(AppStrings.stockInBrandLabel, displayBrand),
+          _InfoItem(AppStrings.stockInUnitLabel, displayUnit),
+          _InfoItem(AppStrings.stockInQuantityLabel, displayQuantity),
+          _InfoItem(AppStrings.stockInPurchasePriceLabel, displayPrice),
+          _InfoItem(AppStrings.stockInDateLabel, displayDate),
+        ];
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: AppNumbers.DOUBLE_0,
-        scrolledUnderElevation: AppNumbers.DOUBLE_0,
-        surfaceTintColor: AppColors.background,
-        leading: IconButton(
-          onPressed: () => context.maybePop(),
-          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
-        ),
-        title: const Text(
-          AppStrings.productDetailsTitle,
-          style: TextStyle(
-            fontSize: AppFontSizes.fontSize18,
-            fontWeight: FontWeight.w600,
-            fontFamily: AppFonts.inter,
-            color: AppColors.textPrimary,
-          ),
-        ),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppNumbers.DOUBLE_16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ProductHeaderCard(
-                imageUrl: imageUrl,
-                productName: displayName,
-                productCode: displayCode,
-                quantity: displayQuantity,
+        return Scaffold(
+          backgroundColor: AppColors.background,
+          appBar: AppBar(
+            backgroundColor: AppColors.background,
+            elevation: AppNumbers.DOUBLE_0,
+            scrolledUnderElevation: AppNumbers.DOUBLE_0,
+            surfaceTintColor: AppColors.background,
+            leading: IconButton(
+              onPressed: () => context.maybePop(),
+              icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+            ),
+            title: const Text(
+              AppStrings.productDetailsTitle,
+              style: TextStyle(
+                fontSize: AppFontSizes.fontSize18,
+                fontWeight: FontWeight.w600,
+                fontFamily: AppFonts.inter,
+                color: AppColors.textPrimary,
               ),
-              const SizedBox(height: AppNumbers.DOUBLE_16),
-              ...infoItems.map((item) => InfoRow(label: item.label, value: item.value)),
-            ],
+            ),
           ),
-        ),
-      ),
-      bottomNavigationBar: ProductDetailActions(
-        displayCode: displayCode,
-        displayName: displayName,
-        displayQuantity: displayQuantity,
-        displayPrice: displayPrice,
-        priceValue: priceValue,
-        imageUrl: imageUrl,
-        productCode: hasPrefill ? productCode : null,
-        productName: hasPrefill ? productName : null,
-        category: category.isNotEmpty ? category : null,
-        platform: platform.isNotEmpty ? platform : null,
-        brand: brand.isNotEmpty ? brand : null,
-        unit: unit.isNotEmpty ? unit : null,
-        quantity: prefillQuantity,
-        purchasePrice: prefillPrice,
-        stockInDate: stockInDate.isNotEmpty ? stockInDate : null,
-      ),
+          body: SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(AppNumbers.DOUBLE_16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ProductHeaderCard(
+                    imageUrl: imageUrl,
+                    productName: displayName,
+                    productCode: displayCode,
+                    quantity: displayQuantity,
+                  ),
+                  const SizedBox(height: AppNumbers.DOUBLE_16),
+                  ...infoItems.map((item) => InfoRow(label: item.label, value: item.value)),
+                ],
+              ),
+            ),
+          ),
+          bottomNavigationBar: ProductDetailActions(
+            displayCode: displayCode,
+            displayName: displayName,
+            displayQuantity: displayQuantity,
+            displayPrice: displayPrice,
+            priceValue: priceValue,
+            imageUrl: imageUrl,
+            productCode: hasPrefill ? productCode : null,
+            productName: hasPrefill ? productName : null,
+            category: category.isNotEmpty ? category : null,
+            platform: platform.isNotEmpty ? platform : null,
+            brand: brand.isNotEmpty ? brand : null,
+            unit: unit.isNotEmpty ? unit : null,
+            quantity: prefillQuantity,
+            purchasePrice: prefillPrice,
+            stockInDate: stockInDate.isNotEmpty ? stockInDate : null,
+          ),
+        );
+      },
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:store_manage/core/constants/app_endpoints.dart';
 import 'package:store_manage/core/network/network_client.dart';
+import 'package:store_manage/core/services/inventory_adjustment_service.dart';
 import 'package:store_manage/feature/product/data/models/product.dart';
 
 abstract class ProductRepository {
@@ -8,8 +9,9 @@ abstract class ProductRepository {
 
 class ProductRepositoryImpl implements ProductRepository {
   final NetworkClient _client;
+  final InventoryAdjustmentService _inventoryService;
 
-  ProductRepositoryImpl(this._client);
+  ProductRepositoryImpl(this._client, this._inventoryService);
 
   @override
   Future<List<Product>> searchProducts(String query) async {
@@ -23,6 +25,16 @@ class ProductRepositoryImpl implements ProductRepository {
       },
     );
 
-    return response.data;
+    final items = response.data;
+    if (items.isEmpty) return items;
+
+    return items.map((product) {
+      final baseQuantity = product.quantity ?? 0;
+      final updatedQuantity = _inventoryService.adjustedQuantity(
+        productCode: product.productCode,
+        baseQuantity: baseQuantity,
+      );
+      return product.copyWith(quantity: updatedQuantity);
+    }).toList();
   }
 }

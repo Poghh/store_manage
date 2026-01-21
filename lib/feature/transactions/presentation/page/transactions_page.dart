@@ -11,6 +11,7 @@ import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/DI/di.dart';
 import 'package:store_manage/core/navigation/home_tab_coordinator.dart';
+import 'package:store_manage/core/storage/retail_transaction_storage.dart';
 import 'package:store_manage/core/widgets/app_page_header.dart';
 import 'package:store_manage/core/widgets/app_surface_card.dart';
 import 'package:store_manage/feature/transactions/presentation/widgets/transaction_empty_state.dart';
@@ -35,6 +36,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
     super.initState();
     _tabCoordinator = di<HomeTabCoordinator>();
     _tabCoordinator.selectedTransactionDate.addListener(_handleDateSelected);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _handleDateSelected());
   }
 
   @override
@@ -52,20 +54,25 @@ class _TransactionsPageState extends State<TransactionsPage> {
 
   Future<void> _loadTransactions(DateTime date) async {
     setState(() => _isLoading = true);
+    final dateKey = DateFormat('yyyy-MM-dd').format(date);
     final raw = await rootBundle.loadString('assets/mocks/transactions.json');
     final json = jsonDecode(raw) as Map<String, dynamic>;
     final records = (json['records'] as List<dynamic>? ?? [])
         .whereType<Map<String, dynamic>>()
         .map(_TransactionRecord.fromJson)
         .toList();
-    final dateKey = DateFormat('yyyy-MM-dd').format(date);
     final record = records.firstWhere(
       (item) => item.date == dateKey,
       orElse: () => const _TransactionRecord(date: '', items: []),
     );
+    final localItems = di<RetailTransactionStorage>()
+        .getAll()
+        .map(_TransactionItem.fromOfflinePayload)
+        .where((item) => item.dateKey == dateKey)
+        .toList();
     if (!mounted) return;
     setState(() {
-      _items = record.items;
+      _items = [...record.items, ...localItems];
       _isLoading = false;
     });
   }
@@ -181,6 +188,7 @@ class _TransactionItem {
   final int price;
   final int total;
   final String paymentMethod;
+  final String dateKey;
 
   const _TransactionItem({
     required this.productCode,
@@ -189,6 +197,7 @@ class _TransactionItem {
     required this.price,
     required this.total,
     required this.paymentMethod,
+    required this.dateKey,
   });
 
   factory _TransactionItem.fromJson(Map<String, dynamic> json) => _TransactionItem(
@@ -198,5 +207,27 @@ class _TransactionItem {
     price: (json['price'] is int) ? json['price'] as int : int.tryParse('${json['price']}') ?? 0,
     total: (json['total'] is int) ? json['total'] as int : int.tryParse('${json['total']}') ?? 0,
     paymentMethod: (json['paymentMethod'] ?? '').toString(),
+    dateKey: (json['date'] ?? '').toString(),
   );
+
+  factory _TransactionItem.fromOfflinePayload(Map<String, dynamic> json) {
+    final createdAtText = (json['createdAt'] ?? '').toString();
+    final createdAt = DateTime.tryParse(createdAtText);
+    final dateKey = createdAt == null ? '' : DateFormat('yyyy-MM-dd').format(createdAt);
+    final paymentMethodRaw = (json['paymentMethod'] ?? '').toString();
+    final paymentLabel = switch (paymentMethodRaw) {
+      'cash' => AppStrings.retailCashLabel,
+      'transfer' => AppStrings.retailTransferLabel,
+      _ => paymentMethodRaw,
+    };
+    return _TransactionItem(
+      productCode: (json['productCode'] ?? '').toString(),
+      productName: (json['productName'] ?? '').toString(),
+      quantity: (json['quantity'] is int) ? json['quantity'] as int : int.tryParse('${json['quantity']}') ?? 0,
+      price: (json['sellPrice'] is int) ? json['sellPrice'] as int : int.tryParse('${json['sellPrice']}') ?? 0,
+      total: (json['total'] is int) ? json['total'] as int : int.tryParse('${json['total']}') ?? 0,
+      paymentMethod: paymentLabel,
+      dateKey: dateKey,
+    );
+  }
 }

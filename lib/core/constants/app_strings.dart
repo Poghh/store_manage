@@ -98,6 +98,7 @@ class AppStrings {
   static const String retailQueued = 'Đã lưu bán lẻ offline, sẽ gửi khi có internet';
   static const String retailValidationSelectProduct = 'Vui lòng chọn sản phẩm';
   static const String retailValidationPrice = 'Vui lòng nhập giá bán';
+  static const String retailValidationQuantityExceed = 'Số lượng bán vượt tồn kho';
 
   // === TRANSACTIONS ===
   static const String transactionsSelectDate = 'Chọn ngày';

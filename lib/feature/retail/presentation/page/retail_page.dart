@@ -18,6 +18,8 @@ import 'package:store_manage/feature/retail/presentation/cubit/retail_state.dart
 import 'package:store_manage/feature/retail/data/repositories/retail_repository.dart';
 import 'package:store_manage/core/network/connectivity_service.dart';
 import 'package:store_manage/core/offline/retail/retail_sync_service.dart';
+import 'package:store_manage/core/services/inventory_adjustment_service.dart';
+import 'package:store_manage/core/storage/retail_transaction_storage.dart';
 import 'package:store_manage/feature/retail/presentation/widgets/payment_method.dart';
 import 'package:store_manage/feature/retail/presentation/widgets/retail_content.dart';
 
@@ -86,77 +88,89 @@ class _RetailPageState extends State<RetailPage> {
       providers: [
         BlocProvider<ProductSearchCubit>(create: (_) => ProductSearchCubit(di<ProductRepository>())..prime()),
         BlocProvider<RetailCubit>(
-          create: (_) => RetailCubit(di<RetailRepository>(), di<RetailSyncService>(), di<ConnectivityService>()),
+          create: (_) => RetailCubit(
+            di<RetailRepository>(),
+            di<RetailSyncService>(),
+            di<ConnectivityService>(),
+            di<RetailTransactionStorage>(),
+            di<InventoryAdjustmentService>(),
+          ),
         ),
       ],
       child: BlocListener<RetailCubit, RetailState>(
         listener: (context, state) {
           if (state is RetailLoaded) {
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppStrings.retailSubmitSuccess)));
+            _applyLocalSale();
+            context.maybePop();
           } else if (state is RetailQueued) {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
+            _applyLocalSale();
+            context.maybePop();
           } else if (state is RetailError) {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
           }
         },
-        child: Scaffold(
-          backgroundColor: AppColors.primary,
-          appBar: AppBar(
+        child: Builder(
+          builder: (innerContext) => Scaffold(
             backgroundColor: AppColors.primary,
-            elevation: AppNumbers.DOUBLE_0,
-            scrolledUnderElevation: AppNumbers.DOUBLE_0,
-            surfaceTintColor: AppColors.primary,
-            leading: IconButton(
-              onPressed: () => context.maybePop(),
-              icon: const Icon(Icons.arrow_back, color: AppColors.textOnPrimary),
-            ),
-            title: const Text(
-              AppStrings.retailTitle,
-              style: TextStyle(
-                fontSize: AppFontSizes.fontSize18,
-                fontWeight: FontWeight.w600,
-                fontFamily: AppFonts.inter,
-                color: AppColors.textOnPrimary,
+            appBar: AppBar(
+              backgroundColor: AppColors.primary,
+              elevation: AppNumbers.DOUBLE_0,
+              scrolledUnderElevation: AppNumbers.DOUBLE_0,
+              surfaceTintColor: AppColors.primary,
+              leading: IconButton(
+                onPressed: () => context.maybePop(),
+                icon: const Icon(Icons.arrow_back, color: AppColors.textOnPrimary),
               ),
-            ),
-            actions: const [
-              Padding(
-                padding: EdgeInsets.only(right: AppNumbers.DOUBLE_12),
-                child: Icon(Icons.local_offer_outlined, color: AppColors.textOnPrimary),
+              title: const Text(
+                AppStrings.retailTitle,
+                style: TextStyle(
+                  fontSize: AppFontSizes.fontSize18,
+                  fontWeight: FontWeight.w600,
+                  fontFamily: AppFonts.inter,
+                  color: AppColors.textOnPrimary,
+                ),
               ),
-            ],
-          ),
-          body: SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(AppNumbers.DOUBLE_16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ProductSearchBar(
-                    hintText: AppStrings.retailSearchPlaceholder,
-                    iconColor: AppColors.textMuted,
-                    onSelected: _onProductSelected,
-                  ),
-                  const SizedBox(height: AppNumbers.DOUBLE_12),
-                  if (hasProduct)
-                    RetailContent(
-                      displayName: displayName,
-                      displayCode: displayCode,
-                      displayStock: displayStock,
-                      displayImage: displayImage,
-                      quantity: _quantity,
-                      onDecrease: () => setState(() => _quantity = _quantity > 1 ? _quantity - 1 : 1),
-                      onIncrease: () => setState(() => _quantity = _quantity + 1),
-                      priceController: _priceController,
-                      onPriceChanged: _onPriceChanged,
-                      purchasePrice: _purchasePrice,
-                      total: _total,
-                      paymentMethod: _paymentMethod,
-                      paymentMethodLabel: _paymentMethodLabel,
-                      onPaymentChanged: (value) => setState(() => _paymentMethod = value),
-                      onConfirm: _submitRetail,
+              actions: const [
+                Padding(
+                  padding: EdgeInsets.only(right: AppNumbers.DOUBLE_12),
+                  child: Icon(Icons.local_offer_outlined, color: AppColors.textOnPrimary),
+                ),
+              ],
+            ),
+            body: SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(AppNumbers.DOUBLE_16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ProductSearchBar(
+                      hintText: AppStrings.retailSearchPlaceholder,
+                      iconColor: AppColors.textMuted,
+                      onSelected: _onProductSelected,
                     ),
-                ],
+                    const SizedBox(height: AppNumbers.DOUBLE_12),
+                    if (hasProduct)
+                      RetailContent(
+                        displayName: displayName,
+                        displayCode: displayCode,
+                        displayStock: displayStock,
+                        displayImage: displayImage,
+                        quantity: _quantity,
+                        onDecrease: () => setState(() => _quantity = _quantity > 1 ? _quantity - 1 : 1),
+                        onIncrease: () => _increaseQuantity(innerContext),
+                        priceController: _priceController,
+                        onPriceChanged: _onPriceChanged,
+                        purchasePrice: _purchasePrice,
+                        total: _total,
+                        paymentMethod: _paymentMethod,
+                        paymentMethodLabel: _paymentMethodLabel,
+                        onPaymentChanged: (value) => setState(() => _paymentMethod = value),
+                        onConfirm: () => _submitRetail(innerContext),
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -165,7 +179,7 @@ class _RetailPageState extends State<RetailPage> {
     );
   }
 
-  void _submitRetail() {
+  void _submitRetail(BuildContext context) {
     if (_selectedCode.isEmpty) {
       ScaffoldMessenger.of(
         context,
@@ -174,6 +188,12 @@ class _RetailPageState extends State<RetailPage> {
     }
     if (_sellPrice <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppStrings.retailValidationPrice)));
+      return;
+    }
+    if (_quantity > _selectedStock) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text(AppStrings.retailValidationQuantityExceed)));
       return;
     }
 
@@ -185,9 +205,33 @@ class _RetailPageState extends State<RetailPage> {
       'purchasePrice': _purchasePrice,
       'total': _total,
       'paymentMethod': _paymentMethod.name,
+      'createdAt': DateTime.now().toIso8601String(),
     };
 
     context.read<RetailCubit>().submitRetailSale(payload);
+  }
+
+  void _increaseQuantity(BuildContext context) {
+    if (_quantity >= _selectedStock) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text(AppStrings.retailValidationQuantityExceed)));
+      return;
+    }
+    setState(() => _quantity = _quantity + 1);
+  }
+
+  void _applyLocalSale() {
+    if (_selectedStock <= 0) return;
+    final updatedStock = (_selectedStock - _quantity).clamp(0, 1 << 30);
+    setState(() {
+      _selectedStock = updatedStock;
+      if (_selectedStock <= 0) {
+        _quantity = 1;
+      } else if (_quantity > _selectedStock) {
+        _quantity = _selectedStock;
+      }
+    });
   }
 
   void _onProductSelected(Product product) {

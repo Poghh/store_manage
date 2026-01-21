@@ -8,6 +8,10 @@ import 'package:store_manage/core/network/connectivity_service.dart';
 import 'package:store_manage/core/network/network_client.dart';
 import 'package:store_manage/core/offline/retail/retail_sync_service.dart';
 import 'package:store_manage/core/offline/stock_in/stock_in_sync_service.dart';
+import 'package:store_manage/core/services/inventory_adjustment_service.dart';
+import 'package:store_manage/core/services/retail_revenue_service.dart';
+import 'package:store_manage/core/storage/inventory_adjustment_storage.dart';
+import 'package:store_manage/core/storage/retail_transaction_storage.dart';
 import 'package:store_manage/core/storage/secure_storage.dart';
 import 'package:store_manage/core/storage/offline_queue_storage.dart';
 import 'package:store_manage/feature/home/presentation/cubit/home_cubit.dart';
@@ -20,6 +24,8 @@ final GetIt di = GetIt.instance;
 Future<void> setupDI() async {
   final secureStorage = SecureStorageImpl();
   final stockInBox = await Hive.openBox<List<String>>('pending_stock_in');
+  final retailTransactionBox = await Hive.openBox<List<String>>('retail_transactions');
+  final inventoryAdjustmentBox = await Hive.openBox<int>('inventory_adjustments');
 
   di.registerLazySingleton<SecureStorageImpl>(() => secureStorage);
 
@@ -30,6 +36,12 @@ Future<void> setupDI() async {
 
   di.registerLazySingleton<ConnectivityService>(() => ConnectivityService(Connectivity()));
   di.registerLazySingleton<OfflineQueueStorage>(() => HiveOfflineQueueStorage(stockInBox));
+  di.registerLazySingleton<RetailTransactionStorage>(() => HiveRetailTransactionStorage(retailTransactionBox));
+  di.registerLazySingleton<InventoryAdjustmentStorage>(() => HiveInventoryAdjustmentStorage(inventoryAdjustmentBox));
+  di.registerLazySingleton<InventoryAdjustmentService>(
+    () => InventoryAdjustmentService(di<InventoryAdjustmentStorage>()),
+  );
+  di.registerLazySingleton<RetailRevenueService>(() => RetailRevenueService(di<RetailTransactionStorage>()));
 
   di.registerLazySingleton<StockInRepository>(() => StockInRepositoryImpl(di<NetworkClient>()));
   di.registerLazySingleton<RetailRepository>(() => RetailRepositoryImpl(di<NetworkClient>()));
@@ -41,7 +53,9 @@ Future<void> setupDI() async {
     () => RetailSyncService(di<OfflineQueueStorage>(), di<RetailRepository>(), di<ConnectivityService>()),
   );
 
-  di.registerLazySingleton<ProductRepository>(() => ProductRepositoryImpl(di<NetworkClient>()));
+  di.registerLazySingleton<ProductRepository>(
+    () => ProductRepositoryImpl(di<NetworkClient>(), di<InventoryAdjustmentService>()),
+  );
 
   di.registerFactory<HomeCubit>(() => HomeCubit());
 }

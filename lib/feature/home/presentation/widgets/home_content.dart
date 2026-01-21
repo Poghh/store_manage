@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -9,6 +10,7 @@ import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/DI/di.dart';
 import 'package:store_manage/core/navigation/home_tab_coordinator.dart';
+import 'package:store_manage/core/services/retail_revenue_service.dart';
 import 'package:store_manage/core/utils/common_funtion_utils.dart';
 import 'package:store_manage/feature/home/presentation/widgets/revenue_summary_card.dart';
 
@@ -23,11 +25,27 @@ class _HomeContentState extends State<HomeContent> {
   final List<_RevenueRecord> _records = [];
   int _currentIndex = 0;
   bool _isFetching = false;
+  late final RetailRevenueService _revenueService;
+  late final ValueListenable _retailBoxListenable;
 
   @override
   void initState() {
     super.initState();
+    _revenueService = di<RetailRevenueService>();
+    _retailBoxListenable = _revenueService.listenable;
+    _retailBoxListenable.addListener(_handleRetailChange);
     _loadRecords();
+  }
+
+  @override
+  void dispose() {
+    _retailBoxListenable.removeListener(_handleRetailChange);
+    super.dispose();
+  }
+
+  void _handleRetailChange() {
+    if (!mounted) return;
+    setState(() {});
   }
 
   Future<void> _loadRecords() async {
@@ -83,6 +101,8 @@ class _HomeContentState extends State<HomeContent> {
     return AppStrings.homeRevenueDateLabel(record.displayDate);
   }
 
+  int _offlineRevenueForDate(String dateKey) => _revenueService.offlineRevenueForDate(dateKey);
+
   void _openTransactionsForRecord(_RevenueRecord? record) {
     final parsed = record == null ? null : DateTime.tryParse(record.rawDate);
     if (parsed == null) return;
@@ -97,7 +117,8 @@ class _HomeContentState extends State<HomeContent> {
     final dateText = record == null ? '' : record.displayDate;
     final canPrev = !_isFetching && _currentIndex > 0;
     final canNext = !_isFetching && !isToday && _records.isNotEmpty && _currentIndex < _records.length - 1;
-    final revenueText = record == null ? '' : CommonFuntionUtils.formatCurrency(record.revenue);
+    final offlineRevenue = record == null ? 0 : _offlineRevenueForDate(record.rawDate);
+    final revenueText = record == null ? '' : CommonFuntionUtils.formatCurrency(record.revenue + offlineRevenue);
     final revenueTitle = _buildRevenueTitle(record);
     return Container(
       color: AppColors.background,
