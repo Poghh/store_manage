@@ -11,9 +11,10 @@ import 'package:store_manage/core/services/inventory_adjustment_service.dart';
 import 'package:store_manage/core/services/local_product_service.dart';
 import 'package:store_manage/core/utils/app_image_picker.dart';
 import 'package:store_manage/core/widgets/app_action_button.dart';
-import 'package:store_manage/core/widgets/app_product_thumbnail.dart';
+import 'package:store_manage/core/widgets/app_image_picker_field.dart';
 import 'package:store_manage/core/widgets/app_surface_card.dart';
 import 'package:store_manage/core/widgets/app_text_form_field.dart';
+import 'package:store_manage/core/utils/common_funtion_utils.dart';
 import 'package:store_manage/feature/stock_in/presentation/widgets/stock_in_date_field.dart';
 import 'package:store_manage/feature/stock_in/presentation/widgets/stock_in_dropdown_field.dart';
 import 'package:store_manage/feature/stock_in/presentation/widgets/stock_in_currency_input_formatter.dart';
@@ -155,7 +156,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
                   const SizedBox(height: AppNumbers.DOUBLE_16),
                   StockInFieldLabel(text: AppStrings.stockInImageLabel),
                   const SizedBox(height: AppNumbers.DOUBLE_8),
-                  _ProductEditImagePicker(
+                  AppImagePickerField(
                     image: _imagePath ?? _imageUrl,
                     onPick: _handlePickImage,
                     onClear: _handleClearImage,
@@ -226,8 +227,9 @@ class _ProductEditPageState extends State<ProductEditPage> {
                   const SizedBox(height: AppNumbers.DOUBLE_8),
                   StockInDateField(
                     controller: _dateController,
-                    selectedDate: _tryParseDate(_dateController.text) ?? DateTime.now(),
-                    onChanged: (value) => setState(() => _dateController.text = _formatDate(value)),
+                    selectedDate: CommonFuntionUtils.tryParseDateDDMMYYYY(_dateController.text) ?? DateTime.now(),
+                    onChanged: (value) =>
+                        setState(() => _dateController.text = CommonFuntionUtils.formatDateDDMMYYYY(value)),
                   ),
                 ],
               ),
@@ -266,7 +268,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
       'brand': _brand,
       'unit': _unit,
       'quantity': widget.baseQuantity,
-      'purchasePrice': _parseCurrency(_priceController.text),
+      'purchasePrice': CommonFuntionUtils.parseDigitsToInt(_priceController.text) ?? 0,
       'stockInDate': _dateController.text.trim(),
       'image': _imagePath ?? _imageUrl,
     };
@@ -275,11 +277,6 @@ class _ProductEditPageState extends State<ProductEditPage> {
     if (!mounted) return;
     AppToast.success(context, AppStrings.productAdjustSuccess);
     Navigator.of(context).maybePop();
-  }
-
-  int _parseCurrency(String value) {
-    final digits = value.replaceAll(RegExp(r'[^0-9]'), '');
-    return int.tryParse(digits) ?? 0;
   }
 
   String? _nonNegativeInt(String? value) {
@@ -291,23 +288,6 @@ class _ProductEditPageState extends State<ProductEditPage> {
       return AppStrings.productAdjustInvalid;
     }
     return null;
-  }
-
-  DateTime? _tryParseDate(String value) {
-    if (value.trim().isEmpty) return null;
-    final parts = value.split('/');
-    if (parts.length != 3) return null;
-    final day = int.tryParse(parts[0]);
-    final month = int.tryParse(parts[1]);
-    final year = int.tryParse(parts[2]);
-    if (day == null || month == null || year == null) return null;
-    return DateTime(year, month, day);
-  }
-
-  String _formatDate(DateTime value) {
-    final day = value.day.toString().padLeft(2, '0');
-    final month = value.month.toString().padLeft(2, '0');
-    return '$day/$month/${value.year}';
   }
 
   Future<void> _handlePickImage() async {
@@ -323,43 +303,5 @@ class _ProductEditPageState extends State<ProductEditPage> {
       _imagePath = null;
       _imageUrl = null;
     });
-  }
-}
-
-class _ProductEditImagePicker extends StatelessWidget {
-  final String? image;
-  final VoidCallback onPick;
-  final VoidCallback onClear;
-
-  const _ProductEditImagePicker({required this.image, required this.onPick, required this.onClear});
-
-  @override
-  Widget build(BuildContext context) {
-    final hasImage = image != null && image!.isNotEmpty;
-    return Row(
-      children: [
-        AppProductThumbnail(
-          imageUrl: image,
-          size: AppNumbers.DOUBLE_80,
-          borderRadius: AppNumbers.DOUBLE_12,
-          padding: AppNumbers.DOUBLE_8,
-          placeholderIcon: Icons.image_outlined,
-        ),
-        const SizedBox(width: AppNumbers.DOUBLE_12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              OutlinedButton.icon(
-                onPressed: onPick,
-                icon: const Icon(Icons.upload_outlined),
-                label: const Text(AppStrings.stockInImagePickButton),
-              ),
-              if (hasImage) TextButton(onPressed: onClear, child: const Text(AppStrings.stockInImageRemoveButton)),
-            ],
-          ),
-        ),
-      ],
-    );
   }
 }

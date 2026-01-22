@@ -84,18 +84,16 @@ class _HomeContentState extends State<HomeContent> {
 
   _RevenueRecord? get _currentRecord => _records.isEmpty ? null : _records[_currentIndex.clamp(0, _records.length - 1)];
 
-  bool _isSameDay(DateTime a, DateTime b) => a.year == b.year && a.month == b.month && a.day == b.day;
-
   String _buildRevenueTitle(_RevenueRecord? record) {
     if (record == null) return AppStrings.todayRevenueLabel;
     final parsed = DateTime.tryParse(record.rawDate);
     if (parsed == null) return AppStrings.todayRevenueLabel;
     final today = DateTime.now();
-    if (_isSameDay(parsed, today)) {
+    if (CommonFuntionUtils.isSameDay(parsed, today)) {
       return AppStrings.todayRevenueLabel;
     }
     final yesterday = today.subtract(const Duration(days: 1));
-    if (_isSameDay(parsed, yesterday)) {
+    if (CommonFuntionUtils.isSameDay(parsed, yesterday)) {
       return AppStrings.homeRevenueYesterdayLabel;
     }
     return AppStrings.homeRevenueDateLabel(record.displayDate);
@@ -113,7 +111,7 @@ class _HomeContentState extends State<HomeContent> {
   Widget build(BuildContext context) {
     final record = _currentRecord;
     final parsedRecordDate = record == null ? null : DateTime.tryParse(record.rawDate);
-    final isToday = parsedRecordDate != null && _isSameDay(parsedRecordDate, DateTime.now());
+    final isToday = parsedRecordDate != null && CommonFuntionUtils.isSameDay(parsedRecordDate, DateTime.now());
     final dateText = record == null ? '' : record.displayDate;
     final canPrev = !_isFetching && _currentIndex > 0;
     final canNext = !_isFetching && !isToday && _records.isNotEmpty && _currentIndex < _records.length - 1;

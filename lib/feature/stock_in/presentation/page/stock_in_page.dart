@@ -5,9 +5,6 @@ import 'package:store_manage/core/utils/app_dialog.dart';
 import 'package:store_manage/core/utils/app_toast.dart';
 
 import 'package:store_manage/core/constants/app_colors.dart';
-import 'package:store_manage/core/constants/app_font_sizes.dart';
-import 'package:store_manage/core/constants/app_fonts.dart';
-import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/DI/di.dart';
 import 'package:store_manage/core/navigation/home_tab_coordinator.dart';
@@ -22,6 +19,7 @@ import 'package:store_manage/feature/stock_in/presentation/cubit/stock_in_cubit.
 import 'package:store_manage/feature/stock_in/presentation/cubit/stock_in_state.dart';
 import 'package:store_manage/feature/stock_in/presentation/widgets/stock_in_form_controller.dart';
 import 'package:store_manage/feature/stock_in/presentation/widgets/stock_in_body.dart';
+import 'package:store_manage/feature/stock_in/presentation/widgets/stock_in_app_bar.dart';
 import 'package:store_manage/feature/stock_in/presentation/widgets/stock_in_submit_button.dart';
 
 @RoutePage()
@@ -109,25 +107,7 @@ class _StockInPageState extends State<StockInPage> {
         },
         child: Scaffold(
           backgroundColor: AppColors.background,
-          appBar: AppBar(
-            backgroundColor: AppColors.background,
-            elevation: AppNumbers.DOUBLE_0,
-            scrolledUnderElevation: AppNumbers.DOUBLE_0,
-            surfaceTintColor: AppColors.background,
-            leading: IconButton(
-              onPressed: () => context.maybePop(),
-              icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
-            ),
-            title: const Text(
-              AppStrings.stockInTitle,
-              style: TextStyle(
-                fontSize: AppFontSizes.fontSize18,
-                fontWeight: FontWeight.w600,
-                fontFamily: AppFonts.inter,
-                color: AppColors.textPrimary,
-              ),
-            ),
-          ),
+          appBar: StockInAppBar(onBack: () => context.maybePop()),
           body: SafeArea(child: StockInBody(formController: _formController)),
           bottomNavigationBar: Builder(
             builder: (innerContext) => StockInSubmitButton(onPressed: () => _submitStockIn(innerContext)),

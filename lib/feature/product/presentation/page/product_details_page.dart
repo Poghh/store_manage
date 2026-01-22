@@ -14,12 +14,11 @@ import 'package:store_manage/core/offline/product/product_delete_sync_service.da
 import 'package:store_manage/core/services/inventory_adjustment_service.dart';
 import 'package:store_manage/core/services/local_product_service.dart';
 import 'package:store_manage/core/utils/common_funtion_utils.dart';
-import 'package:store_manage/core/widgets/app_action_button.dart';
 import 'package:store_manage/feature/product/data/repositories/product_repository.dart';
 import 'package:store_manage/feature/product/presentation/page/product_edit_page.dart';
 import 'package:store_manage/feature/product/presentation/widgets/info_row.dart';
 import 'package:store_manage/feature/product/presentation/widgets/product_detail_actions.dart';
-import 'package:store_manage/feature/product/presentation/widgets/product_header_card.dart';
+import 'package:store_manage/feature/product/presentation/widgets/product_details_body.dart';
 
 @RoutePage()
 class ProductDetailsPage extends StatefulWidget {
@@ -117,16 +116,16 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
             parsedOverridePrice ??
             widget.priceValue ??
             int.tryParse(widget.purchasePrice.replaceAll(RegExp(r'[^0-9]'), ''));
-        final infoItems = [
-          _InfoItem(AppStrings.stockInProductCodeLabel, displayCode),
-          _InfoItem(AppStrings.stockInProductNameLabel, displayName),
-          _InfoItem(AppStrings.stockInCategoryLabel, displayCategory),
-          _InfoItem(AppStrings.stockInPlatformLabel, displayPlatform),
-          _InfoItem(AppStrings.stockInBrandLabel, displayBrand),
-          _InfoItem(AppStrings.stockInUnitLabel, displayUnit),
-          _InfoItem(AppStrings.stockInQuantityLabel, displayQuantity),
-          _InfoItem(AppStrings.stockInPurchasePriceLabel, displayPrice),
-          _InfoItem(AppStrings.stockInDateLabel, displayDate),
+        final infoRows = [
+          InfoRow(label: AppStrings.stockInProductCodeLabel, value: displayCode),
+          InfoRow(label: AppStrings.stockInProductNameLabel, value: displayName),
+          InfoRow(label: AppStrings.stockInCategoryLabel, value: displayCategory),
+          InfoRow(label: AppStrings.stockInPlatformLabel, value: displayPlatform),
+          InfoRow(label: AppStrings.stockInBrandLabel, value: displayBrand),
+          InfoRow(label: AppStrings.stockInUnitLabel, value: displayUnit),
+          InfoRow(label: AppStrings.stockInQuantityLabel, value: displayQuantity),
+          InfoRow(label: AppStrings.stockInPurchasePriceLabel, value: displayPrice),
+          InfoRow(label: AppStrings.stockInDateLabel, value: displayDate),
         ];
 
         return Scaffold(
@@ -153,49 +152,30 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           body: SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(AppNumbers.DOUBLE_16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ProductHeaderCard(
-                    imageUrl: widget.imageUrl,
-                    productName: displayName,
-                    productCode: displayCode,
-                    quantity: displayQuantity,
-                  ),
-                  const SizedBox(height: AppNumbers.DOUBLE_16),
-                  ...infoItems.map((item) => InfoRow(label: item.label, value: item.value)),
-                  const SizedBox(height: AppNumbers.DOUBLE_16),
-                  AppActionButton(
-                    onPressed: () => Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => ProductEditPage(
-                          productCode: widget.productCode,
-                          productName: displayName,
-                          category: widget.category,
-                          platform: widget.platform,
-                          brand: widget.brand,
-                          unit: widget.unit,
-                          purchasePrice: displayPrice,
-                          stockInDate: displayDate,
-                          imageUrl: widget.imageUrl,
-                          baseQuantity: _baseQuantity,
-                          initialAdjustment: _initialAdjustment,
-                        ),
-                      ),
+              child: ProductDetailsBody(
+                displayName: displayName,
+                displayCode: displayCode,
+                displayQuantity: displayQuantity,
+                imageUrl: widget.imageUrl,
+                infoRows: infoRows,
+                onEdit: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => ProductEditPage(
+                      productCode: widget.productCode,
+                      productName: displayName,
+                      category: widget.category,
+                      platform: widget.platform,
+                      brand: widget.brand,
+                      unit: widget.unit,
+                      purchasePrice: displayPrice,
+                      stockInDate: displayDate,
+                      imageUrl: widget.imageUrl,
+                      baseQuantity: _baseQuantity,
+                      initialAdjustment: _initialAdjustment,
                     ),
-                    label: AppStrings.productEditButton,
-                    backgroundColor: AppColors.primaryLight,
-                    foregroundColor: AppColors.primary,
-                    borderColor: AppColors.primary,
                   ),
-                  const SizedBox(height: AppNumbers.DOUBLE_12),
-                  AppActionButton(
-                    onPressed: () => _confirmDelete(displayCode),
-                    label: AppStrings.productDeleteButton,
-                    backgroundColor: AppColors.error,
-                    foregroundColor: AppColors.textOnPrimary,
-                  ),
-                ],
+                ),
+                onDelete: () => _confirmDelete(displayCode),
               ),
             ),
           ),
@@ -267,11 +247,4 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       context.maybePop();
     }
   }
-}
-
-class _InfoItem {
-  final String label;
-  final String value;
-
-  const _InfoItem(this.label, this.value);
 }

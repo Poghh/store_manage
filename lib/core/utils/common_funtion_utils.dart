@@ -28,14 +28,44 @@ class CommonFuntionUtils {
   }
 
   static String formatCurrency(num value) {
-    final formatter =
-        NumberFormat.currency(locale: AppStrings.VIET_NAM_LOCALE, symbol: AppStrings.VIET_NAM_DONG_CURRENCY);
+    final formatter = NumberFormat.currency(
+      locale: AppStrings.VIET_NAM_LOCALE,
+      symbol: AppStrings.VIET_NAM_DONG_CURRENCY,
+    );
     return formatter.format(value);
   }
 
   static bool isValidEmail(String email) => RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$").hasMatch(email);
 
   static bool isValidPhone(String phone) => RegExp(r'^(?:[+0]9)?[0-9]{10,11}$').hasMatch(phone);
+
+  static int? parseDigitsToInt(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return null;
+    }
+    final digits = value.replaceAll(RegExp(r'[^0-9]'), '');
+    if (digits.isEmpty) return null;
+    return int.tryParse(digits);
+  }
+
+  static DateTime? tryParseDateDDMMYYYY(String? value) {
+    if (value == null || value.trim().isEmpty) return null;
+    final parts = value.split('/');
+    if (parts.length != 3) return null;
+    final day = int.tryParse(parts[0]);
+    final month = int.tryParse(parts[1]);
+    final year = int.tryParse(parts[2]);
+    if (day == null || month == null || year == null) return null;
+    return DateTime(year, month, day);
+  }
+
+  static String formatDateDDMMYYYY(DateTime value) {
+    final day = value.day.toString().padLeft(2, '0');
+    final month = value.month.toString().padLeft(2, '0');
+    return '$day/$month/${value.year}';
+  }
+
+  static bool isSameDay(DateTime a, DateTime b) => a.year == b.year && a.month == b.month && a.day == b.day;
 
   static String urlToMockFile(String url) {
     final uri = Uri.parse(url);

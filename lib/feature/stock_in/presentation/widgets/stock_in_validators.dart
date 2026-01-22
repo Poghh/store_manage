@@ -1,4 +1,5 @@
 import 'package:store_manage/core/constants/app_strings.dart';
+import 'package:store_manage/core/utils/common_funtion_utils.dart';
 
 class StockInValidators {
   static String? requiredField(String? value) {
@@ -23,19 +24,11 @@ class StockInValidators {
     if (value == null || value.trim().isEmpty) {
       return AppStrings.stockInValidationRequired;
     }
-    final parsed = _parseDigits(value);
+    final parsed = CommonFuntionUtils.parseDigitsToInt(value);
     if (parsed == null || parsed <= 0) {
       return AppStrings.stockInValidationPositiveNumber;
     }
     return null;
-  }
-
-  static int? _parseDigits(String value) {
-    final digits = value.replaceAll(RegExp(r'[^0-9]'), '');
-    if (digits.isEmpty) {
-      return null;
-    }
-    return int.tryParse(digits);
   }
 
   static String? dateNotFuture(DateTime? value) {

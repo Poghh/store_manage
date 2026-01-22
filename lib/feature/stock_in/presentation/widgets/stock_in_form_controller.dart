@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
+import 'package:store_manage/core/utils/common_funtion_utils.dart';
 
 class StockInFormController {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -25,7 +25,7 @@ class StockInFormController {
   bool _hasPrefillProduct = false;
 
   StockInFormController() {
-    dateController.text = _formatDate(selectedDate);
+    dateController.text = CommonFuntionUtils.formatDateDDMMYYYY(selectedDate);
     productCodeController.text = productCode;
   }
 
@@ -72,7 +72,7 @@ class StockInFormController {
       priceController.text = _formatCurrency(purchasePrice);
       _initialPurchasePrice = purchasePrice;
     }
-    final parsedDate = _tryParseDate(stockInDate);
+    final parsedDate = CommonFuntionUtils.tryParseDateDDMMYYYY(stockInDate);
     if (parsedDate != null) {
       updateDate(parsedDate);
       _initialStockInDate = parsedDate;
@@ -106,9 +106,10 @@ class StockInFormController {
 
   bool get hasLotChanged {
     if (!_hasPrefillProduct) return false;
-    final currentPrice = _parseCurrencyToInt(priceController.text);
+    final currentPrice = CommonFuntionUtils.parseDigitsToInt(priceController.text);
     final priceChanged = _initialPurchasePrice != null && currentPrice != _initialPurchasePrice;
-    final dateChanged = _initialStockInDate != null && !_isSameDay(selectedDate, _initialStockInDate!);
+    final dateChanged =
+        _initialStockInDate != null && !CommonFuntionUtils.isSameDay(selectedDate, _initialStockInDate!);
     return priceChanged || dateChanged;
   }
 
@@ -122,8 +123,8 @@ class StockInFormController {
       'unit': unit,
       'image': imagePath ?? imageUrl,
       'quantity': int.tryParse(quantityController.text.trim()) ?? 0,
-      'purchasePrice': _parseCurrencyToInt(priceController.text) ?? 0,
-      'stockInDate': _formatDate(selectedDate),
+      'purchasePrice': CommonFuntionUtils.parseDigitsToInt(priceController.text) ?? 0,
+      'stockInDate': CommonFuntionUtils.formatDateDDMMYYYY(selectedDate),
     };
   }
 
@@ -131,45 +132,8 @@ class StockInFormController {
 
   void updateDate(DateTime value) {
     selectedDate = value;
-    dateController.text = _formatDate(value);
+    dateController.text = CommonFuntionUtils.formatDateDDMMYYYY(value);
   }
-
-  DateTime? _tryParseDate(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return null;
-    }
-    final parts = value.split('/');
-    if (parts.length != AppNumbers.INT_3) {
-      return null;
-    }
-    final day = int.tryParse(parts[0]);
-    final month = int.tryParse(parts[1]);
-    final year = int.tryParse(parts[2]);
-    if (day == null || month == null || year == null) {
-      return null;
-    }
-    return DateTime(year, month, day);
-  }
-
-  String _formatDate(DateTime value) {
-    final day = value.day.toString().padLeft(AppNumbers.INT_2, '0');
-    final month = value.month.toString().padLeft(AppNumbers.INT_2, '0');
-    final year = value.year.toString();
-    return '$day/$month/$year';
-  }
-
-  int? _parseCurrencyToInt(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return null;
-    }
-    final digits = value.replaceAll(RegExp(r'[^0-9]'), '');
-    if (digits.isEmpty) {
-      return null;
-    }
-    return int.tryParse(digits);
-  }
-
-  bool _isSameDay(DateTime a, DateTime b) => a.year == b.year && a.month == b.month && a.day == b.day;
 
   String _formatCurrency(int value) {
     final formatted = NumberFormat.decimalPattern(AppStrings.VIET_NAM_LOCALE).format(value);

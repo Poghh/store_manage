@@ -6,11 +6,8 @@ import 'package:store_manage/core/utils/app_toast.dart';
 
 import 'package:store_manage/core/DI/di.dart';
 import 'package:store_manage/core/constants/app_colors.dart';
-import 'package:store_manage/core/constants/app_font_sizes.dart';
-import 'package:store_manage/core/constants/app_fonts.dart';
-import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
-import 'package:store_manage/feature/home/presentation/widgets/product_search_bar.dart';
+import 'package:store_manage/core/utils/common_funtion_utils.dart';
 import 'package:store_manage/feature/product/data/models/product.dart';
 import 'package:store_manage/feature/product/data/repositories/product_repository.dart';
 import 'package:store_manage/feature/product/presentation/cubit/product_search_cubit.dart';
@@ -22,7 +19,8 @@ import 'package:store_manage/core/offline/retail/retail_sync_service.dart';
 import 'package:store_manage/core/services/inventory_adjustment_service.dart';
 import 'package:store_manage/core/storage/retail_transaction_storage.dart';
 import 'package:store_manage/feature/retail/presentation/widgets/payment_method.dart';
-import 'package:store_manage/feature/retail/presentation/widgets/retail_content.dart';
+import 'package:store_manage/feature/retail/presentation/widgets/retail_app_bar.dart';
+import 'package:store_manage/feature/retail/presentation/widgets/retail_page_body.dart';
 
 @RoutePage()
 class RetailPage extends StatefulWidget {
@@ -115,63 +113,26 @@ class _RetailPageState extends State<RetailPage> {
         child: Builder(
           builder: (innerContext) => Scaffold(
             backgroundColor: AppColors.primary,
-            appBar: AppBar(
-              backgroundColor: AppColors.primary,
-              elevation: AppNumbers.DOUBLE_0,
-              scrolledUnderElevation: AppNumbers.DOUBLE_0,
-              surfaceTintColor: AppColors.primary,
-              leading: IconButton(
-                onPressed: () => context.maybePop(),
-                icon: const Icon(Icons.arrow_back, color: AppColors.textOnPrimary),
-              ),
-              title: const Text(
-                AppStrings.retailTitle,
-                style: TextStyle(
-                  fontSize: AppFontSizes.fontSize18,
-                  fontWeight: FontWeight.w600,
-                  fontFamily: AppFonts.inter,
-                  color: AppColors.textOnPrimary,
-                ),
-              ),
-              actions: const [
-                Padding(
-                  padding: EdgeInsets.only(right: AppNumbers.DOUBLE_12),
-                  child: Icon(Icons.local_offer_outlined, color: AppColors.textOnPrimary),
-                ),
-              ],
-            ),
+            appBar: RetailAppBar(onBack: () => context.maybePop()),
             body: SafeArea(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(AppNumbers.DOUBLE_16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ProductSearchBar(
-                      hintText: AppStrings.retailSearchPlaceholder,
-                      iconColor: AppColors.textMuted,
-                      onSelected: _onProductSelected,
-                    ),
-                    const SizedBox(height: AppNumbers.DOUBLE_12),
-                    if (hasProduct)
-                      RetailContent(
-                        displayName: displayName,
-                        displayCode: displayCode,
-                        displayStock: displayStock,
-                        displayImage: displayImage,
-                        quantity: _quantity,
-                        onDecrease: () => setState(() => _quantity = _quantity > 1 ? _quantity - 1 : 1),
-                        onIncrease: () => _increaseQuantity(innerContext),
-                        priceController: _priceController,
-                        onPriceChanged: _onPriceChanged,
-                        purchasePrice: _purchasePrice,
-                        total: _total,
-                        paymentMethod: _paymentMethod,
-                        paymentMethodLabel: _paymentMethodLabel,
-                        onPaymentChanged: (value) => setState(() => _paymentMethod = value),
-                        onConfirm: () => _submitRetail(innerContext),
-                      ),
-                  ],
-                ),
+              child: RetailPageBody(
+                hasProduct: hasProduct,
+                displayName: displayName,
+                displayCode: displayCode,
+                displayStock: displayStock,
+                displayImage: displayImage,
+                quantity: _quantity,
+                onDecrease: () => setState(() => _quantity = _quantity > 1 ? _quantity - 1 : 1),
+                onIncrease: () => _increaseQuantity(innerContext),
+                priceController: _priceController,
+                onPriceChanged: _onPriceChanged,
+                purchasePrice: _purchasePrice,
+                total: _total,
+                paymentMethod: _paymentMethod,
+                paymentMethodLabel: _paymentMethodLabel,
+                onPaymentChanged: (value) => setState(() => _paymentMethod = value),
+                onConfirm: () => _submitRetail(innerContext),
+                onProductSelected: _onProductSelected,
               ),
             ),
           ),
@@ -243,8 +204,7 @@ class _RetailPageState extends State<RetailPage> {
   }
 
   void _onPriceChanged(String value) {
-    final digits = value.replaceAll(RegExp(r'[^0-9]'), '');
-    final parsed = int.tryParse(digits) ?? 0;
+    final parsed = CommonFuntionUtils.parseDigitsToInt(value) ?? 0;
     setState(() {
       _sellPrice = parsed;
     });
