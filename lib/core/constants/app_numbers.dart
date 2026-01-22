@@ -10,6 +10,7 @@ class AppNumbers {
   static const double DOUBLE_0_5 = 0.5;
   static const double DOUBLE_0_9 = 0.9;
   static const double DOUBLE_1 = 1.0;
+  static const double DOUBLE_1_4 = 1.4;
   static const double DOUBLE_2 = 2;
   static const double DOUBLE_3 = 3;
   static const double DOUBLE_4 = 4;
