@@ -7,18 +7,28 @@ import 'package:mocktail/mocktail.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/network/connectivity_service.dart';
 import 'package:store_manage/core/offline/stock_in/stock_in_sync_service.dart';
+import 'package:store_manage/core/services/inventory_adjustment_service.dart';
+import 'package:store_manage/core/services/local_product_service.dart';
 import 'package:store_manage/feature/stock_in/data/repositories/stock_in_repository.dart';
 import 'package:store_manage/feature/stock_in/presentation/cubit/stock_in_cubit.dart';
 import 'package:store_manage/feature/stock_in/presentation/cubit/stock_in_state.dart';
 
 class MockStockInRepository extends Mock implements StockInRepository {}
+
 class MockStockInSyncService extends Mock implements StockInSyncService {}
+
 class MockConnectivityService extends Mock implements ConnectivityService {}
+
+class MockInventoryAdjustmentService extends Mock implements InventoryAdjustmentService {}
+
+class MockLocalProductService extends Mock implements LocalProductService {}
 
 void main() {
   late StockInRepository repository;
   late StockInSyncService syncService;
   late ConnectivityService connectivity;
+  late InventoryAdjustmentService inventoryService;
+  late LocalProductService localProductService;
 
   setUpAll(() {
     registerFallbackValue(<String, dynamic>{});
@@ -28,27 +38,27 @@ void main() {
     repository = MockStockInRepository();
     syncService = MockStockInSyncService();
     connectivity = MockConnectivityService();
+    inventoryService = MockInventoryAdjustmentService();
+    localProductService = MockLocalProductService();
 
     when(() => connectivity.onChanged).thenAnswer((_) => const Stream<ConnectivityResult>.empty());
     when(() => connectivity.isOnline).thenAnswer((_) async => true);
     when(() => syncService.syncPending()).thenAnswer((_) async {});
     when(() => syncService.enqueue(any())).thenAnswer((_) async {});
+    when(() => inventoryService.applyStockIn(any(), any())).thenAnswer((_) async {});
+    when(() => localProductService.addFromStockInPayload(any())).thenAnswer((_) async {});
   });
 
   blocTest<StockInCubit, StockInState>(
     'emits error when API base URL is not configured',
-    build: () => StockInCubit(repository, syncService, connectivity),
+    build: () => StockInCubit(repository, syncService, connectivity, inventoryService, localProductService),
     setUp: () {
       dotenv.loadFromString(envString: '', isOptional: true);
     },
     act: (cubit) => cubit.submitStockIn({'name': 'demo'}),
     expect: () => [
       isA<StockInLoading>(),
-      isA<StockInError>().having(
-        (state) => state.message,
-        'message',
-        AppStrings.stockInApiNotConfigured,
-      ),
+      isA<StockInError>().having((state) => state.message, 'message', AppStrings.stockInApiNotConfigured),
     ],
     verify: (_) {
       verifyNever(() => repository.submitStockIn(any()));
@@ -59,16 +69,13 @@ void main() {
 
   blocTest<StockInCubit, StockInState>(
     'emits loaded when submit succeeds',
-    build: () => StockInCubit(repository, syncService, connectivity),
+    build: () => StockInCubit(repository, syncService, connectivity, inventoryService, localProductService),
     setUp: () {
       dotenv.loadFromString(envString: 'API_BASE_URL=http://localhost');
-      when(() => repository.submitStockIn(any())).thenAnswer((_) async {});
+      when(() => repository.submitStockIn(any())).thenAnswer((_) async => <String, dynamic>{});
     },
     act: (cubit) => cubit.submitStockIn({'name': 'demo'}),
-    expect: () => [
-      isA<StockInLoading>(),
-      isA<StockInLoaded>(),
-    ],
+    expect: () => [isA<StockInLoading>(), isA<StockInLoaded>()],
     verify: (_) {
       verify(() => repository.submitStockIn(any())).called(1);
       verify(() => syncService.syncPending()).called(1);
@@ -76,8 +83,8 @@ void main() {
   );
 
   blocTest<StockInCubit, StockInState>(
-    'emits error when submit fails',
-    build: () => StockInCubit(repository, syncService, connectivity),
+    'emits queued when submit fails',
+    build: () => StockInCubit(repository, syncService, connectivity, inventoryService, localProductService),
     setUp: () {
       dotenv.loadFromString(envString: 'API_BASE_URL=http://localhost');
       when(() => repository.submitStockIn(any())).thenThrow(Exception('boom'));
@@ -85,15 +92,11 @@ void main() {
     act: (cubit) => cubit.submitStockIn({'name': 'demo'}),
     expect: () => [
       isA<StockInLoading>(),
-      isA<StockInError>().having(
-        (state) => state.message,
-        'message',
-        AppStrings.stockInSubmitError,
-      ),
+      isA<StockInQueued>().having((state) => state.message, 'message', AppStrings.stockInQueued),
     ],
     verify: (_) {
       verify(() => repository.submitStockIn(any())).called(1);
-      verifyNever(() => syncService.syncPending());
+      verify(() => syncService.enqueue(any())).called(1);
     },
   );
 }

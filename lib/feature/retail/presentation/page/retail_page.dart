@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:store_manage/core/utils/app_toast.dart';
 
 import 'package:store_manage/core/DI/di.dart';
 import 'package:store_manage/core/constants/app_colors.dart';
@@ -100,15 +101,15 @@ class _RetailPageState extends State<RetailPage> {
       child: BlocListener<RetailCubit, RetailState>(
         listener: (context, state) {
           if (state is RetailLoaded) {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppStrings.retailSubmitSuccess)));
+            AppToast.success(context, AppStrings.retailSubmitSuccess);
             _applyLocalSale();
             context.maybePop();
           } else if (state is RetailQueued) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
+            AppToast.warning(context, state.message);
             _applyLocalSale();
             context.maybePop();
           } else if (state is RetailError) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
+            AppToast.error(context, state.message);
           }
         },
         child: Builder(
@@ -181,19 +182,15 @@ class _RetailPageState extends State<RetailPage> {
 
   void _submitRetail(BuildContext context) {
     if (_selectedCode.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text(AppStrings.retailValidationSelectProduct)));
+      AppToast.warning(context, AppStrings.retailValidationSelectProduct);
       return;
     }
     if (_sellPrice <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppStrings.retailValidationPrice)));
+      AppToast.warning(context, AppStrings.retailValidationPrice);
       return;
     }
     if (_quantity > _selectedStock) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text(AppStrings.retailValidationQuantityExceed)));
+      AppToast.warning(context, AppStrings.retailValidationQuantityExceed);
       return;
     }
 
@@ -213,9 +210,7 @@ class _RetailPageState extends State<RetailPage> {
 
   void _increaseQuantity(BuildContext context) {
     if (_quantity >= _selectedStock) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text(AppStrings.retailValidationQuantityExceed)));
+      AppToast.warning(context, AppStrings.retailValidationQuantityExceed);
       return;
     }
     setState(() => _quantity = _quantity + 1);

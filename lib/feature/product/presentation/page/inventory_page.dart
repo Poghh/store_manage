@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:store_manage/core/DI/di.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/services/inventory_adjustment_service.dart';
+import 'package:store_manage/core/services/local_product_service.dart';
 import 'package:store_manage/core/widgets/app_page_header.dart';
 import 'package:store_manage/feature/product/data/repositories/product_repository.dart';
 import 'package:store_manage/feature/product/data/models/product.dart';
@@ -23,6 +24,8 @@ class _InventoryPageState extends State<InventoryPage> {
   bool _isLoading = true;
   late final InventoryAdjustmentService _inventoryService;
   late final ValueListenable _inventoryBoxListenable;
+  late final LocalProductService _localProductService;
+  late final ValueListenable _localProductListenable;
 
   @override
   void initState() {
@@ -30,12 +33,16 @@ class _InventoryPageState extends State<InventoryPage> {
     _inventoryService = di<InventoryAdjustmentService>();
     _inventoryBoxListenable = _inventoryService.listenable;
     _inventoryBoxListenable.addListener(_handleInventoryChange);
+    _localProductService = di<LocalProductService>();
+    _localProductListenable = _localProductService.listenable;
+    _localProductListenable.addListener(_handleInventoryChange);
     _loadProducts();
   }
 
   @override
   void dispose() {
     _inventoryBoxListenable.removeListener(_handleInventoryChange);
+    _localProductListenable.removeListener(_handleInventoryChange);
     _searchController.dispose();
     super.dispose();
   }

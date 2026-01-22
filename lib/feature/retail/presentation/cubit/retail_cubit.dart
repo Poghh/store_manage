@@ -51,7 +51,10 @@ class RetailCubit extends Cubit<RetailState> {
       emit(const RetailLoaded());
       await _syncService.syncPending();
     } catch (_) {
-      emit(const RetailError(AppStrings.retailSubmitError));
+      await _transactionStorage.addTransaction(payload);
+      await _syncService.enqueue(payload);
+      _applyInventoryDeduction(payload);
+      emit(const RetailQueued(AppStrings.retailQueued));
     }
   }
 

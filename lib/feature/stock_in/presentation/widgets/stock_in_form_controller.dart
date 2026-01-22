@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
@@ -16,7 +17,12 @@ class StockInFormController {
   String? platform;
   String? brand;
   String? unit;
+  String? imagePath;
+  String? imageUrl;
   DateTime selectedDate = DateTime.now();
+  int? _initialPurchasePrice;
+  DateTime? _initialStockInDate;
+  bool _hasPrefillProduct = false;
 
   StockInFormController() {
     dateController.text = _formatDate(selectedDate);
@@ -33,13 +39,16 @@ class StockInFormController {
     int? quantity,
     int? purchasePrice,
     String? stockInDate,
+    String? image,
   }) {
     if (productCode != null && productCode.trim().isNotEmpty) {
       this.productCode = productCode.trim();
       productCodeController.text = this.productCode;
+      _hasPrefillProduct = true;
     }
     if (productName != null && productName.trim().isNotEmpty) {
       productNameController.text = productName.trim();
+      _hasPrefillProduct = true;
     }
     if (category != null && category.trim().isNotEmpty) {
       this.category = category;
@@ -53,15 +62,20 @@ class StockInFormController {
     if (unit != null && unit.trim().isNotEmpty) {
       this.unit = unit;
     }
+    if (image != null && image.trim().isNotEmpty) {
+      imageUrl = image.trim();
+    }
     if (quantity != null && quantity > 0) {
       quantityController.text = quantity.toString();
     }
     if (purchasePrice != null && purchasePrice > 0) {
-      priceController.text = purchasePrice.toString();
+      priceController.text = _formatCurrency(purchasePrice);
+      _initialPurchasePrice = purchasePrice;
     }
     final parsedDate = _tryParseDate(stockInDate);
     if (parsedDate != null) {
       updateDate(parsedDate);
+      _initialStockInDate = parsedDate;
     }
   }
 
@@ -72,6 +86,8 @@ class StockInFormController {
     platform = null;
     brand = null;
     unit = null;
+    imagePath = null;
+    imageUrl = null;
     quantityController.clear();
     priceController.clear();
   }
@@ -86,6 +102,16 @@ class StockInFormController {
 
   bool validate() => formKey.currentState?.validate() ?? false;
 
+  bool get hasPrefillProduct => _hasPrefillProduct;
+
+  bool get hasLotChanged {
+    if (!_hasPrefillProduct) return false;
+    final currentPrice = _parseCurrencyToInt(priceController.text);
+    final priceChanged = _initialPurchasePrice != null && currentPrice != _initialPurchasePrice;
+    final dateChanged = _initialStockInDate != null && !_isSameDay(selectedDate, _initialStockInDate!);
+    return priceChanged || dateChanged;
+  }
+
   Map<String, dynamic> buildPayload() {
     return {
       'productCode': productCode,
@@ -94,11 +120,14 @@ class StockInFormController {
       'platform': platform,
       'brand': brand,
       'unit': unit,
+      'image': imagePath ?? imageUrl,
       'quantity': int.tryParse(quantityController.text.trim()) ?? 0,
       'purchasePrice': _parseCurrencyToInt(priceController.text) ?? 0,
       'stockInDate': _formatDate(selectedDate),
     };
   }
+
+  String? get displayImage => imagePath ?? imageUrl;
 
   void updateDate(DateTime value) {
     selectedDate = value;
@@ -138,5 +167,12 @@ class StockInFormController {
       return null;
     }
     return int.tryParse(digits);
+  }
+
+  bool _isSameDay(DateTime a, DateTime b) => a.year == b.year && a.month == b.month && a.day == b.day;
+
+  String _formatCurrency(int value) {
+    final formatted = NumberFormat.decimalPattern(AppStrings.VIET_NAM_LOCALE).format(value);
+    return '$formatted ${AppStrings.VIET_NAM_DONG_TEXT}';
   }
 }

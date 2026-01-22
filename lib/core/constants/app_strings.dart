@@ -42,6 +42,9 @@ class AppStrings {
   static const String stockInQuantityLabel = 'Số lượng';
   static const String stockInPurchasePriceLabel = 'Giá nhập';
   static const String stockInDateLabel = 'Ngày nhập hàng';
+  static const String stockInImageLabel = 'Hình ảnh sản phẩm';
+  static const String stockInImagePickButton = 'Chọn ảnh';
+  static const String stockInImageRemoveButton = 'Xóa ảnh';
   static const String stockInAutoCodeValue = 'Tự động';
   static const String stockInProductNameHint = 'Nhập tên sản phẩm';
   static const String stockInQuantityHint = 'Nhập số lượng';
@@ -76,12 +79,39 @@ class AppStrings {
   static const String stockInSubmitError = 'Lưu nhập hàng thất bại';
   static const String stockInApiNotConfigured = 'Chưa cấu hình API nhập hàng';
   static const String stockInQueued = 'Đã lưu offline, sẽ gửi khi có internet';
+  static const String stockInLotChangeTitle = 'Xác nhận lô nhập';
+  static const String stockInLotChangeMessage =
+      'Giá nhập hoặc ngày nhập khác lô hiện có. Bạn muốn tạo lô mới hay cập nhật lô hiện tại?';
+  static const String stockInLotCreateButton = 'Tạo lô mới';
+  static const String stockInLotUpdateButton = 'Cập nhật lô hiện tại';
+  static const String stockInLotCancelButton = 'Hủy';
 
   // === PRODUCT DETAILS ===
   static const String productDetailsTitle = 'Chi Tiết Sản Phẩm';
   static const String productDetailsStockLabel = 'Tồn';
   static const String productDetailsSellButton = 'BÁN HÀNG';
   static const String productDetailsStockInButton = 'NHẬP THÊM';
+  static const String productEditButton = 'CHỈNH SỬA THÔNG TIN';
+  static const String productDeleteButton = 'XÓA SẢN PHẨM';
+  static const String productEditTitle = 'Chỉnh sửa sản phẩm';
+  static const String productEditSaveButton = 'LƯU THAY ĐỔI';
+  static const String productDeleteConfirmTitle = 'Xóa sản phẩm';
+  static const String productDeleteConfirmMessage = 'Bạn có chắc muốn xóa sản phẩm này không?';
+  static const String productDeleteCancel = 'Hủy';
+  static const String productDeleteConfirm = 'Xóa';
+  static const String productDeleteSuccess = 'Đã xóa sản phẩm';
+  static const String productDeleteQueued = 'Đã lưu xóa offline, sẽ gửi khi có internet';
+  static const String productDeleteError = 'Xóa sản phẩm thất bại';
+  static const String productAdjustButton = 'ĐIỀU CHỈNH TỒN KHO';
+  static const String productAdjustTitle = 'Điều chỉnh tồn kho';
+  static const String productAdjustIncrease = 'Tăng';
+  static const String productAdjustDecrease = 'Giảm';
+  static const String productAdjustQuantityHint = 'Nhập số lượng';
+  static const String productAdjustCancel = 'Hủy';
+  static const String productAdjustConfirm = 'Xác nhận';
+  static const String productAdjustInvalid = 'Số lượng không hợp lệ';
+  static const String productAdjustExceed = 'Không thể giảm quá tồn hiện tại';
+  static const String productAdjustSuccess = 'Đã điều chỉnh tồn kho';
 
   // === RETAIL ===
   static const String retailTitle = 'Bán Lẻ';
@@ -129,4 +159,11 @@ class AppStrings {
   static const String profileItemHelpCenter = 'Trung tâm trợ giúp';
   static const String profileItemContactSupport = 'Liên hệ hỗ trợ';
   static const String profileLogout = 'Đăng xuất';
+
+  // === CONNECTIVITY ===
+  static const String connectivityOnline = 'Đã kết nối internet';
+  static const String connectivityOffline = 'Mất kết nối internet';
+
+  // === PERMISSIONS ===
+  static const String photoPermissionDenied = 'Không có quyền truy cập ảnh';
 }

@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
+import 'package:store_manage/core/widgets/app_product_thumbnail.dart';
+import 'package:store_manage/core/utils/app_image_picker.dart';
 import 'package:store_manage/feature/stock_in/presentation/widgets/stock_in_date_field.dart';
 import 'package:store_manage/feature/stock_in/presentation/widgets/stock_in_dropdown_field.dart';
 import 'package:store_manage/feature/stock_in/presentation/widgets/stock_in_currency_input_formatter.dart';
@@ -95,6 +97,7 @@ class _StockInFormState extends State<StockInForm> {
                     quantity: item.quantity,
                     purchasePrice: item.purchasePrice,
                     stockInDate: item.stockInDate,
+                    image: item.image,
                   );
                 });
               },
@@ -106,6 +109,14 @@ class _StockInFormState extends State<StockInForm> {
               enabled: false,
               controller: widget.controller.productCodeController,
               hintText: widget.controller.productCode,
+            ),
+            const SizedBox(height: AppNumbers.DOUBLE_16),
+            StockInFieldLabel(text: AppStrings.stockInImageLabel),
+            const SizedBox(height: AppNumbers.DOUBLE_8),
+            _StockInImagePicker(
+              image: widget.controller.displayImage,
+              onPick: _handlePickImage,
+              onClear: _handleClearImage,
             ),
             const SizedBox(height: AppNumbers.DOUBLE_16),
             StockInFieldLabel(text: AppStrings.stockInCategoryLabel),
@@ -177,6 +188,59 @@ class _StockInFormState extends State<StockInForm> {
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> _handlePickImage() async {
+    final path = await AppImagePicker.pickImage(context);
+    if (path == null || path.isEmpty) return;
+    setState(() {
+      widget.controller.imagePath = path;
+    });
+  }
+
+  void _handleClearImage() {
+    setState(() {
+      widget.controller.imagePath = null;
+      widget.controller.imageUrl = null;
+    });
+  }
+}
+
+class _StockInImagePicker extends StatelessWidget {
+  final String? image;
+  final VoidCallback onPick;
+  final VoidCallback onClear;
+
+  const _StockInImagePicker({required this.image, required this.onPick, required this.onClear});
+
+  @override
+  Widget build(BuildContext context) {
+    final hasImage = image != null && image!.isNotEmpty;
+    return Row(
+      children: [
+        AppProductThumbnail(
+          imageUrl: image,
+          size: AppNumbers.DOUBLE_80,
+          borderRadius: AppNumbers.DOUBLE_12,
+          padding: AppNumbers.DOUBLE_8,
+          placeholderIcon: Icons.image_outlined,
+        ),
+        const SizedBox(width: AppNumbers.DOUBLE_12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              OutlinedButton.icon(
+                onPressed: onPick,
+                icon: const Icon(Icons.upload_outlined),
+                label: const Text(AppStrings.stockInImagePickButton),
+              ),
+              if (hasImage) TextButton(onPressed: onClear, child: const Text(AppStrings.stockInImageRemoveButton)),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
