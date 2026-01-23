@@ -105,6 +105,11 @@ class _HomeTabsPageState extends State<HomeTabsPage> {
       controller: _controller,
       screens: _buildScreens(),
       items: _navBarsItems(),
+      onItemSelected: (index) {
+        if (index == 1) {
+          _tabCoordinator.selectedTransactionDate.value = DateTime.now();
+        }
+      },
       confineToSafeArea: true,
       navBarHeight: AppNumbers.DOUBLE_70,
       backgroundColor: AppColors.surface,
