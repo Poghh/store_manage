@@ -36,7 +36,7 @@ class _PinInputPageState extends State<PinInputPage> {
   }
 
   void _onForgotPin() {
-    // TODO: Handle forgot PIN
+    context.router.push(const ForgotPinRoute());
   }
 
   @override

@@ -20,6 +20,17 @@ class AppStrings {
   static const String loginPinSubtitle = 'Nhập mã PIN 4 số để đăng nhập';
   static const String loginPinButton = 'Đăng nhập';
   static const String loginPinForgotButton = 'Quên mã PIN?';
+  static const String loginForgotPinDialogTitle = 'Quên mã PIN?';
+  static const String loginForgotPinDialogMessage = 'Bạn sẽ cần xác minh lại số điện thoại và tạo mã PIN mới. Tiếp tục?';
+  static const String loginForgotPinDialogCancel = 'Hủy';
+  static const String loginForgotPinDialogConfirm = 'Xác nhận';
+  static const String forgotPinPageTitle = 'Đặt lại mã PIN';
+  static const String forgotPinPageDescription = 'Để đặt lại mã PIN, bạn cần xác minh lại số điện thoại. Quá trình này sẽ xóa thông tin đăng nhập hiện tại.';
+  static const String forgotPinStep1 = 'Xác minh lại số điện thoại của bạn';
+  static const String forgotPinStep2 = 'Tạo mã PIN mới';
+  static const String forgotPinStep3 = 'Đăng nhập với mã PIN mới';
+  static const String forgotPinConfirmButton = 'Tiếp tục đặt lại';
+  static const String forgotPinCancelButton = 'Quay lại';
 
   // === HOME ===
   static const String homeGreetingPrefix = 'Xin chào, ';

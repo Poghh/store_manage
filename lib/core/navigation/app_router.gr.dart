@@ -11,6 +11,22 @@
 part of 'app_router.dart';
 
 /// generated route for
+/// [ForgotPinPage]
+class ForgotPinRoute extends PageRouteInfo<void> {
+  const ForgotPinRoute({List<PageRouteInfo>? children})
+    : super(ForgotPinRoute.name, initialChildren: children);
+
+  static const String name = 'ForgotPinRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ForgotPinPage();
+    },
+  );
+}
+
+/// generated route for
 /// [HomePage]
 class HomeRoute extends PageRouteInfo<void> {
   const HomeRoute({List<PageRouteInfo>? children})
