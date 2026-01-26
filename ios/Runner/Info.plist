@@ -26,6 +26,8 @@
 	<string>Cho phép truy cập thư viện ảnh để chọn hình sản phẩm.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Cho phép lưu ảnh sản phẩm vào thư viện khi cần.</string>
+	<key>PHPhotoLibraryPreventAutomaticLimitedAccessAlert</key>
+	<true/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
