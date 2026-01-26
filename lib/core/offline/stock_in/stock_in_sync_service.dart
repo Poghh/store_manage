@@ -1,4 +1,5 @@
 import 'package:store_manage/core/network/connectivity_service.dart';
+import 'package:store_manage/core/services/inventory_adjustment_service.dart';
 import 'package:store_manage/core/storage/offline_queue_storage.dart';
 import 'package:store_manage/core/services/local_product_service.dart';
 import 'package:store_manage/feature/stock_in/data/repositories/stock_in_repository.dart';
@@ -10,8 +11,15 @@ class StockInSyncService {
   final StockInRepository _repository;
   final ConnectivityService _connectivity;
   final LocalProductService _localProductService;
+  final InventoryAdjustmentService _inventoryAdjustmentService;
 
-  StockInSyncService(this._queue, this._repository, this._connectivity, this._localProductService);
+  StockInSyncService(
+    this._queue,
+    this._repository,
+    this._connectivity,
+    this._localProductService,
+    this._inventoryAdjustmentService,
+  );
 
   Future<void> enqueue(Map<String, dynamic> payload) => _queue.enqueue(queueKey, payload);
 
@@ -28,6 +36,8 @@ class StockInSyncService {
         final newCode = _extractProductCode(response);
         if (tempCode.isNotEmpty && newCode.isNotEmpty) {
           await _localProductService.updateProductCode(tempCode, newCode);
+
+          await _inventoryAdjustmentService.migrateProductCode(from: tempCode, to: newCode);
         }
         await _queue.removeAt(queueKey, 0);
       } catch (_) {

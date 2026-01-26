@@ -60,6 +60,7 @@ Future<void> setupDI() async {
       di<StockInRepository>(),
       di<ConnectivityService>(),
       di<LocalProductService>(),
+      di<InventoryAdjustmentService>(),
     ),
   );
   di.registerLazySingleton<ProductDeleteSyncService>(

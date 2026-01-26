@@ -43,10 +43,15 @@ class StockInCubit extends Cubit<StockInState> {
       return;
     }
 
-    if (!await _connectivity.isOnline) {
+    final isOnline = await _connectivity.isOnline;
+
+    if (!isOnline) {
       await _prepareOfflinePayload(payload);
       await _syncService.enqueue(payload);
+
+      payload['_skipInventoryIncrease'] = false;
       _applyInventoryIncrease(payload);
+
       emit(const StockInQueued(AppStrings.stockInQueued));
       return;
     }
@@ -60,7 +65,10 @@ class StockInCubit extends Cubit<StockInState> {
     } catch (_) {
       await _prepareOfflinePayload(payload);
       await _syncService.enqueue(payload);
+
+      payload['_skipInventoryIncrease'] = false;
       _applyInventoryIncrease(payload);
+
       emit(const StockInQueued(AppStrings.stockInQueued));
     }
   }
@@ -84,8 +92,12 @@ class StockInCubit extends Cubit<StockInState> {
 
     final tempCode = 'OFFLINE-${DateTime.now().millisecondsSinceEpoch}';
     payload['_offlineTempCode'] = tempCode;
+    payload['productCode'] = tempCode;
     payload['_skipInventoryIncrease'] = true;
-    final localPayload = Map<String, dynamic>.from(payload)..['productCode'] = tempCode;
+
+    // Save local product with quantity = 0, adjustment will track actual quantity
+    final localPayload = Map<String, dynamic>.from(payload);
+    localPayload['quantity'] = 0;
     await _localProductService.addFromStockInPayload(localPayload);
   }
 

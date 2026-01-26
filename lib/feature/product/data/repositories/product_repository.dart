@@ -18,17 +18,23 @@ class ProductRepositoryImpl implements ProductRepository {
 
   @override
   Future<List<Product>> searchProducts(String query) async {
-    final response = await _client.invoke<List<Product>>(
-      AppEndpoints.PRODUCT_SEARCH,
-      RequestType.get,
-      queryParameters: {'q': query},
-      fromJsonT: (json) {
-        final list = json is List ? json : const <dynamic>[];
-        return list.whereType<Map<String, dynamic>>().map(Product.fromJson).toList();
-      },
-    );
+    List<Product> items = [];
 
-    final items = response.data;
+    try {
+      final response = await _client.invoke<List<Product>>(
+        AppEndpoints.PRODUCT_SEARCH,
+        RequestType.get,
+        queryParameters: {'q': query},
+        fromJsonT: (json) {
+          final list = json is List ? json : const <dynamic>[];
+          return list.whereType<Map<String, dynamic>>().map(Product.fromJson).toList();
+        },
+      );
+      items = response.data;
+    } catch (_) {
+      // If API fails (offline or error), continue with empty server items
+      items = [];
+    }
     final deletedCodes = <String>{};
     final localItems = <Product>[];
     for (final json in _localStorage.getAll()) {
