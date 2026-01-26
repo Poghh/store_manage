@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:store_manage/core/DI/di.dart';
+// import 'package:flutter_bloc/flutter_bloc.dart';
+// import 'package:store_manage/core/DI/di.dart';
 import 'package:store_manage/core/constants/app_colors.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/navigation/app_router.dart';
-import 'package:store_manage/core/utils/common_funtion_utils.dart';
+// import 'package:store_manage/core/utils/common_funtion_utils.dart';
 import 'package:store_manage/feature/home/presentation/widgets/image_action_button.dart';
-import 'package:store_manage/feature/home/presentation/widgets/product_search_bar.dart';
-import 'package:store_manage/feature/product/data/repositories/product_repository.dart';
-import 'package:store_manage/feature/product/presentation/cubit/product_search_cubit.dart';
+// import 'package:store_manage/feature/home/presentation/widgets/product_search_bar.dart';
+// import 'package:store_manage/feature/product/data/repositories/product_repository.dart';
+// import 'package:store_manage/feature/product/presentation/cubit/product_search_cubit.dart';
 
 class QuickActionsSection extends StatelessWidget {
   const QuickActionsSection({super.key});
@@ -47,31 +47,31 @@ class QuickActionsSection extends StatelessWidget {
             arrowIconColor: AppColors.primaryDark,
           ),
           SizedBox(height: AppNumbers.DOUBLE_12),
-          BlocProvider<ProductSearchCubit>(
-            create: (_) => ProductSearchCubit(di<ProductRepository>())..prime(),
-            child: ProductSearchBar(
-              onSelected: (product) {
-                context.router.push(
-                  ProductDetailsRoute(
-                    productCode: product.productCode,
-                    productName: product.productName,
-                    category: product.category ?? '',
-                    platform: product.platform ?? '',
-                    brand: product.brand ?? '',
-                    unit: product.unit ?? '',
-                    quantity: (product.quantity ?? 0).toString(),
-                    purchasePrice: product.purchasePrice == null
-                        ? ''
-                        : CommonFuntionUtils.formatCurrency(product.purchasePrice!),
-                    stockQuantityValue: product.quantity,
-                    priceValue: product.purchasePrice,
-                    stockInDate: product.stockInDate ?? '',
-                    imageUrl: product.image,
-                  ),
-                );
-              },
-            ),
-          ),
+          // BlocProvider<ProductSearchCubit>(
+          //   create: (_) => ProductSearchCubit(di<ProductRepository>())..prime(),
+          //   child: ProductSearchBar(
+          //     onSelected: (product) {
+          //       context.router.push(
+          //         ProductDetailsRoute(
+          //           productCode: product.productCode,
+          //           productName: product.productName,
+          //           category: product.category ?? '',
+          //           platform: product.platform ?? '',
+          //           brand: product.brand ?? '',
+          //           unit: product.unit ?? '',
+          //           quantity: (product.quantity ?? 0).toString(),
+          //           purchasePrice: product.purchasePrice == null
+          //               ? ''
+          //               : CommonFuntionUtils.formatCurrency(product.purchasePrice!),
+          //           stockQuantityValue: product.quantity,
+          //           priceValue: product.purchasePrice,
+          //           stockInDate: product.stockInDate ?? '',
+          //           imageUrl: product.image,
+          //         ),
+          //       );
+          //     },
+          //   ),
+          // ),
         ],
       ),
     );

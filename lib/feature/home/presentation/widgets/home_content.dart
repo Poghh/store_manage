@@ -1,8 +1,5 @@
-import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 import 'package:store_manage/core/constants/app_colors.dart';
@@ -22,8 +19,7 @@ class HomeContent extends StatefulWidget {
 }
 
 class _HomeContentState extends State<HomeContent> {
-  final List<_RevenueRecord> _records = [];
-  int _currentIndex = 0;
+  late DateTime _selectedDate;
   bool _isFetching = false;
   late final RetailRevenueService _revenueService;
   late final ValueListenable _retailBoxListenable;
@@ -31,10 +27,20 @@ class _HomeContentState extends State<HomeContent> {
   @override
   void initState() {
     super.initState();
+    _selectedDate = DateTime.now();
+    // Debug: print current system time and selected date to help diagnose incorrect date issues
+    debugPrint('HomeContent initState - DateTime.now(): ${DateTime.now().toIso8601String()}');
+    debugPrint('HomeContent initState - timezone: ${DateTime.now().timeZoneName} ${DateTime.now().timeZoneOffset}');
+    debugPrint('HomeContent initState - selectedDate init: ${_selectedDate.toIso8601String()}');
     _revenueService = di<RetailRevenueService>();
     _retailBoxListenable = _revenueService.listenable;
     _retailBoxListenable.addListener(_handleRetailChange);
-    _loadRecords();
+    _loadApiData();
+  }
+
+  Future<void> _loadApiData() async {
+    await _revenueService.loadApiData();
+    if (mounted) setState(() {});
   }
 
   @override
@@ -48,76 +54,46 @@ class _HomeContentState extends State<HomeContent> {
     setState(() {});
   }
 
-  Future<void> _loadRecords() async {
-    final raw = await rootBundle.loadString('assets/mocks/revenue.json');
-    final json = jsonDecode(raw) as Map<String, dynamic>;
-    final items = (json['records'] as List<dynamic>? ?? [])
-        .whereType<Map<String, dynamic>>()
-        .map(_RevenueRecord.fromJson)
-        .toList();
-    if (!mounted) return;
-    setState(() {
-      _records
-        ..clear()
-        ..addAll(items);
-      _currentIndex = _pickTodayIndex();
-    });
-  }
-
-  int _pickTodayIndex() {
-    if (_records.isEmpty) return 0;
-    final todayKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
-    final idx = _records.indexWhere((record) => record.rawDate == todayKey);
-    return idx == -1 ? (_records.length - 1) : idx;
-  }
-
-  Future<void> _fetchRecord(int nextIndex) async {
-    if (_isFetching || nextIndex == _currentIndex) return;
+  Future<void> _changeDate(int daysDelta) async {
+    if (_isFetching) return;
+    final newDate = _selectedDate.add(Duration(days: daysDelta));
+    if (newDate.isAfter(DateTime.now())) return;
     setState(() => _isFetching = true);
-    await Future.delayed(const Duration(milliseconds: 350));
+    await Future.delayed(const Duration(milliseconds: 200));
     if (!mounted) return;
     setState(() {
-      _currentIndex = nextIndex;
+      _selectedDate = newDate;
       _isFetching = false;
     });
   }
 
-  _RevenueRecord? get _currentRecord => _records.isEmpty ? null : _records[_currentIndex.clamp(0, _records.length - 1)];
-
-  String _buildRevenueTitle(_RevenueRecord? record) {
-    if (record == null) return AppStrings.todayRevenueLabel;
-    final parsed = DateTime.tryParse(record.rawDate);
-    if (parsed == null) return AppStrings.todayRevenueLabel;
+  String _buildRevenueTitle() {
     final today = DateTime.now();
-    if (CommonFuntionUtils.isSameDay(parsed, today)) {
+    if (CommonFuntionUtils.isSameDay(_selectedDate, today)) {
       return AppStrings.todayRevenueLabel;
     }
     final yesterday = today.subtract(const Duration(days: 1));
-    if (CommonFuntionUtils.isSameDay(parsed, yesterday)) {
+    if (CommonFuntionUtils.isSameDay(_selectedDate, yesterday)) {
       return AppStrings.homeRevenueYesterdayLabel;
     }
-    return AppStrings.homeRevenueDateLabel(record.displayDate);
+    return AppStrings.homeRevenueDateLabel(DateFormat('dd/MM/yyyy').format(_selectedDate));
   }
 
-  int _offlineRevenueForDate(String dateKey) => _revenueService.offlineRevenueForDate(dateKey);
-
-  void _openTransactionsForRecord(_RevenueRecord? record) {
-    final parsed = record == null ? null : DateTime.tryParse(record.rawDate);
-    if (parsed == null) return;
-    di<HomeTabCoordinator>().openTransactionsForDate(parsed);
+  void _openTransactionsForDate() {
+    di<HomeTabCoordinator>().openTransactionsForDate(_selectedDate);
   }
 
   @override
   Widget build(BuildContext context) {
-    final record = _currentRecord;
-    final parsedRecordDate = record == null ? null : DateTime.tryParse(record.rawDate);
-    final isToday = parsedRecordDate != null && CommonFuntionUtils.isSameDay(parsedRecordDate, DateTime.now());
-    final dateText = record == null ? '' : record.displayDate;
-    final canPrev = !_isFetching && _currentIndex > 0;
-    final canNext = !_isFetching && !isToday && _records.isNotEmpty && _currentIndex < _records.length - 1;
-    final offlineRevenue = record == null ? 0 : _offlineRevenueForDate(record.rawDate);
-    final revenueText = record == null ? '' : CommonFuntionUtils.formatCurrency(record.revenue + offlineRevenue);
-    final revenueTitle = _buildRevenueTitle(record);
+    final today = DateTime.now();
+    final isToday = CommonFuntionUtils.isSameDay(_selectedDate, today);
+    final dateText = DateFormat('dd/MM/yyyy').format(_selectedDate);
+    final canPrev = !_isFetching;
+    final canNext = !_isFetching && !isToday;
+    final dateKey = DateFormat('yyyy-MM-dd').format(_selectedDate);
+    final totalRevenue = _revenueService.getTotalRevenueForDate(dateKey);
+    final revenueText = CommonFuntionUtils.formatCurrency(totalRevenue);
+    final revenueTitle = _buildRevenueTitle();
     return Container(
       color: AppColors.background,
       child: Padding(
@@ -150,7 +126,7 @@ class _HomeContentState extends State<HomeContent> {
                       Material(
                         color: AppColors.surface.withValues(alpha: 0),
                         child: InkWell(
-                          onTap: () => _fetchRecord(_currentIndex - 1),
+                          onTap: () => _changeDate(-1),
                           borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_16),
                           child: Icon(
                             Icons.arrow_circle_left,
@@ -169,7 +145,7 @@ class _HomeContentState extends State<HomeContent> {
                       Material(
                         color: AppColors.surface.withValues(alpha: 0),
                         child: InkWell(
-                          onTap: () => _fetchRecord(_currentIndex + 1),
+                          onTap: () => _changeDate(1),
                           borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_16),
                           child: Icon(
                             Icons.arrow_circle_right,
@@ -187,29 +163,11 @@ class _HomeContentState extends State<HomeContent> {
               title: revenueTitle,
               revenueText: revenueText,
               isLoading: _isFetching,
-              onTap: _isFetching ? null : () => _openTransactionsForRecord(record),
+              onTap: _isFetching ? null : _openTransactionsForDate,
             ),
           ],
         ),
       ),
     );
-  }
-}
-
-class _RevenueRecord {
-  final String rawDate;
-  final int revenue;
-
-  _RevenueRecord({required this.rawDate, required this.revenue});
-
-  factory _RevenueRecord.fromJson(Map<String, dynamic> json) => _RevenueRecord(
-    rawDate: (json['date'] ?? '').toString(),
-    revenue: (json['revenue'] is int) ? json['revenue'] as int : int.tryParse('${json['revenue']}') ?? 0,
-  );
-
-  String get displayDate {
-    final parsed = DateTime.tryParse(rawDate);
-    if (parsed == null) return rawDate;
-    return DateFormat('dd/MM/yyyy').format(parsed);
   }
 }

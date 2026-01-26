@@ -43,6 +43,69 @@ class HomeTabsRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [PhoneInputPage]
+class PhoneInputRoute extends PageRouteInfo<void> {
+  const PhoneInputRoute({List<PageRouteInfo>? children})
+    : super(PhoneInputRoute.name, initialChildren: children);
+
+  static const String name = 'PhoneInputRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const PhoneInputPage();
+    },
+  );
+}
+
+/// generated route for
+/// [PinInputPage]
+class PinInputRoute extends PageRouteInfo<PinInputRouteArgs> {
+  PinInputRoute({
+    Key? key,
+    required String phoneNumber,
+    List<PageRouteInfo>? children,
+  }) : super(
+         PinInputRoute.name,
+         args: PinInputRouteArgs(key: key, phoneNumber: phoneNumber),
+         initialChildren: children,
+       );
+
+  static const String name = 'PinInputRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<PinInputRouteArgs>();
+      return PinInputPage(key: args.key, phoneNumber: args.phoneNumber);
+    },
+  );
+}
+
+class PinInputRouteArgs {
+  const PinInputRouteArgs({this.key, required this.phoneNumber});
+
+  final Key? key;
+
+  final String phoneNumber;
+
+  @override
+  String toString() {
+    return 'PinInputRouteArgs{key: $key, phoneNumber: $phoneNumber}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! PinInputRouteArgs) return false;
+    return key == other.key && phoneNumber == other.phoneNumber;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ phoneNumber.hashCode;
+}
+
+/// generated route for
 /// [ProductDetailsPage]
 class ProductDetailsRoute extends PageRouteInfo<ProductDetailsRouteArgs> {
   ProductDetailsRoute({

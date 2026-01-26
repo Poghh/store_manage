@@ -47,7 +47,9 @@ Future<void> setupDI() async {
     () => InventoryAdjustmentService(di<InventoryAdjustmentStorage>()),
   );
   di.registerLazySingleton<LocalProductService>(() => LocalProductService(di<LocalProductStorage>()));
-  di.registerLazySingleton<RetailRevenueService>(() => RetailRevenueService(di<RetailTransactionStorage>()));
+  di.registerLazySingleton<RetailRevenueService>(
+    () => RetailRevenueService(di<RetailTransactionStorage>(), di<NetworkClient>()),
+  );
 
   di.registerLazySingleton<StockInRepository>(() => StockInRepositoryImpl(di<NetworkClient>()));
   di.registerLazySingleton<RetailRepository>(() => RetailRepositoryImpl(di<NetworkClient>()));

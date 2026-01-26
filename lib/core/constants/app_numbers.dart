@@ -5,6 +5,7 @@ class AppNumbers {
   static const int INT_3 = 3;
   static const int INT_4 = 4;
   static const int INT_5 = 5;
+  static const int INT_10 = 10;
   static const int INT_128 = 128;
   static const double DOUBLE_0 = 0.0;
   static const double DOUBLE_0_5 = 0.5;
@@ -36,6 +37,7 @@ class AppNumbers {
   static const double DOUBLE_40 = 40;
   static const double DOUBLE_48 = 48;
   static const double DOUBLE_50 = 50;
+  static const double DOUBLE_52 = 52;
   static const double DOUBLE_56 = 56;
   static const double DOUBLE_60 = 60;
   static const double DOUBLE_64 = 64;

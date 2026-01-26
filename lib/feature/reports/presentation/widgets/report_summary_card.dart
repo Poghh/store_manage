@@ -10,23 +10,24 @@ import 'package:store_manage/core/utils/common_funtion_utils.dart';
 import 'package:store_manage/core/widgets/app_surface_card.dart';
 
 class ReportSummaryCard extends StatelessWidget {
-  final DateTime date;
-  final int totalRevenue;
-  final double growthValue;
-  final String growthLabel;
+  final int todayRevenue;
+  final int yesterdayRevenue;
+  final double growthPercentage;
 
   const ReportSummaryCard({
     super.key,
-    required this.date,
-    required this.totalRevenue,
-    required this.growthValue,
-    required this.growthLabel,
+    required this.todayRevenue,
+    required this.yesterdayRevenue,
+    required this.growthPercentage,
   });
 
   @override
   Widget build(BuildContext context) {
+    final today = DateTime.now();
+    final yesterday = today.subtract(const Duration(days: 1));
+
     return AppSurfaceCard(
-      padding: const EdgeInsets.all(AppNumbers.DOUBLE_16),
+      padding: EdgeInsets.all(AppNumbers.DOUBLE_16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -39,44 +40,85 @@ class ReportSummaryCard extends StatelessWidget {
               color: AppColors.textPrimary,
             ),
           ),
-          const SizedBox(height: AppNumbers.DOUBLE_8),
-          Text(
-            DateFormat('dd/MM/yyyy').format(date),
-            style: const TextStyle(
-              fontSize: AppFontSizes.fontSize12,
-              fontWeight: FontWeight.w500,
-              fontFamily: AppFonts.inter,
-              color: AppColors.textSecondary,
-            ),
+          SizedBox(height: AppNumbers.DOUBLE_16),
+          _buildRevenueRow(
+            label: AppStrings.reportTodayLabel,
+            date: today,
+            revenue: todayRevenue,
+            showGrowth: true,
           ),
-          const SizedBox(height: AppNumbers.DOUBLE_12),
-          Row(
+          SizedBox(height: AppNumbers.DOUBLE_12),
+          _buildRevenueRow(
+            label: AppStrings.reportYesterdayLabel,
+            date: yesterday,
+            revenue: yesterdayRevenue,
+            showGrowth: false,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRevenueRow({
+    required String label,
+    required DateTime date,
+    required int revenue,
+    required bool showGrowth,
+  }) {
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.assessment_outlined, color: AppColors.primary),
-              const SizedBox(width: AppNumbers.DOUBLE_8),
               Text(
-                CommonFuntionUtils.formatCurrency(totalRevenue),
+                label,
                 style: const TextStyle(
-                  fontSize: AppFontSizes.fontSize20,
-                  fontWeight: FontWeight.w700,
+                  fontSize: AppFontSizes.fontSize12,
+                  fontWeight: FontWeight.w500,
                   fontFamily: AppFonts.inter,
-                  color: AppColors.textPrimary,
+                  color: AppColors.textSecondary,
                 ),
               ),
-              const Spacer(),
+              SizedBox(height: AppNumbers.DOUBLE_4),
               Text(
-                growthLabel,
+                DateFormat('dd/MM/yyyy').format(date),
                 style: TextStyle(
-                  fontSize: AppFontSizes.fontSize12,
-                  fontWeight: FontWeight.w600,
+                  fontSize: AppFontSizes.fontSize10,
                   fontFamily: AppFonts.inter,
-                  color: growthValue >= 0 ? AppColors.primary : Colors.redAccent,
+                  color: AppColors.textMuted,
                 ),
               ),
             ],
           ),
-        ],
-      ),
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text(
+              CommonFuntionUtils.formatCurrency(revenue),
+              style: const TextStyle(
+                fontSize: AppFontSizes.fontSize16,
+                fontWeight: FontWeight.w700,
+                fontFamily: AppFonts.inter,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            if (showGrowth) ...[
+              SizedBox(height: AppNumbers.DOUBLE_4),
+              Text(
+                AppStrings.reportGrowthLabel(growthPercentage),
+                style: TextStyle(
+                  fontSize: AppFontSizes.fontSize10,
+                  fontWeight: FontWeight.w600,
+                  fontFamily: AppFonts.inter,
+                  color: growthPercentage >= 0 ? AppColors.primary : Colors.redAccent,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ],
     );
   }
 }

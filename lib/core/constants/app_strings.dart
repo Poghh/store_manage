@@ -11,6 +11,16 @@ class AppStrings {
   static const String PASSWORD = 'Mật khẩu';
   static const String LOGIN = 'Đăng nhập';
 
+  // === LOGIN ===
+  static const String loginPhoneTitle = 'Nhập số điện thoại';
+  static const String loginPhoneSubtitle = 'Vui lòng nhập số điện thoại để tiếp tục';
+  static const String loginPhoneHint = 'Số điện thoại';
+  static const String loginPhoneContinueButton = 'Tiếp tục';
+  static const String loginPinTitle = 'Nhập mã PIN';
+  static const String loginPinSubtitle = 'Nhập mã PIN 4 số để đăng nhập';
+  static const String loginPinButton = 'Đăng nhập';
+  static const String loginPinForgotButton = 'Quên mã PIN?';
+
   // === HOME ===
   static const String homeGreetingPrefix = 'Xin chào, ';
   static const String homeGreetingName = 'Thanh Phong';
@@ -141,6 +151,14 @@ class AppStrings {
 
   // === REPORTS ===
   static const String reportSummaryTitle = 'Tóm tắt doanh thu';
+  static const String reportTodayLabel = 'Hôm nay';
+  static const String reportYesterdayLabel = 'Hôm qua';
+  static const String reportCompareYesterday = 'so với hôm qua';
+  static const String reportNoData = 'Chưa có dữ liệu';
+  static String reportGrowthLabel(double percentage) {
+    final sign = percentage >= 0 ? '+' : '';
+    return '$sign${percentage.toStringAsFixed(1)}% so với hôm qua';
+  }
   static const String reportAiTitle = 'AI phân tích & gợi ý';
   static const String reportSuggestionTitle = 'Đề xuất';
   static const String reportBulletPrefix = '• ';
