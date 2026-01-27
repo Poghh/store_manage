@@ -60,22 +60,22 @@ class _MyAppState extends State<MyApp> {
       return const MaterialApp(debugShowCheckedModeBanner: false, home: SplashScreen());
     }
 
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.defaultTheme,
-      themeMode: ThemeMode.system,
-      routerConfig: _appRouter.config(
-        navigatorObservers: () => [MyRouteObserver()],
-        deepLinkBuilder: (_) {
-          if (_savedPhone != null) {
-            return DeepLink([PinInputRoute(phoneNumber: _savedPhone!)]);
-          }
-          return DeepLink([const PhoneInputRoute()]);
-        },
-      ),
-      builder: (context, child) {
-        return ToastificationWrapper(
-          child: ConnectivityToastListener(
+    return ToastificationWrapper(
+      child: MaterialApp.router(
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.defaultTheme,
+        themeMode: ThemeMode.system,
+        routerConfig: _appRouter.config(
+          navigatorObservers: () => [MyRouteObserver()],
+          deepLinkBuilder: (_) {
+            if (_savedPhone != null) {
+              return DeepLink([PinInputRoute(phoneNumber: _savedPhone!)]);
+            }
+            return DeepLink([const PhoneInputRoute()]);
+          },
+        ),
+        builder: (context, child) {
+          return ConnectivityToastListener(
             child: Stack(
               children: [
                 child ?? const SizedBox(),
@@ -90,9 +90,9 @@ class _MyAppState extends State<MyApp> {
                 ),
               ],
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }

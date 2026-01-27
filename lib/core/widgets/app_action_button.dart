@@ -31,11 +31,18 @@ class AppActionButton extends StatelessWidget {
     this.fontWeight = FontWeight.w700,
   });
 
+  bool get _isEnabled => onPressed != null;
+
   @override
   Widget build(BuildContext context) {
+    final effectiveBackgroundColor = _isEnabled ? backgroundColor : AppColors.border;
+    final effectiveForegroundColor = _isEnabled ? foregroundColor : AppColors.textMuted;
+
     final style = ElevatedButton.styleFrom(
-      backgroundColor: backgroundColor,
-      foregroundColor: foregroundColor,
+      backgroundColor: effectiveBackgroundColor,
+      foregroundColor: effectiveForegroundColor,
+      disabledBackgroundColor: AppColors.border,
+      disabledForegroundColor: AppColors.textMuted,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(borderRadius),
         side: borderColor == null ? BorderSide.none : BorderSide(color: borderColor!),
@@ -44,7 +51,12 @@ class AppActionButton extends StatelessWidget {
 
     final textWidget = Text(
       label,
-      style: TextStyle(fontSize: fontSize, fontWeight: fontWeight, fontFamily: AppFonts.inter, color: foregroundColor),
+      style: TextStyle(
+        fontSize: fontSize,
+        fontWeight: fontWeight,
+        fontFamily: AppFonts.inter,
+        color: effectiveForegroundColor,
+      ),
     );
 
     return SizedBox(
@@ -55,7 +67,7 @@ class AppActionButton extends StatelessWidget {
           : ElevatedButton.icon(
               onPressed: onPressed,
               style: style,
-              icon: Icon(icon, color: foregroundColor),
+              icon: Icon(icon, color: effectiveForegroundColor),
               label: textWidget,
             ),
     );

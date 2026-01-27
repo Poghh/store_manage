@@ -75,11 +75,13 @@ class _MoneyTransactionPageState extends State<MoneyTransactionPage> {
         ],
       ),
       body: SafeArea(
-        child: Container(
-          decoration: const BoxDecoration(
-            color: AppColors.background,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-          ),
+        bottom: false,
+        child: SizedBox.expand(
+          child: Container(
+            decoration: const BoxDecoration(
+              color: AppColors.background,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            ),
           padding: const EdgeInsets.all(AppNumbers.DOUBLE_16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,6 +102,7 @@ class _MoneyTransactionPageState extends State<MoneyTransactionPage> {
             ],
           ),
         ),
+      ),
       ),
     );
   }

@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/utils/common_funtion_utils.dart';
 
-class StockInFormController {
+class StockInFormController extends ChangeNotifier {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController productCodeController = TextEditingController();
   final TextEditingController productNameController = TextEditingController();
@@ -27,6 +27,23 @@ class StockInFormController {
   StockInFormController() {
     dateController.text = CommonFuntionUtils.formatDateDDMMYYYY(selectedDate);
     productCodeController.text = productCode;
+
+    // Listen to text changes to notify listeners
+    productNameController.addListener(_onFormChanged);
+    quantityController.addListener(_onFormChanged);
+    priceController.addListener(_onFormChanged);
+  }
+
+  void _onFormChanged() {
+    notifyListeners();
+  }
+
+  /// Check if form has minimum required data to enable submit button
+  bool get isFormValid {
+    final hasProductName = productNameController.text.trim().isNotEmpty;
+    final hasQuantity = (int.tryParse(quantityController.text.trim()) ?? 0) > 0;
+    final hasPrice = (CommonFuntionUtils.parseDigitsToInt(priceController.text) ?? 0) > 0;
+    return hasProductName && hasQuantity && hasPrice;
   }
 
   void applyPrefill({
@@ -92,12 +109,17 @@ class StockInFormController {
     priceController.clear();
   }
 
+  @override
   void dispose() {
+    productNameController.removeListener(_onFormChanged);
+    quantityController.removeListener(_onFormChanged);
+    priceController.removeListener(_onFormChanged);
     productCodeController.dispose();
     productNameController.dispose();
     quantityController.dispose();
     priceController.dispose();
     dateController.dispose();
+    super.dispose();
   }
 
   bool validate() => formKey.currentState?.validate() ?? false;

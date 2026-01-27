@@ -5,12 +5,14 @@ import 'package:store_manage/core/utils/app_dialog.dart';
 import 'package:store_manage/core/utils/app_toast.dart';
 
 import 'package:store_manage/core/constants/app_colors.dart';
+import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/DI/di.dart';
 import 'package:store_manage/core/navigation/home_tab_coordinator.dart';
 import 'package:store_manage/core/offline/stock_in/stock_in_sync_service.dart';
 import 'package:store_manage/core/services/inventory_adjustment_service.dart';
 import 'package:store_manage/core/services/local_product_service.dart';
+import 'package:store_manage/core/widgets/app_page_app_bar.dart';
 import 'package:store_manage/feature/product/data/repositories/product_repository.dart';
 import 'package:store_manage/feature/product/presentation/cubit/product_search_cubit.dart';
 import 'package:store_manage/core/network/connectivity_service.dart';
@@ -19,7 +21,6 @@ import 'package:store_manage/feature/stock_in/presentation/cubit/stock_in_cubit.
 import 'package:store_manage/feature/stock_in/presentation/cubit/stock_in_state.dart';
 import 'package:store_manage/feature/stock_in/presentation/widgets/stock_in_form_controller.dart';
 import 'package:store_manage/feature/stock_in/presentation/widgets/stock_in_body.dart';
-import 'package:store_manage/feature/stock_in/presentation/widgets/stock_in_app_bar.dart';
 import 'package:store_manage/feature/stock_in/presentation/widgets/stock_in_submit_button.dart';
 
 @RoutePage()
@@ -105,12 +106,28 @@ class _StockInPageState extends State<StockInPage> {
             AppToast.error(context, state.message);
           }
         },
-        child: Scaffold(
-          backgroundColor: AppColors.background,
-          appBar: StockInAppBar(onBack: () => context.maybePop()),
-          body: SafeArea(child: StockInBody(formController: _formController)),
-          bottomNavigationBar: Builder(
-            builder: (innerContext) => StockInSubmitButton(onPressed: () => _submitStockIn(innerContext)),
+        child: Builder(
+          builder: (innerContext) => Scaffold(
+            backgroundColor: AppColors.primary,
+            appBar: AppPageAppBar(onBack: () => context.maybePop(), title: AppStrings.stockInTitle),
+            body: SafeArea(
+              bottom: false,
+              child: SizedBox.expand(
+                child: Container(
+                  decoration: const BoxDecoration(
+                    color: AppColors.background,
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(AppNumbers.DOUBLE_24)),
+                  ),
+                  child: StockInBody(formController: _formController),
+                ),
+              ),
+            ),
+            bottomNavigationBar: ListenableBuilder(
+              listenable: _formController,
+              builder: (context, child) => StockInSubmitButton(
+                onPressed: _formController.isFormValid ? () => _submitStockIn(innerContext) : null,
+              ),
+            ),
           ),
         ),
       ),
