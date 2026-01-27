@@ -220,4 +220,10 @@ class AppStrings {
   static const transactionFeeLabel = 'Phí giao dịch (5%)';
   static const totalAmountLabel = 'Tổng tiền';
   static const confirmTransaction = 'Xác nhận giao dịch';
+
+  // === LOGOUT ===
+  static const String logoutTitle = 'Đăng xuất';
+  static const String logoutMessage = 'Bạn có chắc muốn đăng xuất?';
+  static const String logoutConfirm = 'Đăng xuất';
+  static const String logoutCancel = 'Hủy';
 }

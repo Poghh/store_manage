@@ -204,7 +204,7 @@ class _MoneyTransactionPageState extends State<MoneyTransactionPage> {
   }
 
   void _onConfirm() {
-    // TODO: submit transaction
+    // 
   }
 
   String _format(int value) {
