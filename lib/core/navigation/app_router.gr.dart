@@ -59,6 +59,22 @@ class HomeTabsRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [MoneyTransactionPage]
+class MoneyTransactionRoute extends PageRouteInfo<void> {
+  const MoneyTransactionRoute({List<PageRouteInfo>? children})
+    : super(MoneyTransactionRoute.name, initialChildren: children);
+
+  static const String name = 'MoneyTransactionRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const MoneyTransactionPage();
+    },
+  );
+}
+
+/// generated route for
 /// [PhoneInputPage]
 class PhoneInputRoute extends PageRouteInfo<void> {
   const PhoneInputRoute({List<PageRouteInfo>? children})

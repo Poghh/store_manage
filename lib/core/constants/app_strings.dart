@@ -21,7 +21,8 @@ class AppStrings {
   static const String loginPinButton = 'Đăng nhập';
   static const String loginPinForgotButton = 'Quên mã PIN?';
   static const String loginForgotPinDialogTitle = 'Quên mã PIN?';
-  static const String loginForgotPinDialogMessage = 'Bạn sẽ cần xác minh lại số điện thoại và tạo mã PIN mới. Tiếp tục?';
+  static const String loginForgotPinDialogMessage =
+      'Bạn sẽ cần xác minh lại số điện thoại và tạo mã PIN mới. Tiếp tục?';
   static const String loginForgotPinDialogCancel = 'Hủy';
   static const String loginForgotPinDialogConfirm = 'Xác nhận';
   static const String forgotPinPageTitle = 'Đặt lại mã PIN';
@@ -32,7 +33,8 @@ class AppStrings {
   static const String forgotPinOptionResetDesc = 'Không nhớ số điện thoại? Xóa tất cả dữ liệu và bắt đầu lại';
   static const String forgotPinCancelButton = 'Quay lại';
   static const String forgotPinResetDialogTitle = 'Xóa toàn bộ dữ liệu?';
-  static const String forgotPinResetDialogMessage = 'Hành động này sẽ xóa tất cả dữ liệu của ứng dụng bao gồm thông tin đăng nhập, giao dịch offline và cài đặt. Bạn không thể hoàn tác.';
+  static const String forgotPinResetDialogMessage =
+      'Hành động này sẽ xóa tất cả dữ liệu của ứng dụng bao gồm thông tin đăng nhập, giao dịch offline và cài đặt. Bạn không thể hoàn tác.';
   static const String forgotPinResetDialogCancel = 'Hủy';
   static const String forgotPinResetDialogConfirm = 'Xóa tất cả';
   static const String verifyPhoneTitle = 'Xác minh số điện thoại';
@@ -58,6 +60,8 @@ class AppStrings {
   static const String homeTabProfile = 'Cá nhân';
   static const String homeRevenueYesterdayLabel = 'Doanh thu hôm qua';
   static String homeRevenueDateLabel(String date) => 'Doanh thu ngày $date';
+  static const String homeMoneyTransactionTitle = 'CHUYỂN / RÚT TIỀN';
+  static const String homeMoneyTransactionSubtitle = 'Giao dịch';
 
   // === STOCK IN ===
   static const String stockInTitle = 'Nhập Hàng';
@@ -180,6 +184,7 @@ class AppStrings {
     final sign = percentage >= 0 ? '+' : '';
     return '$sign${percentage.toStringAsFixed(1)}% so với hôm qua';
   }
+
   static const String reportAiTitle = 'AI phân tích & gợi ý';
   static const String reportSuggestionTitle = 'Đề xuất';
   static const String reportBulletPrefix = '• ';
@@ -205,4 +210,14 @@ class AppStrings {
 
   // === PERMISSIONS ===
   static const String photoPermissionDenied = 'Không có quyền truy cập ảnh';
+
+  // === MONEY TRANSACTION ===
+  static const moneyTransactionTitle = 'Chuyển / Rút tiền';
+  static const transferMoney = 'Chuyển tiền';
+  static const withdrawCash = 'Rút tiền mặt';
+  static const amountLabel = 'Số tiền';
+  static const bankLabel = 'Ngân hàng';
+  static const transactionFeeLabel = 'Phí giao dịch (5%)';
+  static const totalAmountLabel = 'Tổng tiền';
+  static const confirmTransaction = 'Xác nhận giao dịch';
 }
