@@ -125,43 +125,40 @@ class _RetailPageState extends State<RetailPage> {
               ],
             ),
             body: SafeArea(
-              child: Column(
-                children: [
-                  Expanded(
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        color: AppColors.background,
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(AppNumbers.DOUBLE_24)),
-                      ),
-                      child: RetailPageBody(
-                        hasProduct: hasProduct,
-                        displayName: displayName,
-                        displayCode: displayCode,
-                        displayStock: displayStock,
-                        displayImage: displayImage,
-                        quantity: _quantity,
-                        onDecrease: () => setState(() => _quantity = _quantity > 1 ? _quantity - 1 : 1),
-                        onIncrease: () => _increaseQuantity(innerContext),
-                        priceController: _priceController,
-                        onPriceChanged: _onPriceChanged,
-                        purchasePrice: _purchasePrice,
-                        total: _total,
-                        paymentMethod: _paymentMethod,
-                        paymentMethodLabel: _paymentMethodLabel,
-                        onPaymentChanged: (value) => setState(() => _paymentMethod = value),
-                        onConfirm: () => _submitRetail(innerContext),
-                        onProductSelected: _onProductSelected,
-                      ),
-                    ),
+              bottom: false,
+              child: SizedBox.expand(
+                child: Container(
+                  decoration: const BoxDecoration(
+                    color: AppColors.background,
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(AppNumbers.DOUBLE_24)),
                   ),
-                ],
+                  child: RetailPageBody(
+                  hasProduct: hasProduct,
+                  displayName: displayName,
+                  displayCode: displayCode,
+                  displayStock: displayStock,
+                  displayImage: displayImage,
+                  quantity: _quantity,
+                  onDecrease: () => setState(() => _quantity = _quantity > 1 ? _quantity - 1 : 1),
+                  onIncrease: () => _increaseQuantity(innerContext),
+                  priceController: _priceController,
+                  onPriceChanged: _onPriceChanged,
+                  purchasePrice: _purchasePrice,
+                  total: _total,
+                  paymentMethod: _paymentMethod,
+                  paymentMethodLabel: _paymentMethodLabel,
+                  onPaymentChanged: (value) => setState(() => _paymentMethod = value),
+                  onConfirm: () => _submitRetail(innerContext),
+                  onProductSelected: _onProductSelected,
+                ),
               ),
             ),
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   void _submitRetail(BuildContext context) {
     if (_selectedCode.isEmpty) {

@@ -22,13 +22,18 @@ class _ConnectivityToastListenerState extends State<ConnectivityToastListener> {
   StreamSubscription<ConnectivityResult>? _subscription;
   bool? _isOnline;
   bool _initialized = false;
+  bool _isReady = false;
 
   @override
   void initState() {
     super.initState();
     _connectivity = di<ConnectivityService>();
     _bootstrap();
-    _subscription = _connectivity.onChanged.listen(_handleChange);
+    // Delay subscription until after first frame to ensure Navigator is ready
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _isReady = true;
+      _subscription = _connectivity.onChanged.listen(_handleChange);
+    });
   }
 
   Future<void> _bootstrap() async {
@@ -39,7 +44,7 @@ class _ConnectivityToastListenerState extends State<ConnectivityToastListener> {
 
   void _handleChange(ConnectivityResult result) {
     final online = result != ConnectivityResult.none;
-    if (!_initialized) {
+    if (!_initialized || !_isReady) {
       _isOnline = online;
       _initialized = true;
       return;

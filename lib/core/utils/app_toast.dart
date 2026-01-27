@@ -5,7 +5,13 @@ import 'package:toastification/toastification.dart';
 class AppToast {
   const AppToast._();
 
+  /// Check if Navigator is available in context
+  static bool _isNavigatorReady(BuildContext context) {
+    return Navigator.maybeOf(context) != null;
+  }
+
   static void success(BuildContext context, String message) {
+    if (!_isNavigatorReady(context)) return;
     toastification.show(
       context: context,
       type: ToastificationType.success,
@@ -15,6 +21,7 @@ class AppToast {
   }
 
   static void warning(BuildContext context, String message) {
+    if (!_isNavigatorReady(context)) return;
     toastification.show(
       context: context,
       type: ToastificationType.warning,
@@ -24,6 +31,7 @@ class AppToast {
   }
 
   static void error(BuildContext context, String message) {
+    if (!_isNavigatorReady(context)) return;
     toastification.show(
       context: context,
       type: ToastificationType.error,
