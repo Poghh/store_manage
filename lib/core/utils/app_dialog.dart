@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:store_manage/core/constants/app_colors.dart';
 import 'package:store_manage/core/constants/app_font_sizes.dart';
+import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 
 enum AppDialogType { warning, error, success, normal }
@@ -23,119 +24,25 @@ class AppDialog {
     showDialog<void>(
       context: context,
       barrierDismissible: barrierDismissible,
-      builder: (dialogContext) {
-        final confirmColor = _resolveConfirmColor(type);
-        return AlertDialog(
-          insetPadding: const EdgeInsets.symmetric(horizontal: AppNumbers.DOUBLE_24, vertical: AppNumbers.DOUBLE_24),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_16)),
-          title: Stack(
-            children: [
-              Align(
-                alignment: Alignment.center,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: AppNumbers.DOUBLE_6),
-                  child: Text(
-                    title,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: AppFontSizes.fontSize18,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                top: -8,
-                right: -8,
-                child: IconButton(
-                  constraints: const BoxConstraints(minWidth: AppNumbers.DOUBLE_32, minHeight: AppNumbers.DOUBLE_32),
-                  padding: EdgeInsets.zero,
-                  iconSize: AppNumbers.DOUBLE_20,
-                  icon: const Icon(Icons.close, color: AppColors.textSecondary),
-                  onPressed: () {
-                    Navigator.of(dialogContext).pop();
-                  },
-                ),
-              ),
-            ],
-          ),
-          content: Text(
-            message,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: AppFontSizes.fontSize14,
-              color: AppColors.textSecondary,
-              height: AppNumbers.DOUBLE_1_4,
-            ),
-          ),
-          actionsPadding: const EdgeInsets.fromLTRB(
-            AppNumbers.DOUBLE_16,
-            AppNumbers.DOUBLE_0,
-            AppNumbers.DOUBLE_16,
-            AppNumbers.DOUBLE_16,
-          ),
-          actions: [
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () {
-                      Navigator.of(dialogContext).pop();
-                      onCancel();
-                    },
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: AppNumbers.DOUBLE_12),
-                      side: const BorderSide(color: AppColors.warning, width: AppNumbers.DOUBLE_1),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_10)),
-                    ),
-                    child: Text(
-                      cancelText,
-                      textAlign: TextAlign.center,
-                      maxLines: AppNumbers.INT_2,
-                      overflow: TextOverflow.visible,
-                      style: const TextStyle(
-                        fontSize: AppFontSizes.fontSize12,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.warning,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: AppNumbers.DOUBLE_12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(dialogContext).pop();
-                      onConfirm();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: AppNumbers.DOUBLE_12),
-                      backgroundColor: confirmColor,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_10)),
-                    ),
-                    child: Text(
-                      confirmText,
-                      textAlign: TextAlign.center,
-                      maxLines: AppNumbers.INT_2,
-                      overflow: TextOverflow.visible,
-                      style: const TextStyle(
-                        fontSize: AppFontSizes.fontSize12,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textOnPrimary,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        );
-      },
+      builder: (dialogContext) => _DialogContent(
+        title: title,
+        message: message,
+        confirmText: confirmText,
+        cancelText: cancelText,
+        type: type,
+        onConfirm: () {
+          Navigator.of(dialogContext).pop();
+          onConfirm();
+        },
+        onCancel: () {
+          Navigator.of(dialogContext).pop();
+          onCancel();
+        },
+        onClose: () => Navigator.of(dialogContext).pop(),
+      ),
     );
   }
 
-  /// Async version of confirm that returns true if confirmed, false otherwise
   static Future<bool> confirmAsync({
     required BuildContext context,
     required String title,
@@ -148,112 +55,43 @@ class AppDialog {
     final result = await showDialog<bool>(
       context: context,
       barrierDismissible: barrierDismissible,
-      builder: (dialogContext) {
-        final confirmColor = _resolveConfirmColor(type);
-        return AlertDialog(
-          insetPadding: const EdgeInsets.symmetric(horizontal: AppNumbers.DOUBLE_24, vertical: AppNumbers.DOUBLE_24),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_16)),
-          title: Stack(
-            children: [
-              Align(
-                alignment: Alignment.center,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: AppNumbers.DOUBLE_6),
-                  child: Text(
-                    title,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: AppFontSizes.fontSize18,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                top: -8,
-                right: -8,
-                child: IconButton(
-                  constraints: const BoxConstraints(minWidth: AppNumbers.DOUBLE_32, minHeight: AppNumbers.DOUBLE_32),
-                  padding: EdgeInsets.zero,
-                  iconSize: AppNumbers.DOUBLE_20,
-                  icon: const Icon(Icons.close, color: AppColors.textSecondary),
-                  onPressed: () => Navigator.of(dialogContext).pop(false),
-                ),
-              ),
-            ],
-          ),
-          content: Text(
-            message,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: AppFontSizes.fontSize14,
-              color: AppColors.textSecondary,
-              height: AppNumbers.DOUBLE_1_4,
-            ),
-          ),
-          actionsPadding: const EdgeInsets.fromLTRB(
-            AppNumbers.DOUBLE_16,
-            AppNumbers.DOUBLE_0,
-            AppNumbers.DOUBLE_16,
-            AppNumbers.DOUBLE_16,
-          ),
-          actions: [
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.of(dialogContext).pop(false),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: AppNumbers.DOUBLE_12),
-                      side: BorderSide(color: confirmColor, width: AppNumbers.DOUBLE_1),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_10)),
-                    ),
-                    child: Text(
-                      cancelText,
-                      textAlign: TextAlign.center,
-                      maxLines: AppNumbers.INT_2,
-                      overflow: TextOverflow.visible,
-                      style: TextStyle(
-                        fontSize: AppFontSizes.fontSize12,
-                        fontWeight: FontWeight.w600,
-                        color: confirmColor,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: AppNumbers.DOUBLE_12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.of(dialogContext).pop(true),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: AppNumbers.DOUBLE_12),
-                      backgroundColor: confirmColor,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_10)),
-                    ),
-                    child: Text(
-                      confirmText,
-                      textAlign: TextAlign.center,
-                      maxLines: AppNumbers.INT_2,
-                      overflow: TextOverflow.visible,
-                      style: const TextStyle(
-                        fontSize: AppFontSizes.fontSize12,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textOnPrimary,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        );
-      },
+      builder: (dialogContext) => _DialogContent(
+        title: title,
+        message: message,
+        confirmText: confirmText,
+        cancelText: cancelText,
+        type: type,
+        onConfirm: () => Navigator.of(dialogContext).pop(true),
+        onCancel: () => Navigator.of(dialogContext).pop(false),
+        onClose: () => Navigator.of(dialogContext).pop(false),
+      ),
     );
     return result ?? false;
   }
+}
 
-  static Color _resolveConfirmColor(AppDialogType type) {
+class _DialogContent extends StatelessWidget {
+  final String title;
+  final String message;
+  final String confirmText;
+  final String cancelText;
+  final AppDialogType type;
+  final VoidCallback onConfirm;
+  final VoidCallback onCancel;
+  final VoidCallback onClose;
+
+  const _DialogContent({
+    required this.title,
+    required this.message,
+    required this.confirmText,
+    required this.cancelText,
+    required this.type,
+    required this.onConfirm,
+    required this.onCancel,
+    required this.onClose,
+  });
+
+  Color get _typeColor {
     switch (type) {
       case AppDialogType.error:
         return AppColors.error;
@@ -264,5 +102,128 @@ class AppDialog {
       case AppDialogType.warning:
         return AppColors.warning;
     }
+  }
+
+  IconData get _typeIcon {
+    switch (type) {
+      case AppDialogType.error:
+        return Icons.error_outline;
+      case AppDialogType.success:
+        return Icons.check_circle_outline;
+      case AppDialogType.normal:
+        return Icons.info_outline;
+      case AppDialogType.warning:
+        return Icons.warning_amber_rounded;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: AppNumbers.DOUBLE_24),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_20),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(AppNumbers.DOUBLE_24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Icon
+            Container(
+              width: AppNumbers.DOUBLE_64,
+              height: AppNumbers.DOUBLE_64,
+              decoration: BoxDecoration(
+                color: _typeColor.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                _typeIcon,
+                size: AppNumbers.DOUBLE_32,
+                color: _typeColor,
+              ),
+            ),
+            const SizedBox(height: AppNumbers.DOUBLE_20),
+            // Title
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: AppFontSizes.fontSize18,
+                fontWeight: FontWeight.w700,
+                fontFamily: AppFonts.inter,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: AppNumbers.DOUBLE_12),
+            // Message
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: AppFontSizes.fontSize14,
+                fontFamily: AppFonts.inter,
+                color: AppColors.textSecondary,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: AppNumbers.DOUBLE_24),
+            // Buttons
+            Row(
+              children: [
+                Expanded(
+                  child: SizedBox(
+                    height: AppNumbers.DOUBLE_48,
+                    child: OutlinedButton(
+                      onPressed: onCancel,
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: AppColors.border, width: 1.5),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_12),
+                        ),
+                      ),
+                      child: Text(
+                        cancelText,
+                        style: const TextStyle(
+                          fontSize: AppFontSizes.fontSize14,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: AppFonts.inter,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppNumbers.DOUBLE_12),
+                Expanded(
+                  child: SizedBox(
+                    height: AppNumbers.DOUBLE_48,
+                    child: ElevatedButton(
+                      onPressed: onConfirm,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _typeColor,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_12),
+                        ),
+                      ),
+                      child: Text(
+                        confirmText,
+                        style: const TextStyle(
+                          fontSize: AppFontSizes.fontSize14,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: AppFonts.inter,
+                          color: AppColors.textOnPrimary,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

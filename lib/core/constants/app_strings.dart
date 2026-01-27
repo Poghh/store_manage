@@ -1,4 +1,15 @@
 class AppStrings {
+  // === CHANGE PIN ===
+  static const String changePinTitle = 'Đổi mã PIN';
+  static const String changePinOldPin = 'Nhập mã PIN cũ';
+  static const String changePinNewPin = 'Nhập mã PIN mới';
+  static const String changePinConfirmPin = 'Xác nhận mã PIN mới';
+  static const String changePinButton = 'Đổi mã PIN';
+  static const String changePinPinLength = 'Mã PIN phải đủ 4 số';
+  static const String changePinConfirmNotMatch = 'Xác nhận mã PIN không khớp';
+  static const String changePinOldPinIncorrect = 'Mã PIN cũ không đúng';
+  static const String changePinSuccessTitle = 'Thành công';
+  static const String changePinSuccessMessage = 'Đổi mã PIN thành công!';
   // === SYSTEM ===
   static const String VIET_NAM_LOCALE = 'vi_VN';
   static const String VIET_NAM_DONG_CURRENCY = '₫';
@@ -217,7 +228,7 @@ class AppStrings {
   static const withdrawCash = 'Rút tiền mặt';
   static const amountLabel = 'Số tiền';
   static const bankLabel = 'Ngân hàng';
-  static const transactionFeeLabel = 'Phí giao dịch (5%)';
+  static const transactionFeeLabel = 'Phí giao dịch (0.5%)';
   static const totalAmountLabel = 'Tổng tiền';
   static const confirmTransaction = 'Xác nhận giao dịch';
 
@@ -226,4 +237,25 @@ class AppStrings {
   static const String logoutMessage = 'Bạn có chắc muốn đăng xuất?';
   static const String logoutConfirm = 'Đăng xuất';
   static const String logoutCancel = 'Hủy';
+
+  // === SETUP PROFILE ===
+  static const String setupProfileTitle = 'Thiết lập thông tin';
+  static const String setupProfileSubtitle = 'Nhập thông tin cá nhân để tiếp tục';
+  static const String setupProfileNameLabel = 'Tên của bạn';
+  static const String setupProfileNameHint = 'Nhập tên của bạn';
+  static const String setupProfileStoreLabel = 'Tên cửa hàng';
+  static const String setupProfileStoreHint = 'Nhập tên cửa hàng';
+  static const String setupProfileButton = 'Hoàn tất';
+  static const String setupProfileNameRequired = 'Vui lòng nhập tên';
+  static const String setupProfileStoreRequired = 'Vui lòng nhập tên cửa hàng';
+
+  // === EDIT PROFILE ===
+  static const String editProfileTitle = 'Thông tin cá nhân';
+  static const String editProfileSaveButton = 'Lưu thay đổi';
+  static const String editProfileSaveSuccess = 'Đã lưu thông tin';
+  static const String editProfileAvatarLabel = 'Ảnh đại diện';
+  static const String editProfileAvatarChangeButton = 'Đổi ảnh';
+  static const String editProfileAvatarRemoveButton = 'Xóa ảnh';
+  static const String editProfileNameLabel = 'Tên của bạn';
+  static const String editProfileStoreLabel = 'Tên cửa hàng';
 }

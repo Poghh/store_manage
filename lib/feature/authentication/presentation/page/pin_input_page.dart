@@ -63,14 +63,14 @@ class _PinInputPageState extends State<PinInputPage> {
       // Creating new PIN
       await secureStorage.savePin(_controller.text);
       if (mounted) {
-        context.router.replaceAll([const HomeTabsRoute()]);
+        await _navigateAfterLogin(secureStorage);
       }
     } else {
       // Verifying existing PIN
       final storedPin = await secureStorage.getPin();
       if (storedPin == _controller.text) {
         if (mounted) {
-          context.router.replaceAll([const HomeTabsRoute()]);
+          await _navigateAfterLogin(secureStorage);
         }
       } else {
         if (mounted) {
@@ -80,6 +80,17 @@ class _PinInputPageState extends State<PinInputPage> {
             _controller.clear();
           });
         }
+      }
+    }
+  }
+
+  Future<void> _navigateAfterLogin(SecureStorageImpl secureStorage) async {
+    final hasProfile = await secureStorage.hasProfileSetup();
+    if (mounted) {
+      if (hasProfile) {
+        context.router.replaceAll([const HomeTabsRoute()]);
+      } else {
+        context.router.replaceAll([const SetupProfileRoute()]);
       }
     }
   }

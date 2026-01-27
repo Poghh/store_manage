@@ -380,6 +380,22 @@ class RetailRouteArgs {
 }
 
 /// generated route for
+/// [SetupProfilePage]
+class SetupProfileRoute extends PageRouteInfo<void> {
+  const SetupProfileRoute({List<PageRouteInfo>? children})
+    : super(SetupProfileRoute.name, initialChildren: children);
+
+  static const String name = 'SetupProfileRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const SetupProfilePage();
+    },
+  );
+}
+
+/// generated route for
 /// [StockInPage]
 class StockInRoute extends PageRouteInfo<StockInRouteArgs> {
   StockInRoute({

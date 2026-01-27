@@ -31,9 +31,16 @@ class _MoneyTransactionPageState extends State<MoneyTransactionPage> {
 
   int _amount = 0;
 
-  static const double _feeRate = 0.05;
+  static const double _feeRate = 0.005;
+  static const int _minFee = 5000;
 
-  int get _fee => (_amount * _feeRate).round();
+  int get _fee {
+    if (_amount <= 0) return 0;
+
+    final calculatedFee = (_amount * _feeRate).round();
+    return calculatedFee < _minFee ? _minFee : calculatedFee;
+  }
+
   int get _total => _amount + _fee;
 
   final NumberFormat _currencyFormat = NumberFormat.decimalPattern(AppStrings.VIET_NAM_LOCALE);
@@ -82,27 +89,27 @@ class _MoneyTransactionPageState extends State<MoneyTransactionPage> {
               color: AppColors.background,
               borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
             ),
-          padding: const EdgeInsets.all(AppNumbers.DOUBLE_16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildTransactionType(),
-              const SizedBox(height: AppNumbers.DOUBLE_16),
+            padding: const EdgeInsets.all(AppNumbers.DOUBLE_16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildTransactionType(),
+                const SizedBox(height: AppNumbers.DOUBLE_16),
 
-              _buildAmountField(),
-              const SizedBox(height: AppNumbers.DOUBLE_16),
+                _buildAmountField(),
+                const SizedBox(height: AppNumbers.DOUBLE_16),
 
-              if (_transactionType == TransactionType.transfer) _buildBankField(),
+                if (_transactionType == TransactionType.transfer) _buildBankField(),
 
-              const SizedBox(height: AppNumbers.DOUBLE_24),
-              _buildSummaryCards(),
+                const SizedBox(height: AppNumbers.DOUBLE_24),
+                _buildSummaryCards(),
 
-              const Spacer(),
-              _buildConfirmButton(),
-            ],
+                const Spacer(),
+                _buildConfirmButton(),
+              ],
+            ),
           ),
         ),
-      ),
       ),
     );
   }
@@ -204,7 +211,7 @@ class _MoneyTransactionPageState extends State<MoneyTransactionPage> {
   }
 
   void _onConfirm() {
-    // 
+    //
   }
 
   String _format(int value) {
