@@ -6,6 +6,7 @@ import 'package:store_manage/feature/authentication/presentation/page/forgot_pin
 import 'package:store_manage/feature/authentication/presentation/page/phone_input_page.dart';
 import 'package:store_manage/feature/authentication/presentation/page/pin_input_page.dart';
 import 'package:store_manage/feature/authentication/presentation/page/verify_phone_page.dart';
+import 'package:store_manage/feature/money_transaction/presentation/page/money_transaction_page.dart';
 import 'package:store_manage/feature/product/presentation/page/product_details_page.dart';
 import 'package:store_manage/feature/retail/presentation/page/retail_page.dart';
 import 'package:store_manage/feature/stock_in/presentation/page/stock_in_page.dart';
@@ -25,5 +26,6 @@ class AppRouter extends RootStackRouter {
     AutoRoute(page: StockInRoute.page, path: '/stock-in'),
     AutoRoute(page: ProductDetailsRoute.page, path: '/product-details'),
     AutoRoute(page: RetailRoute.page, path: '/retail'),
+    AutoRoute(page: MoneyTransactionRoute.page, path: '/money-transaction'),
   ];
 }

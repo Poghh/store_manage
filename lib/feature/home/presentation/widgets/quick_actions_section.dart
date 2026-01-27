@@ -48,6 +48,18 @@ class QuickActionsSection extends StatelessWidget {
             arrowIconColor: AppColors.primaryDark,
           ),
           SizedBox(height: AppNumbers.DOUBLE_12),
+          ImageActionButton(
+            onTap: () => context.router.push(MoneyTransactionRoute()),
+            backgroundImage: AppImages.btnRetail,
+            title: AppStrings.homeMoneyTransactionTitle,
+            subtitle: AppStrings.homeMoneyTransactionSubtitle,
+            leadingIcon: Icons.currency_exchange,
+            leadingIconColor: AppColors.textOnPrimary,
+            titleColor: AppColors.textOnPrimary,
+            subtitleColor: AppColors.primaryLight,
+            arrowBackgroundColor: AppColors.surface,
+            arrowIconColor: AppColors.primaryDark,
+          ),
           // BlocProvider<ProductSearchCubit>(
           //   create: (_) => ProductSearchCubit(di<ProductRepository>())..prime(),
           //   child: ProductSearchBar(

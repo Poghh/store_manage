@@ -4,12 +4,13 @@ import 'package:store_manage/core/constants/app_colors.dart';
 import 'package:store_manage/core/constants/app_font_sizes.dart';
 import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
-import 'package:store_manage/core/constants/app_strings.dart';
 
-class RetailAppBar extends StatelessWidget implements PreferredSizeWidget {
+class AppPageAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback onBack;
+  final String title;
+  final List<Widget>? actions;
 
-  const RetailAppBar({super.key, required this.onBack});
+  const AppPageAppBar({super.key, required this.onBack, required this.title, this.actions});
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -25,21 +26,16 @@ class RetailAppBar extends StatelessWidget implements PreferredSizeWidget {
         onPressed: onBack,
         icon: const Icon(Icons.arrow_back, color: AppColors.textOnPrimary),
       ),
-      title: const Text(
-        AppStrings.retailTitle,
-        style: TextStyle(
+      title: Text(
+        title,
+        style: const TextStyle(
           fontSize: AppFontSizes.fontSize18,
           fontWeight: FontWeight.w600,
           fontFamily: AppFonts.inter,
           color: AppColors.textOnPrimary,
         ),
       ),
-      actions: const [
-        Padding(
-          padding: EdgeInsets.only(right: AppNumbers.DOUBLE_12),
-          child: Icon(Icons.local_offer_outlined, color: AppColors.textOnPrimary),
-        ),
-      ],
+      actions: actions,
     );
   }
 }

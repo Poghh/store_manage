@@ -2,12 +2,14 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/utils/app_toast.dart';
 
 import 'package:store_manage/core/DI/di.dart';
 import 'package:store_manage/core/constants/app_colors.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/utils/common_funtion_utils.dart';
+import 'package:store_manage/core/widgets/app_page_app_bar.dart';
 import 'package:store_manage/feature/product/data/models/product.dart';
 import 'package:store_manage/feature/product/data/repositories/product_repository.dart';
 import 'package:store_manage/feature/product/presentation/cubit/product_search_cubit.dart';
@@ -19,7 +21,6 @@ import 'package:store_manage/core/offline/retail/retail_sync_service.dart';
 import 'package:store_manage/core/services/inventory_adjustment_service.dart';
 import 'package:store_manage/core/storage/retail_transaction_storage.dart';
 import 'package:store_manage/feature/retail/presentation/widgets/payment_method.dart';
-import 'package:store_manage/feature/retail/presentation/widgets/retail_app_bar.dart';
 import 'package:store_manage/feature/retail/presentation/widgets/retail_page_body.dart';
 
 @RoutePage()
@@ -113,26 +114,47 @@ class _RetailPageState extends State<RetailPage> {
         child: Builder(
           builder: (innerContext) => Scaffold(
             backgroundColor: AppColors.primary,
-            appBar: RetailAppBar(onBack: () => context.maybePop()),
+            appBar: AppPageAppBar(
+              onBack: () => context.maybePop(),
+              title: AppStrings.retailTitle,
+              actions: const [
+                Padding(
+                  padding: EdgeInsets.only(right: AppNumbers.DOUBLE_12),
+                  child: Icon(Icons.local_offer_outlined, color: AppColors.textOnPrimary),
+                ),
+              ],
+            ),
             body: SafeArea(
-              child: RetailPageBody(
-                hasProduct: hasProduct,
-                displayName: displayName,
-                displayCode: displayCode,
-                displayStock: displayStock,
-                displayImage: displayImage,
-                quantity: _quantity,
-                onDecrease: () => setState(() => _quantity = _quantity > 1 ? _quantity - 1 : 1),
-                onIncrease: () => _increaseQuantity(innerContext),
-                priceController: _priceController,
-                onPriceChanged: _onPriceChanged,
-                purchasePrice: _purchasePrice,
-                total: _total,
-                paymentMethod: _paymentMethod,
-                paymentMethodLabel: _paymentMethodLabel,
-                onPaymentChanged: (value) => setState(() => _paymentMethod = value),
-                onConfirm: () => _submitRetail(innerContext),
-                onProductSelected: _onProductSelected,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        color: AppColors.background,
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(AppNumbers.DOUBLE_24)),
+                      ),
+                      child: RetailPageBody(
+                        hasProduct: hasProduct,
+                        displayName: displayName,
+                        displayCode: displayCode,
+                        displayStock: displayStock,
+                        displayImage: displayImage,
+                        quantity: _quantity,
+                        onDecrease: () => setState(() => _quantity = _quantity > 1 ? _quantity - 1 : 1),
+                        onIncrease: () => _increaseQuantity(innerContext),
+                        priceController: _priceController,
+                        onPriceChanged: _onPriceChanged,
+                        purchasePrice: _purchasePrice,
+                        total: _total,
+                        paymentMethod: _paymentMethod,
+                        paymentMethodLabel: _paymentMethodLabel,
+                        onPaymentChanged: (value) => setState(() => _paymentMethod = value),
+                        onConfirm: () => _submitRetail(innerContext),
+                        onProductSelected: _onProductSelected,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
