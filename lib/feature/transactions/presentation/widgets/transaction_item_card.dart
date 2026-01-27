@@ -45,7 +45,7 @@ class TransactionItemCard extends StatelessWidget {
                     fontFamily: AppFonts.inter,
                     color: AppColors.textPrimary,
                   ),
-                  maxLines: 2,
+                  maxLines: AppNumbers.INT_2,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),

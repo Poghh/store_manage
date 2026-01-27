@@ -487,3 +487,19 @@ class StockInRouteArgs {
       purchasePrice.hashCode ^
       stockInDate.hashCode;
 }
+
+/// generated route for
+/// [VerifyPhonePage]
+class VerifyPhoneRoute extends PageRouteInfo<void> {
+  const VerifyPhoneRoute({List<PageRouteInfo>? children})
+    : super(VerifyPhoneRoute.name, initialChildren: children);
+
+  static const String name = 'VerifyPhoneRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const VerifyPhonePage();
+    },
+  );
+}

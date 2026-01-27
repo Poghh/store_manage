@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:store_manage/core/constants/app_colors.dart';
+import 'package:store_manage/core/constants/app_images.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 
 class HomeHeader extends StatelessWidget {
@@ -19,7 +20,7 @@ class HomeHeader extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Image.asset('assets/images/logo.png', width: AppNumbers.DOUBLE_120, height: AppNumbers.DOUBLE_120),
+                Image.asset(AppImages.logo, width: AppNumbers.DOUBLE_120, height: AppNumbers.DOUBLE_120),
                 const Spacer(),
                 Container(
                   height: AppNumbers.DOUBLE_36,

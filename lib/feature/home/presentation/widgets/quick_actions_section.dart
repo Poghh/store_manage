@@ -3,6 +3,7 @@ import 'package:auto_route/auto_route.dart';
 // import 'package:flutter_bloc/flutter_bloc.dart';
 // import 'package:store_manage/core/DI/di.dart';
 import 'package:store_manage/core/constants/app_colors.dart';
+import 'package:store_manage/core/constants/app_images.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/navigation/app_router.dart';
@@ -23,7 +24,7 @@ class QuickActionsSection extends StatelessWidget {
         children: [
           ImageActionButton(
             onTap: () => context.router.push(RetailRoute()),
-            backgroundImage: 'assets/images/btn_retail.png',
+            backgroundImage: AppImages.btnRetail,
             title: AppStrings.homeRetailTitle,
             subtitle: AppStrings.homeRetailSubtitle,
             leadingIcon: Icons.shopping_cart_outlined,
@@ -36,7 +37,7 @@ class QuickActionsSection extends StatelessWidget {
           SizedBox(height: AppNumbers.DOUBLE_12),
           ImageActionButton(
             onTap: () => context.router.push(StockInRoute()),
-            backgroundImage: 'assets/images/btn_stock_in.png',
+            backgroundImage: AppImages.btnStockIn,
             title: AppStrings.homeStockInTitle,
             subtitle: AppStrings.homeStockInSubtitle,
             leadingIcon: Icons.inventory_2_outlined,

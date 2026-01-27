@@ -52,4 +52,5 @@ class AppNumbers {
   static const double DOUBLE_160 = 160;
   static const double DOUBLE_200 = 200;
   static const double DOUBLE_250 = 250;
+  static const double DOUBLE_400 = 400;
 }

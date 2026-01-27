@@ -5,6 +5,7 @@ import 'package:store_manage/feature/home/presentation/page/home_tabs_page.dart'
 import 'package:store_manage/feature/authentication/presentation/page/forgot_pin_page.dart';
 import 'package:store_manage/feature/authentication/presentation/page/phone_input_page.dart';
 import 'package:store_manage/feature/authentication/presentation/page/pin_input_page.dart';
+import 'package:store_manage/feature/authentication/presentation/page/verify_phone_page.dart';
 import 'package:store_manage/feature/product/presentation/page/product_details_page.dart';
 import 'package:store_manage/feature/retail/presentation/page/retail_page.dart';
 import 'package:store_manage/feature/stock_in/presentation/page/stock_in_page.dart';
@@ -18,6 +19,7 @@ class AppRouter extends RootStackRouter {
     AutoRoute(page: PhoneInputRoute.page, path: '/', initial: true),
     AutoRoute(page: PinInputRoute.page, path: '/pin-input'),
     AutoRoute(page: ForgotPinRoute.page, path: '/forgot-pin'),
+    AutoRoute(page: VerifyPhoneRoute.page, path: '/verify-phone'),
     AutoRoute(page: HomeTabsRoute.page, path: '/home-tabs'),
     AutoRoute(page: HomeRoute.page, path: '/home'),
     AutoRoute(page: StockInRoute.page, path: '/stock-in'),

@@ -25,12 +25,20 @@ class AppStrings {
   static const String loginForgotPinDialogCancel = 'Hủy';
   static const String loginForgotPinDialogConfirm = 'Xác nhận';
   static const String forgotPinPageTitle = 'Đặt lại mã PIN';
-  static const String forgotPinPageDescription = 'Để đặt lại mã PIN, bạn cần xác minh lại số điện thoại. Quá trình này sẽ xóa thông tin đăng nhập hiện tại.';
-  static const String forgotPinStep1 = 'Xác minh lại số điện thoại của bạn';
-  static const String forgotPinStep2 = 'Tạo mã PIN mới';
-  static const String forgotPinStep3 = 'Đăng nhập với mã PIN mới';
-  static const String forgotPinConfirmButton = 'Tiếp tục đặt lại';
+  static const String forgotPinPageDescription = 'Chọn cách bạn muốn khôi phục tài khoản:';
+  static const String forgotPinOptionVerifyTitle = 'Xác minh số điện thoại';
+  static const String forgotPinOptionVerifyDesc = 'Nhập đúng số điện thoại đã đăng ký để tạo mã PIN mới';
+  static const String forgotPinOptionResetTitle = 'Xóa toàn bộ dữ liệu';
+  static const String forgotPinOptionResetDesc = 'Không nhớ số điện thoại? Xóa tất cả dữ liệu và bắt đầu lại';
   static const String forgotPinCancelButton = 'Quay lại';
+  static const String forgotPinResetDialogTitle = 'Xóa toàn bộ dữ liệu?';
+  static const String forgotPinResetDialogMessage = 'Hành động này sẽ xóa tất cả dữ liệu của ứng dụng bao gồm thông tin đăng nhập, giao dịch offline và cài đặt. Bạn không thể hoàn tác.';
+  static const String forgotPinResetDialogCancel = 'Hủy';
+  static const String forgotPinResetDialogConfirm = 'Xóa tất cả';
+  static const String verifyPhoneTitle = 'Xác minh số điện thoại';
+  static const String verifyPhoneSubtitle = 'Nhập số điện thoại bạn đã dùng để đăng ký';
+  static const String verifyPhoneButton = 'Xác minh';
+  static const String verifyPhoneError = 'Số điện thoại không khớp';
 
   // === HOME ===
   static const String homeGreetingPrefix = 'Xin chào, ';

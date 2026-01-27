@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:store_manage/core/constants/app_images.dart';
+import 'package:store_manage/core/constants/app_numbers.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -48,7 +50,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          Center(child: Image.asset('assets/images/splash_logo.png', width: 400, fit: BoxFit.contain)),
+          Center(child: Image.asset(AppImages.splashLogo, width: AppNumbers.DOUBLE_400, fit: BoxFit.contain)),
           Positioned(
             left: 0,
             right: 0,
@@ -59,7 +61,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                 position: _waveSlideX,
                 child: ScaleTransition(
                   scale: _waveScale,
-                  child: Image.asset('assets/images/splash_wave.png', height: 200, fit: BoxFit.cover),
+                  child: Image.asset(AppImages.splashWave, height: AppNumbers.DOUBLE_200, fit: BoxFit.cover),
                 ),
               ),
             ),

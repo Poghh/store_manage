@@ -3,6 +3,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:store_manage/core/constants/app_colors.dart';
+import 'package:store_manage/core/constants/app_font_sizes.dart';
+import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/utils/app_toast.dart';
 
@@ -26,10 +28,21 @@ class AppImagePicker {
       return null;
     }
 
+    // Filter options with sort order to avoid SQL error on some Android versions
+    final filterOption = FilterOptionGroup(
+      imageOption: const FilterOption(
+        sizeConstraint: SizeConstraint(ignoreSize: true),
+      ),
+      orders: [
+        const OrderOption(type: OrderOptionType.createDate, asc: false),
+      ],
+    );
+
     // Get all photos that app has access to (respects limited access)
     final List<AssetPathEntity> albums = await PhotoManager.getAssetPathList(
       type: RequestType.image,
       onlyAll: true, // Only get "Recent" album
+      filterOption: filterOption,
     );
 
     if (albums.isEmpty) {
@@ -86,19 +99,19 @@ class _ImagePickerSheet extends StatelessWidget {
       height: MediaQuery.of(context).size.height * 0.75,
       decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppNumbers.DOUBLE_20)),
       ),
       child: Column(
         children: [
           // Header
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppNumbers.DOUBLE_16),
             child: Row(
               children: [
-                const Text(
+                Text(
                   'Chọn ảnh',
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: AppFontSizes.fontSize18,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -112,7 +125,7 @@ class _ImagePickerSheet extends StatelessWidget {
                         debugPrint('presentLimited error: $e');
                       }
                     },
-                    icon: const Icon(Icons.add_photo_alternate, size: 18),
+                    icon: Icon(Icons.add_photo_alternate, size: AppNumbers.DOUBLE_18),
                     label: const Text('Thêm ảnh'),
                     style: TextButton.styleFrom(
                       foregroundColor: AppColors.primary,
@@ -127,16 +140,16 @@ class _ImagePickerSheet extends StatelessWidget {
               ],
             ),
           ),
-          const Divider(height: 1),
+          Divider(height: AppNumbers.DOUBLE_1),
 
           // Photo grid
           Expanded(
             child: GridView.builder(
-              padding: const EdgeInsets.all(8),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
+              padding: const EdgeInsets.all(AppNumbers.DOUBLE_8),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: AppNumbers.INT_3,
+                crossAxisSpacing: AppNumbers.DOUBLE_8,
+                mainAxisSpacing: AppNumbers.DOUBLE_8,
               ),
               itemCount: photos.length,
               itemBuilder: (context, index) {
@@ -169,7 +182,7 @@ class _PhotoThumbnail extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.hasData && snapshot.data != null) {
           return ClipRRect(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_8),
             child: Image.memory(
               snapshot.data!,
               fit: BoxFit.cover,
@@ -179,10 +192,10 @@ class _PhotoThumbnail extends StatelessWidget {
         return Container(
           decoration: BoxDecoration(
             color: AppColors.surfaceMuted,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_8),
           ),
           child: const Center(
-            child: CircularProgressIndicator(strokeWidth: 2),
+            child: CircularProgressIndicator(strokeWidth: AppNumbers.DOUBLE_2),
           ),
         );
       },

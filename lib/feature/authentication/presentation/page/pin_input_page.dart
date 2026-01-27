@@ -81,6 +81,12 @@ class _PinInputPageState extends State<PinInputPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Icon(
+                Icons.lock_outline,
+                size: AppNumbers.DOUBLE_64,
+                color: AppColors.primary,
+              ),
+              SizedBox(height: AppNumbers.DOUBLE_24),
               Text(
                 AppStrings.loginPinTitle,
                 style: TextStyle(
@@ -127,7 +133,7 @@ class _PinInputPageState extends State<PinInputPage> {
                         AppColors.primary.withValues(alpha: 0.5),
                     disabledForegroundColor:
                         AppColors.textOnPrimary.withValues(alpha: 0.7),
-                    elevation: 0,
+                    elevation: AppNumbers.DOUBLE_0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_16),
                     ),

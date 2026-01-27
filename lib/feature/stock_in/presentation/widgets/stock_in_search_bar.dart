@@ -154,7 +154,7 @@ class _StockInSearchBarState extends State<StockInSearchBar> {
                         child: ListView.separated(
                           padding: EdgeInsets.zero,
                           itemCount: state.results.length,
-                          separatorBuilder: (context, index) => const Divider(height: 1, color: AppColors.border),
+                          separatorBuilder: (context, index) => Divider(height: AppNumbers.DOUBLE_1, color: AppColors.border),
                           itemBuilder: (context, index) {
                             final item = state.results[index];
                             return InkWell(
