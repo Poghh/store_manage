@@ -11,6 +11,10 @@ abstract class SecureStorage {
   Future<String?> getSavedPhoneNumber();
   Future<bool> hasValidPhoneNumber();
   Future<void> clearPhoneNumber();
+  Future<void> savePin(String pin);
+  Future<String?> getPin();
+  Future<bool> hasPin();
+  Future<void> clearPin();
   void removeAll();
   Future<void> removeAllAsync();
 }
@@ -18,6 +22,7 @@ abstract class SecureStorage {
 class SecureStorageImpl implements SecureStorage {
   static const String _phoneNumberKey = 'saved_phone_number';
   static const String _phoneTimestampKey = 'phone_saved_timestamp';
+  static const String _pinKey = 'saved_pin';
   static const int _expirationDays = 30;
 
   final secureStorage = const FlutterSecureStorage();
@@ -94,6 +99,26 @@ class SecureStorageImpl implements SecureStorage {
   Future<void> clearPhoneNumber() async {
     await secureStorage.delete(key: _phoneNumberKey);
     await secureStorage.delete(key: _phoneTimestampKey);
+  }
+
+  @override
+  Future<void> savePin(String pin) async {
+    await secureStorage.write(key: _pinKey, value: pin);
+  }
+
+  @override
+  Future<String?> getPin() async {
+    return secureStorage.read(key: _pinKey);
+  }
+
+  @override
+  Future<bool> hasPin() async {
+    return secureStorage.containsKey(key: _pinKey);
+  }
+
+  @override
+  Future<void> clearPin() async {
+    await secureStorage.delete(key: _pinKey);
   }
 
   @override

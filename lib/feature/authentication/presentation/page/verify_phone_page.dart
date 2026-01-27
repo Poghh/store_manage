@@ -2,12 +2,14 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:store_manage/core/DI/di.dart';
 import 'package:store_manage/core/constants/app_colors.dart';
 import 'package:store_manage/core/constants/app_font_sizes.dart';
 import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/navigation/app_router.dart';
+import 'package:store_manage/core/storage/secure_storage.dart';
 
 @RoutePage()
 class VerifyPhonePage extends StatefulWidget {
@@ -45,7 +47,8 @@ class _VerifyPhonePageState extends State<VerifyPhonePage> {
     if (!mounted) return;
 
     if (storedPhone == _controller.text) {
-      // Phone matches - go directly to PIN input to create new PIN
+      // Phone matches - clear old PIN and go to create new PIN
+      await di<SecureStorageImpl>().clearPin();
       if (mounted) {
         context.router.replaceAll([PinInputRoute(phoneNumber: _controller.text)]);
       }

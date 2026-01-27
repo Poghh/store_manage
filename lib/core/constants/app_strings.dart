@@ -39,6 +39,8 @@ class AppStrings {
   static const String verifyPhoneSubtitle = 'Nhập số điện thoại bạn đã dùng để đăng ký';
   static const String verifyPhoneButton = 'Xác minh';
   static const String verifyPhoneError = 'Số điện thoại không khớp';
+  static const String loginPinError = 'Mã PIN không đúng';
+  static const String loginPinCreateSubtitle = 'Tạo mã PIN 4 số để đăng nhập';
 
   // === HOME ===
   static const String homeGreetingPrefix = 'Xin chào, ';
