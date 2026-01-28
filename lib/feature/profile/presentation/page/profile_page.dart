@@ -12,7 +12,6 @@ import 'package:store_manage/core/widgets/app_page_header.dart';
 import 'package:store_manage/feature/profile/presentation/widgets/profile_header_card.dart';
 import 'package:store_manage/feature/profile/presentation/widgets/profile_logout_card.dart';
 import 'package:store_manage/feature/profile/presentation/widgets/profile_section_card.dart';
-import 'package:store_manage/feature/profile/presentation/page/change_pin_page.dart';
 import 'package:store_manage/feature/profile/presentation/page/edit_profile_page.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -66,7 +65,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ],
               onItemTap: (item) async {
                 if (item.label == AppStrings.profileItemChangePassword) {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ChangePinPage()));
+                  context.router.push(const VerifyCurrentPinRoute());
                 } else if (item.label == AppStrings.profileItemPersonalInfo) {
                   final result = await Navigator.of(context).push<bool>(
                     MaterialPageRoute(

@@ -11,19 +11,27 @@ class AppStrings {
   static const String changePinPinLength = 'Mã PIN phải đủ 4 số';
   static const String changePinConfirmNotMatch = 'Xác nhận mã PIN không khớp';
   static const String changePinOldPinIncorrect = 'Mã PIN cũ không đúng';
-  static const String changePinSuccessTitle = 'Thành công';
   static const String changePinSuccessMessage = 'Đổi mã PIN thành công!';
+
+  // === VERIFY CURRENT PIN (Screen 1) ===
+  static const String verifyCurrentPinTitle = 'Xác nhận mã PIN';
+  static const String verifyCurrentPinSubtitle = 'Nhập mã PIN hiện tại để tiếp tục';
+  static const String verifyCurrentPinButton = 'Tiếp tục';
+  static const String verifyCurrentPinError = 'Mã PIN không đúng';
+
+  // === SET NEW PIN (Screen 2) ===
+  static const String setNewPinTitle = 'Tạo mã PIN mới';
+  static const String setNewPinSubtitle = 'Nhập mã PIN mới 4 số';
+  static const String setNewPinConfirmTitle = 'Xác nhận mã PIN';
+  static const String setNewPinConfirmSubtitle = 'Nhập lại mã PIN mới để xác nhận';
+  static const String setNewPinButton = 'Xác nhận';
+  static const String setNewPinMismatchError = 'Mã PIN không khớp, vui lòng thử lại';
   // === SYSTEM ===
   static const String VIET_NAM_LOCALE = 'vi_VN';
   static const String VIET_NAM_DONG_CURRENCY = '₫';
   static const String VIET_NAM_DONG_TEXT = 'VNĐ';
   static const String ACCESSTOKEN = 'access_token';
   static const String USERID = 'id';
-
-  // === AUTH ===
-  static const String USERNAME = 'Tên đăng nhập';
-  static const String PASSWORD = 'Mật khẩu';
-  static const String LOGIN = 'Đăng nhập';
 
   // === LOGIN ===
   static const String loginPhoneTitle = 'Nhập số điện thoại';
@@ -34,11 +42,6 @@ class AppStrings {
   static const String loginPinSubtitle = 'Nhập mã PIN 4 số để đăng nhập';
   static const String loginPinButton = 'Đăng nhập';
   static const String loginPinForgotButton = 'Quên mã PIN?';
-  static const String loginForgotPinDialogTitle = 'Quên mã PIN?';
-  static const String loginForgotPinDialogMessage =
-      'Bạn sẽ cần xác minh lại số điện thoại và tạo mã PIN mới. Tiếp tục?';
-  static const String loginForgotPinDialogCancel = 'Hủy';
-  static const String loginForgotPinDialogConfirm = 'Xác nhận';
   static const String forgotPinPageTitle = 'Đặt lại mã PIN';
   static const String forgotPinPageDescription = 'Chọn cách bạn muốn khôi phục tài khoản:';
   static const String forgotPinOptionVerifyTitle = 'Xác minh số điện thoại';
@@ -150,16 +153,7 @@ class AppStrings {
   static const String productDeleteConfirm = 'Xóa';
   static const String productDeleteSuccess = 'Đã xóa sản phẩm';
   static const String productDeleteQueued = 'Đã lưu xóa offline, sẽ gửi khi có internet';
-  static const String productDeleteError = 'Xóa sản phẩm thất bại';
-  static const String productAdjustButton = 'ĐIỀU CHỈNH TỒN KHO';
-  static const String productAdjustTitle = 'Điều chỉnh tồn kho';
-  static const String productAdjustIncrease = 'Tăng';
-  static const String productAdjustDecrease = 'Giảm';
-  static const String productAdjustQuantityHint = 'Nhập số lượng';
-  static const String productAdjustCancel = 'Hủy';
-  static const String productAdjustConfirm = 'Xác nhận';
   static const String productAdjustInvalid = 'Số lượng không hợp lệ';
-  static const String productAdjustExceed = 'Không thể giảm quá tồn hiện tại';
   static const String productAdjustSuccess = 'Đã điều chỉnh tồn kho';
 
   // === RETAIL ===
@@ -192,8 +186,6 @@ class AppStrings {
   static const String reportSummaryTitle = 'Tóm tắt doanh thu';
   static const String reportTodayLabel = 'Hôm nay';
   static const String reportYesterdayLabel = 'Hôm qua';
-  static const String reportCompareYesterday = 'so với hôm qua';
-  static const String reportNoData = 'Chưa có dữ liệu';
   static String reportGrowthLabel(double percentage) {
     final sign = percentage >= 0 ? '+' : '';
     return '$sign${percentage.toStringAsFixed(1)}% so với hôm qua';
@@ -205,7 +197,6 @@ class AppStrings {
 
   // === PROFILE ===
   static const String profileName = 'Thanh Phong';
-  static const String profileEmail = 'thanhphong@store.vn';
   static const String profileSectionAccount = 'Tài khoản';
   static const String profileSectionSettings = 'Cài đặt';
   static const String profileSectionSupport = 'Hỗ trợ';

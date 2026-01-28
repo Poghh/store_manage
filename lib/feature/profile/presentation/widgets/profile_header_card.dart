@@ -37,7 +37,7 @@ class ProfileHeaderCard extends StatelessWidget {
                       fit: BoxFit.cover,
                       width: AppNumbers.DOUBLE_64,
                       height: AppNumbers.DOUBLE_64,
-                      errorBuilder: (_, __, ___) => _buildAvatarPlaceholder(),
+                      errorBuilder: (context, error, stackTrace) => _buildAvatarPlaceholder(),
                     )
                   : _buildAvatarPlaceholder(),
             ),

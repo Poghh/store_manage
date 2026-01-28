@@ -380,6 +380,22 @@ class RetailRouteArgs {
 }
 
 /// generated route for
+/// [SetNewPinPage]
+class SetNewPinRoute extends PageRouteInfo<void> {
+  const SetNewPinRoute({List<PageRouteInfo>? children})
+    : super(SetNewPinRoute.name, initialChildren: children);
+
+  static const String name = 'SetNewPinRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const SetNewPinPage();
+    },
+  );
+}
+
+/// generated route for
 /// [SetupProfilePage]
 class SetupProfileRoute extends PageRouteInfo<void> {
   const SetupProfileRoute({List<PageRouteInfo>? children})
@@ -518,6 +534,22 @@ class StockInRouteArgs {
       quantity.hashCode ^
       purchasePrice.hashCode ^
       stockInDate.hashCode;
+}
+
+/// generated route for
+/// [VerifyCurrentPinPage]
+class VerifyCurrentPinRoute extends PageRouteInfo<void> {
+  const VerifyCurrentPinRoute({List<PageRouteInfo>? children})
+    : super(VerifyCurrentPinRoute.name, initialChildren: children);
+
+  static const String name = 'VerifyCurrentPinRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const VerifyCurrentPinPage();
+    },
+  );
 }
 
 /// generated route for

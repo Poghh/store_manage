@@ -122,7 +122,7 @@ class _BankSearchBarState extends State<BankSearchBar> {
                     padding: EdgeInsets.zero,
                     shrinkWrap: true,
                     itemCount: _results.length,
-                    separatorBuilder: (_, __) => Divider(height: 1, color: AppColors.border),
+                    separatorBuilder: (context, index) => Divider(height: 1, color: AppColors.border),
                     itemBuilder: (context, index) {
                       final bank = _results[index];
                       return InkWell(

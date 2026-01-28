@@ -275,7 +275,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       fit: BoxFit.cover,
                       width: AppNumbers.DOUBLE_100,
                       height: AppNumbers.DOUBLE_100,
-                      errorBuilder: (_, __, ___) => _buildAvatarPlaceholder(),
+                      errorBuilder: (context, error, stackTrace) => _buildAvatarPlaceholder(),
                     )
                   : _buildAvatarPlaceholder(),
             ),
