@@ -91,9 +91,10 @@ class _ForgotPinPageState extends State<ForgotPinPage> {
           icon: Icon(Icons.arrow_back, color: AppColors.textPrimary),
           onPressed: () => context.router.pop(),
         ),
+        scrolledUnderElevation: AppNumbers.DOUBLE_0,
       ),
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: EdgeInsets.all(AppNumbers.DOUBLE_24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -150,7 +151,7 @@ class _ForgotPinPageState extends State<ForgotPinPage> {
                 isDanger: true,
               ),
 
-              Spacer(),
+              SizedBox(height: AppNumbers.DOUBLE_32),
 
               // Cancel button
               SizedBox(

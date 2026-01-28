@@ -7,6 +7,7 @@ import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/DI/di.dart';
 import 'package:store_manage/core/navigation/home_tab_coordinator.dart';
 import 'package:store_manage/core/data/services/retail_revenue_service.dart';
+import 'package:store_manage/core/data/storage/secure_storage.dart';
 import 'package:store_manage/core/utils/common_funtion_utils.dart';
 import 'package:store_manage/feature/home/presentation/widgets/revenue_summary_card.dart';
 
@@ -21,20 +22,30 @@ class _HomeContentState extends State<HomeContent> {
   late DateTime _selectedDate;
   bool _isFetching = false;
   late final RetailRevenueService _revenueService;
+  late final SecureStorage _secureStorage;
   int _totalRevenue = 0;
-  final String _userName = '';
+  String _userName = '';
 
   @override
   void initState() {
     super.initState();
     _selectedDate = DateTime.now();
     _revenueService = di<RetailRevenueService>();
+    _secureStorage = di<SecureStorageImpl>();
     _loadData();
   }
 
   Future<void> _loadData() async {
+    await _loadUserName();
     await _revenueService.loadApiData();
     await _loadRevenueForDate();
+  }
+
+  Future<void> _loadUserName() async {
+    final name = await _secureStorage.getUserName();
+    if (mounted && name != null && name.isNotEmpty) {
+      setState(() => _userName = name);
+    }
   }
 
   Future<void> _loadRevenueForDate() async {

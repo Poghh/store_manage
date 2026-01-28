@@ -110,14 +110,12 @@ class _MoneyTransactionPageState extends State<MoneyTransactionPage> {
 
                 const SizedBox(height: AppNumbers.DOUBLE_24),
                 _buildSummaryCards(),
-
-                const Spacer(),
-                _buildConfirmButton(),
               ],
             ),
           ),
         ),
       ),
+      bottomNavigationBar: _buildConfirmButton(),
     );
   }
 
@@ -214,7 +212,20 @@ class _MoneyTransactionPageState extends State<MoneyTransactionPage> {
 
   // ===== CONFIRM =====
   Widget _buildConfirmButton() {
-    return AppActionButton(label: AppStrings.confirmTransaction, onPressed: _amount > 0 ? _onConfirm : null);
+    return Container(
+      color: AppColors.background,
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: EdgeInsets.only(
+            left: AppNumbers.DOUBLE_16,
+            right: AppNumbers.DOUBLE_16,
+            bottom: AppNumbers.DOUBLE_16 + MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: AppActionButton(label: AppStrings.confirmTransaction, onPressed: _amount > 0 ? _onConfirm : null),
+        ),
+      ),
+    );
   }
 
   void _onConfirm() {

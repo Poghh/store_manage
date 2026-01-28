@@ -62,7 +62,10 @@ class _ImageActionButtonState extends State<ImageActionButton> {
                 Image.asset(widget.backgroundImage, fit: BoxFit.cover, width: double.infinity),
                 Positioned.fill(
                   child: Padding(
-                    padding: const EdgeInsets.all(AppNumbers.DOUBLE_24),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppNumbers.DOUBLE_24,
+                      vertical: AppNumbers.DOUBLE_16,
+                    ),
                     child: Row(
                       children: [
                         Icon(widget.leadingIcon, size: AppNumbers.DOUBLE_48, color: widget.leadingIconColor),
@@ -70,15 +73,20 @@ class _ImageActionButtonState extends State<ImageActionButton> {
                         Expanded(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                widget.title,
-                                style: TextStyle(
-                                  fontSize: AppFontSizes.fontSize22,
-                                  fontWeight: FontWeight.w700,
-                                  fontFamily: AppFonts.inter,
-                                  color: widget.titleColor,
+                              FittedBox(
+                                fit: BoxFit.scaleDown,
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  widget.title,
+                                  style: TextStyle(
+                                    fontSize: AppFontSizes.fontSize22,
+                                    fontWeight: FontWeight.w700,
+                                    fontFamily: AppFonts.inter,
+                                    color: widget.titleColor,
+                                  ),
                                 ),
                               ),
                               const SizedBox(height: AppNumbers.DOUBLE_4),
@@ -90,6 +98,8 @@ class _ImageActionButtonState extends State<ImageActionButton> {
                                   fontFamily: AppFonts.inter,
                                   color: widget.subtitleColor,
                                 ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ],
                           ),

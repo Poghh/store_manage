@@ -3,10 +3,12 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
+import 'package:store_manage/core/DI/di.dart';
 import 'package:store_manage/core/constants/app_colors.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
+import 'package:store_manage/core/network/connectivity_service.dart';
 
 class AppProductThumbnail extends StatefulWidget {
   final String? imageUrl;
@@ -37,16 +39,18 @@ class AppProductThumbnail extends StatefulWidget {
 }
 
 class _AppProductThumbnailState extends State<AppProductThumbnail> {
-  late final Stream<List<ConnectivityResult>> _connectivityStream;
+  late final ConnectivityService _connectivity;
+  late final Stream<InternetStatus> _connectivityStream;
   bool _isOffline = false;
 
   @override
   void initState() {
     super.initState();
-    _connectivityStream = Connectivity().onConnectivityChanged;
-    Connectivity().checkConnectivity().then((result) {
+    _connectivity = di<ConnectivityService>();
+    _connectivityStream = _connectivity.onChanged;
+    _connectivity.isOnline.then((online) {
       if (!mounted) return;
-      setState(() => _isOffline = result.contains(ConnectivityResult.none));
+      setState(() => _isOffline = !online);
     });
   }
 
@@ -72,12 +76,12 @@ class _AppProductThumbnailState extends State<AppProductThumbnail> {
 
   Widget _buildImage(String source, {required bool isNetwork, required bool isAsset}) {
     if (isNetwork) {
-      return StreamBuilder<List<ConnectivityResult>>(
+      return StreamBuilder<InternetStatus>(
         stream: _connectivityStream,
-        initialData: _isOffline ? const [ConnectivityResult.none] : const [ConnectivityResult.wifi],
+        initialData: _isOffline ? InternetStatus.disconnected : InternetStatus.connected,
         builder: (context, snapshot) {
-          final results = snapshot.data ?? const <ConnectivityResult>[];
-          final isOffline = results.contains(ConnectivityResult.none);
+          final status = snapshot.data ?? InternetStatus.disconnected;
+          final isOffline = status == InternetStatus.disconnected;
           if (isOffline) {
             return Icon(widget.placeholderIcon, color: widget.placeholderColor, size: widget.placeholderSize);
           }
