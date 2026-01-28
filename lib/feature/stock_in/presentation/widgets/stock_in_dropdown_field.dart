@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:store_manage/core/constants/app_colors.dart';
-import 'package:store_manage/core/constants/app_font_sizes.dart';
-import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/widgets/app_input_decoration.dart';
 
 class StockInDropdownField extends StatelessWidget {
@@ -15,6 +13,7 @@ class StockInDropdownField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     return DropdownButtonFormField<String>(
       initialValue: value,
       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -25,15 +24,7 @@ class StockInDropdownField extends StatelessWidget {
           .map(
             (item) => DropdownMenuItem<String>(
               value: item,
-              child: Text(
-                item,
-                style: const TextStyle(
-                  fontSize: AppFontSizes.fontSize14,
-                  fontWeight: FontWeight.w500,
-                  fontFamily: AppFonts.inter,
-                  color: AppColors.textPrimary,
-                ),
-              ),
+              child: Text(item, style: textTheme.labelLarge),
             ),
           )
           .toList(),

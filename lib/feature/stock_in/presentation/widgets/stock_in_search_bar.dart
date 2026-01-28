@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:store_manage/core/constants/app_colors.dart';
-import 'package:store_manage/core/constants/app_font_sizes.dart';
-import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/widgets/app_search_field.dart';
@@ -118,6 +116,7 @@ class _StockInSearchBarState extends State<StockInSearchBar> {
   }
 
   OverlayEntry _buildOverlayEntry() {
+    final textTheme = Theme.of(context).textTheme;
     return OverlayEntry(
       builder: (context) {
         final state = _searchCubit?.state ?? const ProductSearchState();
@@ -154,7 +153,8 @@ class _StockInSearchBarState extends State<StockInSearchBar> {
                         child: ListView.separated(
                           padding: EdgeInsets.zero,
                           itemCount: state.results.length,
-                          separatorBuilder: (context, index) => Divider(height: AppNumbers.DOUBLE_1, color: AppColors.border),
+                          separatorBuilder: (context, index) =>
+                              Divider(height: AppNumbers.DOUBLE_1, color: AppColors.border),
                           itemBuilder: (context, index) {
                             final item = state.results[index];
                             return InkWell(
@@ -178,25 +178,9 @@ class _StockInSearchBarState extends State<StockInSearchBar> {
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Text(
-                                            item.productName,
-                                            style: const TextStyle(
-                                              fontSize: AppFontSizes.fontSize14,
-                                              fontWeight: FontWeight.w600,
-                                              fontFamily: AppFonts.inter,
-                                              color: AppColors.textPrimary,
-                                            ),
-                                          ),
+                                          Text(item.productName, style: textTheme.titleSmall),
                                           const SizedBox(height: AppNumbers.DOUBLE_4),
-                                          Text(
-                                            item.productCode,
-                                            style: const TextStyle(
-                                              fontSize: AppFontSizes.fontSize12,
-                                              fontWeight: FontWeight.w500,
-                                              fontFamily: AppFonts.inter,
-                                              color: AppColors.textMuted,
-                                            ),
-                                          ),
+                                          Text(item.productCode, style: textTheme.labelMedium),
                                         ],
                                       ),
                                     ),

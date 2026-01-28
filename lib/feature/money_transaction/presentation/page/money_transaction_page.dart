@@ -201,11 +201,12 @@ class _MoneyTransactionPageState extends State<MoneyTransactionPage> {
   }
 
   Widget _summaryRow(String label, String value, {bool isBold = false}) {
+    final textTheme = Theme.of(context).textTheme;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label),
-        Text(value, style: TextStyle(fontWeight: isBold ? FontWeight.w700 : FontWeight.w400)),
+        Text(label, style: textTheme.bodyMedium),
+        Text(value, style: textTheme.bodyLarge),
       ],
     );
   }

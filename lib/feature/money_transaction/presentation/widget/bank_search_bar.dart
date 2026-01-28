@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:store_manage/core/constants/app_colors.dart';
-import 'package:store_manage/core/constants/app_font_sizes.dart';
-import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/widgets/app_field_container.dart';
@@ -94,6 +92,7 @@ class _BankSearchBarState extends State<BankSearchBar> {
   }
 
   OverlayEntry _buildOverlay() {
+    final textTheme = Theme.of(context).textTheme;
     return OverlayEntry(
       builder: (context) {
         final renderBox = this.context.findRenderObject() as RenderBox?;
@@ -133,15 +132,7 @@ class _BankSearchBarState extends State<BankSearchBar> {
                         },
                         child: Padding(
                           padding: const EdgeInsets.all(AppNumbers.DOUBLE_12),
-                          child: Text(
-                            bank,
-                            style: const TextStyle(
-                              fontSize: AppFontSizes.fontSize14,
-                              fontWeight: FontWeight.w600,
-                              fontFamily: AppFonts.inter,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
+                          child: Text(bank, style: textTheme.titleSmall),
                         ),
                       );
                     },
