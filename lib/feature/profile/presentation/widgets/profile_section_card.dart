@@ -9,8 +9,9 @@ import 'package:store_manage/core/widgets/app_surface_card.dart';
 class ProfileSectionCard extends StatelessWidget {
   final String title;
   final List<ProfileItem> items;
+  final void Function(ProfileItem)? onItemTap;
 
-  const ProfileSectionCard({super.key, required this.title, required this.items});
+  const ProfileSectionCard({super.key, required this.title, required this.items, this.onItemTap});
 
   @override
   Widget build(BuildContext context) {
@@ -29,30 +30,32 @@ class ProfileSectionCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppNumbers.DOUBLE_8),
-          ...items
-              .map(
-                (item) => Padding(
-                  padding: const EdgeInsets.symmetric(vertical: AppNumbers.DOUBLE_4),
-                  child: Row(
-                    children: [
-                      Icon(item.icon, color: AppColors.primary, size: AppNumbers.DOUBLE_20),
-                      const SizedBox(width: AppNumbers.DOUBLE_12),
-                      Expanded(
-                        child: Text(
-                          item.label,
-                          style: const TextStyle(
-                            fontSize: AppFontSizes.fontSize14,
-                            fontWeight: FontWeight.w600,
-                            fontFamily: AppFonts.inter,
-                            color: AppColors.textPrimary,
-                          ),
+          ...items.map(
+            (item) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: AppNumbers.DOUBLE_4),
+              child: InkWell(
+                onTap: onItemTap == null ? null : () => onItemTap!(item),
+                child: Row(
+                  children: [
+                    Icon(item.icon, color: AppColors.primary, size: AppNumbers.DOUBLE_20),
+                    const SizedBox(width: AppNumbers.DOUBLE_12),
+                    Expanded(
+                      child: Text(
+                        item.label,
+                        style: const TextStyle(
+                          fontSize: AppFontSizes.fontSize14,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: AppFonts.inter,
+                          color: AppColors.textPrimary,
                         ),
                       ),
-                      const Icon(Icons.chevron_right, color: AppColors.textMuted),
-                    ],
-                  ),
+                    ),
+                    const Icon(Icons.chevron_right, color: AppColors.textMuted),
+                  ],
                 ),
               ),
+            ),
+          ),
         ],
       ),
     );

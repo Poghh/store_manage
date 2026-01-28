@@ -18,7 +18,25 @@ Future mainCommon() async {
   await dotenv.load(fileName: ".env");
   await Hive.initFlutter();
   await setupDI();
+  await _handleFreshInstall();
   runApp(MyApp());
+}
+
+/// iOS Keychain persists data even after app uninstall.
+/// Use Hive (which IS deleted on uninstall) to detect fresh install
+/// and clear keychain if needed.
+Future<void> _handleFreshInstall() async {
+  const boxName = 'app_state';
+  const installedKey = 'has_been_installed';
+
+  final box = await Hive.openBox(boxName);
+  final hasBeenInstalled = box.get(installedKey, defaultValue: false) as bool;
+
+  if (!hasBeenInstalled) {
+    // Fresh install - clear keychain data that may persist from previous install
+    await di<SecureStorageImpl>().removeAllAsync();
+    await box.put(installedKey, true);
+  }
 }
 
 class MyApp extends StatefulWidget {

@@ -7,40 +7,24 @@ import 'package:store_manage/core/constants/app_font_sizes.dart';
 import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
-import 'package:store_manage/core/navigation/app_router.dart';
 import 'package:store_manage/core/storage/secure_storage.dart';
+import 'package:store_manage/core/utils/app_toast.dart';
 
 @RoutePage()
-class PinInputPage extends StatefulWidget {
-  final String phoneNumber;
-
-  const PinInputPage({super.key, required this.phoneNumber});
+class SetNewPinPage extends StatefulWidget {
+  const SetNewPinPage({super.key});
 
   @override
-  State<PinInputPage> createState() => _PinInputPageState();
+  State<SetNewPinPage> createState() => _SetNewPinPageState();
 }
 
-class _PinInputPageState extends State<PinInputPage> {
+class _SetNewPinPageState extends State<SetNewPinPage> {
   final _controller = TextEditingController();
   final _focusNode = FocusNode();
   String? _errorText;
   bool _isLoading = false;
-  bool _isCreatingPin = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _checkPinExists();
-  }
-
-  Future<void> _checkPinExists() async {
-    final hasPin = await di<SecureStorageImpl>().hasPin();
-    if (mounted) {
-      setState(() {
-        _isCreatingPin = !hasPin;
-      });
-    }
-  }
+  bool _isConfirmStep = false;
+  String _newPin = '';
 
   @override
   void dispose() {
@@ -49,54 +33,42 @@ class _PinInputPageState extends State<PinInputPage> {
     super.dispose();
   }
 
-  Future<void> _onLogin() async {
+  Future<void> _onSubmit() async {
     if (_controller.text.length != AppNumbers.INT_4) return;
 
-    setState(() {
-      _isLoading = true;
-      _errorText = null;
-    });
-
-    final secureStorage = di<SecureStorageImpl>();
-
-    if (_isCreatingPin) {
-      // Creating new PIN
-      await secureStorage.savePin(_controller.text);
-      if (mounted) {
-        await _navigateAfterLogin(secureStorage);
-      }
+    if (!_isConfirmStep) {
+      // Step 1: Save new PIN and move to confirm step
+      setState(() {
+        _newPin = _controller.text;
+        _isConfirmStep = true;
+        _controller.clear();
+        _errorText = null;
+      });
+      _focusNode.requestFocus();
     } else {
-      // Verifying existing PIN
-      final storedPin = await secureStorage.getPin();
-      if (storedPin == _controller.text) {
+      // Step 2: Verify confirm PIN matches
+      if (_controller.text == _newPin) {
+        setState(() => _isLoading = true);
+
+        final secureStorage = di<SecureStorageImpl>();
+        await secureStorage.savePin(_newPin);
+
         if (mounted) {
-          await _navigateAfterLogin(secureStorage);
+          AppToast.success(context, AppStrings.changePinSuccessMessage);
+          // Pop both SetNewPinPage and VerifyCurrentPinPage
+          context.router.popUntilRoot();
         }
       } else {
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-            _errorText = AppStrings.loginPinError;
-            _controller.clear();
-          });
-        }
+        setState(() {
+          _errorText = AppStrings.setNewPinMismatchError;
+          _controller.clear();
+          // Go back to first step
+          _isConfirmStep = false;
+          _newPin = '';
+        });
+        _focusNode.requestFocus();
       }
     }
-  }
-
-  Future<void> _navigateAfterLogin(SecureStorageImpl secureStorage) async {
-    final hasProfile = await secureStorage.hasProfileSetup();
-    if (mounted) {
-      if (hasProfile) {
-        context.router.replaceAll([const HomeTabsRoute()]);
-      } else {
-        context.router.replaceAll([const SetupProfileRoute()]);
-      }
-    }
-  }
-
-  void _onForgotPin() {
-    context.router.push(const ForgotPinRoute());
   }
 
   @override
@@ -141,8 +113,16 @@ class _PinInputPageState extends State<PinInputPage> {
       ),
     );
 
+    final title = _isConfirmStep ? AppStrings.setNewPinConfirmTitle : AppStrings.setNewPinTitle;
+    final subtitle = _isConfirmStep ? AppStrings.setNewPinConfirmSubtitle : AppStrings.setNewPinSubtitle;
+
     return Scaffold(
       backgroundColor: AppColors.background,
+      appBar: AppBar(
+        title: const Text(AppStrings.changePinTitle),
+        backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.textOnPrimary,
+      ),
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: AppNumbers.DOUBLE_24),
@@ -150,13 +130,13 @@ class _PinInputPageState extends State<PinInputPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                Icons.lock_outline,
+                _isConfirmStep ? Icons.lock_reset : Icons.lock_outline,
                 size: AppNumbers.DOUBLE_64,
                 color: AppColors.primary,
               ),
               SizedBox(height: AppNumbers.DOUBLE_24),
               Text(
-                AppStrings.loginPinTitle,
+                title,
                 style: TextStyle(
                   fontSize: AppFontSizes.fontSize24,
                   fontWeight: FontWeight.w700,
@@ -166,12 +146,13 @@ class _PinInputPageState extends State<PinInputPage> {
               ),
               SizedBox(height: AppNumbers.DOUBLE_8),
               Text(
-                _isCreatingPin ? AppStrings.loginPinCreateSubtitle : AppStrings.loginPinSubtitle,
+                subtitle,
                 style: TextStyle(
                   fontSize: AppFontSizes.fontSize14,
                   fontFamily: AppFonts.inter,
                   color: AppColors.textSecondary,
                 ),
+                textAlign: TextAlign.center,
               ),
               if (_errorText != null) ...[
                 SizedBox(height: AppNumbers.DOUBLE_8),
@@ -182,6 +163,7 @@ class _PinInputPageState extends State<PinInputPage> {
                     fontFamily: AppFonts.inter,
                     color: AppColors.error,
                   ),
+                  textAlign: TextAlign.center,
                 ),
               ],
               SizedBox(height: AppNumbers.DOUBLE_32),
@@ -203,21 +185,19 @@ class _PinInputPageState extends State<PinInputPage> {
                     setState(() {});
                   }
                 },
-                onCompleted: (_) => _onLogin(),
+                onCompleted: (_) => _onSubmit(),
               ),
               SizedBox(height: AppNumbers.DOUBLE_32),
               SizedBox(
                 width: double.infinity,
                 height: AppNumbers.DOUBLE_52,
                 child: ElevatedButton(
-                  onPressed: (_controller.text.length == AppNumbers.INT_4 && !_isLoading) ? _onLogin : null,
+                  onPressed: (_controller.text.length == AppNumbers.INT_4 && !_isLoading) ? _onSubmit : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: AppColors.textOnPrimary,
-                    disabledBackgroundColor:
-                        AppColors.primary.withValues(alpha: 0.5),
-                    disabledForegroundColor:
-                        AppColors.textOnPrimary.withValues(alpha: 0.7),
+                    disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.5),
+                    disabledForegroundColor: AppColors.textOnPrimary.withValues(alpha: 0.7),
                     elevation: AppNumbers.DOUBLE_0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_16),
@@ -233,25 +213,13 @@ class _PinInputPageState extends State<PinInputPage> {
                           ),
                         )
                       : Text(
-                          AppStrings.loginPinButton,
+                          _isConfirmStep ? AppStrings.setNewPinButton : AppStrings.verifyCurrentPinButton,
                           style: TextStyle(
                             fontSize: AppFontSizes.fontSize16,
                             fontWeight: FontWeight.w600,
                             fontFamily: AppFonts.inter,
                           ),
                         ),
-                ),
-              ),
-              SizedBox(height: AppNumbers.DOUBLE_16),
-              TextButton(
-                onPressed: _onForgotPin,
-                child: Text(
-                  AppStrings.loginPinForgotButton,
-                  style: TextStyle(
-                    fontSize: AppFontSizes.fontSize14,
-                    fontFamily: AppFonts.inter,
-                    color: AppColors.textSecondary,
-                  ),
                 ),
               ),
             ],

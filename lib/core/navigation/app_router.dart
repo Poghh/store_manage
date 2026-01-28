@@ -5,11 +5,14 @@ import 'package:store_manage/feature/home/presentation/page/home_tabs_page.dart'
 import 'package:store_manage/feature/authentication/presentation/page/forgot_pin_page.dart';
 import 'package:store_manage/feature/authentication/presentation/page/phone_input_page.dart';
 import 'package:store_manage/feature/authentication/presentation/page/pin_input_page.dart';
+import 'package:store_manage/feature/authentication/presentation/page/setup_profile_page.dart';
 import 'package:store_manage/feature/authentication/presentation/page/verify_phone_page.dart';
 import 'package:store_manage/feature/money_transaction/presentation/page/money_transaction_page.dart';
 import 'package:store_manage/feature/product/presentation/page/product_details_page.dart';
 import 'package:store_manage/feature/retail/presentation/page/retail_page.dart';
 import 'package:store_manage/feature/stock_in/presentation/page/stock_in_page.dart';
+import 'package:store_manage/feature/profile/presentation/page/verify_current_pin_page.dart';
+import 'package:store_manage/feature/profile/presentation/page/set_new_pin_page.dart';
 
 part 'app_router.gr.dart';
 
@@ -19,6 +22,7 @@ class AppRouter extends RootStackRouter {
   List<AutoRoute> get routes => [
     AutoRoute(page: PhoneInputRoute.page, path: '/', initial: true),
     AutoRoute(page: PinInputRoute.page, path: '/pin-input'),
+    AutoRoute(page: SetupProfileRoute.page, path: '/setup-profile'),
     AutoRoute(page: ForgotPinRoute.page, path: '/forgot-pin'),
     AutoRoute(page: VerifyPhoneRoute.page, path: '/verify-phone'),
     AutoRoute(page: HomeTabsRoute.page, path: '/home-tabs'),
@@ -27,5 +31,7 @@ class AppRouter extends RootStackRouter {
     AutoRoute(page: ProductDetailsRoute.page, path: '/product-details'),
     AutoRoute(page: RetailRoute.page, path: '/retail'),
     AutoRoute(page: MoneyTransactionRoute.page, path: '/money-transaction'),
+    AutoRoute(page: VerifyCurrentPinRoute.page, path: '/verify-current-pin'),
+    AutoRoute(page: SetNewPinRoute.page, path: '/set-new-pin'),
   ];
 }

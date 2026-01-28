@@ -8,17 +8,35 @@ import 'package:store_manage/core/constants/app_numbers.dart';
 class AppInputDecoration {
   static InputDecoration build({
     String? hintText,
+    String? labelText,
     Widget? suffixIcon,
+    Widget? prefixIcon,
     EdgeInsetsGeometry? contentPadding,
     Color? fillColor,
+    bool obscureText = false,
+    String? counterText,
   }) {
     return InputDecoration(
       hintText: hintText,
+      labelText: labelText,
+      counterText: counterText,
       hintStyle: const TextStyle(
         fontSize: AppFontSizes.fontSize14,
         fontWeight: FontWeight.w500,
         fontFamily: AppFonts.inter,
         color: AppColors.textMuted,
+      ),
+      labelStyle: const TextStyle(
+        fontSize: AppFontSizes.fontSize14,
+        fontWeight: FontWeight.w500,
+        fontFamily: AppFonts.inter,
+        color: AppColors.textSecondary,
+      ),
+      floatingLabelStyle: const TextStyle(
+        fontSize: AppFontSizes.fontSize14,
+        fontWeight: FontWeight.w500,
+        fontFamily: AppFonts.inter,
+        color: AppColors.primary,
       ),
       filled: true,
       fillColor: fillColor ?? AppColors.surface,
@@ -38,6 +56,7 @@ class AppInputDecoration {
         borderSide: const BorderSide(color: AppColors.primary),
       ),
       suffixIcon: suffixIcon,
+      prefixIcon: prefixIcon,
     );
   }
 }

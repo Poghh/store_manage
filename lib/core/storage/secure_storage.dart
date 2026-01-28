@@ -15,6 +15,14 @@ abstract class SecureStorage {
   Future<String?> getPin();
   Future<bool> hasPin();
   Future<void> clearPin();
+  Future<void> saveUserName(String name);
+  Future<String?> getUserName();
+  Future<void> saveStoreName(String name);
+  Future<String?> getStoreName();
+  Future<void> saveAvatarPath(String path);
+  Future<String?> getAvatarPath();
+  Future<void> clearAvatarPath();
+  Future<bool> hasProfileSetup();
   void removeAll();
   Future<void> removeAllAsync();
 }
@@ -23,6 +31,9 @@ class SecureStorageImpl implements SecureStorage {
   static const String _phoneNumberKey = 'saved_phone_number';
   static const String _phoneTimestampKey = 'phone_saved_timestamp';
   static const String _pinKey = 'saved_pin';
+  static const String _userNameKey = 'user_name';
+  static const String _storeNameKey = 'store_name';
+  static const String _avatarPathKey = 'avatar_path';
   static const int _expirationDays = 30;
 
   final secureStorage = const FlutterSecureStorage();
@@ -119,6 +130,47 @@ class SecureStorageImpl implements SecureStorage {
   @override
   Future<void> clearPin() async {
     await secureStorage.delete(key: _pinKey);
+  }
+
+  @override
+  Future<void> saveUserName(String name) async {
+    await secureStorage.write(key: _userNameKey, value: name);
+  }
+
+  @override
+  Future<String?> getUserName() async {
+    return secureStorage.read(key: _userNameKey);
+  }
+
+  @override
+  Future<void> saveStoreName(String name) async {
+    await secureStorage.write(key: _storeNameKey, value: name);
+  }
+
+  @override
+  Future<String?> getStoreName() async {
+    return secureStorage.read(key: _storeNameKey);
+  }
+
+  @override
+  Future<void> saveAvatarPath(String path) async {
+    await secureStorage.write(key: _avatarPathKey, value: path);
+  }
+
+  @override
+  Future<String?> getAvatarPath() async {
+    return secureStorage.read(key: _avatarPathKey);
+  }
+
+  @override
+  Future<void> clearAvatarPath() async {
+    await secureStorage.delete(key: _avatarPathKey);
+  }
+
+  @override
+  Future<bool> hasProfileSetup() async {
+    final userName = await secureStorage.read(key: _userNameKey);
+    return userName != null && userName.isNotEmpty;
   }
 
   @override

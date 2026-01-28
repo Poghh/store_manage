@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import 'package:store_manage/core/constants/app_colors.dart';
@@ -9,19 +11,36 @@ import 'package:store_manage/core/widgets/app_surface_card.dart';
 class ProfileHeaderCard extends StatelessWidget {
   final String name;
   final String email;
+  final String? avatarPath;
 
-  const ProfileHeaderCard({super.key, required this.name, required this.email});
+  const ProfileHeaderCard({super.key, required this.name, required this.email, this.avatarPath});
 
   @override
   Widget build(BuildContext context) {
+    final hasAvatar = avatarPath != null && avatarPath!.isNotEmpty;
+
     return AppSurfaceCard(
       padding: const EdgeInsets.all(AppNumbers.DOUBLE_16),
       child: Row(
         children: [
-          CircleAvatar(
-            radius: AppNumbers.DOUBLE_32,
-            backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-            child: const Icon(Icons.person_outline, size: AppNumbers.DOUBLE_32, color: AppColors.primary),
+          Container(
+            width: AppNumbers.DOUBLE_64,
+            height: AppNumbers.DOUBLE_64,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.primary.withValues(alpha: 0.1),
+            ),
+            child: ClipOval(
+              child: hasAvatar
+                  ? Image.file(
+                      File(avatarPath!),
+                      fit: BoxFit.cover,
+                      width: AppNumbers.DOUBLE_64,
+                      height: AppNumbers.DOUBLE_64,
+                      errorBuilder: (context, error, stackTrace) => _buildAvatarPlaceholder(),
+                    )
+                  : _buildAvatarPlaceholder(),
+            ),
           ),
           const SizedBox(width: AppNumbers.DOUBLE_16),
           Expanded(
@@ -51,6 +70,17 @@ class ProfileHeaderCard extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildAvatarPlaceholder() {
+    return Container(
+      color: AppColors.primary.withValues(alpha: 0.1),
+      child: const Icon(
+        Icons.person_outline,
+        size: AppNumbers.DOUBLE_32,
+        color: AppColors.primary,
       ),
     );
   }
