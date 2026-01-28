@@ -9,9 +9,9 @@ import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/DI/di.dart';
 import 'package:store_manage/core/navigation/home_tab_coordinator.dart';
-import 'package:store_manage/core/offline/stock_in/stock_in_sync_service.dart';
-import 'package:store_manage/core/services/inventory_adjustment_service.dart';
-import 'package:store_manage/core/services/local_product_service.dart';
+import 'package:store_manage/core/data/sync/stock_in_sync_service.dart';
+import 'package:store_manage/core/data/services/inventory_adjustment_service.dart';
+import 'package:store_manage/core/data/services/local_product_service.dart';
 import 'package:store_manage/core/widgets/app_page_app_bar.dart';
 import 'package:store_manage/feature/product/data/repositories/product_repository.dart';
 import 'package:store_manage/feature/product/presentation/cubit/product_search_cubit.dart';
@@ -174,6 +174,7 @@ class _StockInPageState extends State<StockInPage> {
   }
 
   void _handlePostSuccessNavigation() {
+    di<HomeTabCoordinator>().triggerInventoryRefresh();
     if (_postSuccessAction == _PostSuccessAction.openInventory) {
       di<HomeTabCoordinator>().requestedIndex.value = 2;
       context.router.popUntilRoot();

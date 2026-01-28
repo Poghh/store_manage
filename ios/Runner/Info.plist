@@ -28,6 +28,10 @@
 	<string>Cho phép lưu ảnh sản phẩm vào thư viện khi cần.</string>
 	<key>PHPhotoLibraryPreventAutomaticLimitedAccessAlert</key>
 	<true/>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Dùng Face ID để xác thực và đặt lại mã PIN</string>
+	<key>NSBiometricUsageDescription</key>
+	<string>Dùng sinh trắc học để xác thực người dùng</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

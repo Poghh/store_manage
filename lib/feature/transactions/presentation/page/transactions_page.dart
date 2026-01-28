@@ -11,7 +11,7 @@ import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/DI/di.dart';
 import 'package:store_manage/core/navigation/home_tab_coordinator.dart';
-import 'package:store_manage/core/storage/retail_transaction_storage.dart';
+import 'package:store_manage/core/data/storage/interfaces/retail_transaction_storage.dart';
 import 'package:store_manage/core/widgets/app_page_header.dart';
 import 'package:store_manage/core/widgets/app_surface_card.dart';
 import 'package:store_manage/feature/transactions/presentation/widgets/transaction_empty_state.dart';
@@ -65,8 +65,8 @@ class _TransactionsPageState extends State<TransactionsPage> {
       (item) => item.date == dateKey,
       orElse: () => const _TransactionRecord(date: '', items: []),
     );
-    final localItems = di<RetailTransactionStorage>()
-        .getAll()
+    final allLocalItems = await di<RetailTransactionStorage>().getAll();
+    final localItems = allLocalItems
         .map(_TransactionItem.fromOfflinePayload)
         .where((item) => item.dateKey == dateKey)
         .toList();

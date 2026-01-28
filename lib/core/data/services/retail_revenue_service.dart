@@ -1,9 +1,7 @@
-import 'package:flutter/foundation.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
 
 import 'package:store_manage/core/network/network_client.dart';
-import 'package:store_manage/core/storage/retail_transaction_storage.dart';
+import 'package:store_manage/core/data/storage/interfaces/retail_transaction_storage.dart';
 
 class RetailRevenueService {
   final RetailTransactionStorage _storage;
@@ -12,9 +10,6 @@ class RetailRevenueService {
   bool _isApiDataLoaded = false;
 
   RetailRevenueService(this._storage, this._networkClient);
-
-  ValueListenable<Box<List<String>>> get listenable =>
-      Hive.box<List<String>>('retail_transactions').listenable();
 
   /// Load revenue data - NetworkClient auto handles mock (dev) / real API (stg/prod)
   Future<void> loadApiData() async {
@@ -49,8 +44,8 @@ class RetailRevenueService {
   }
 
   /// Get revenue from offline/local transactions for a specific date
-  int getOfflineRevenueForDate(String dateKey) {
-    final items = _storage.getAll();
+  Future<int> getOfflineRevenueForDate(String dateKey) async {
+    final items = await _storage.getAll();
     var total = 0;
     for (final item in items) {
       final createdAt = DateTime.tryParse((item['createdAt'] ?? '').toString());
@@ -66,18 +61,18 @@ class RetailRevenueService {
   }
 
   /// Get total revenue (API + offline) for a specific date
-  int getTotalRevenueForDate(String dateKey) {
-    return getApiRevenueForDate(dateKey) + getOfflineRevenueForDate(dateKey);
+  Future<int> getTotalRevenueForDate(String dateKey) async {
+    return getApiRevenueForDate(dateKey) + await getOfflineRevenueForDate(dateKey);
   }
 
   /// Get total revenue for today
-  int getTodayRevenue() {
+  Future<int> getTodayRevenue() async {
     final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
     return getTotalRevenueForDate(today);
   }
 
   /// Get total revenue for yesterday
-  int getYesterdayRevenue() {
+  Future<int> getYesterdayRevenue() async {
     final yesterday = DateTime.now().subtract(const Duration(days: 1));
     final yesterdayKey = DateFormat('yyyy-MM-dd').format(yesterday);
     return getTotalRevenueForDate(yesterdayKey);
@@ -89,8 +84,4 @@ class RetailRevenueService {
     }
     return ((todayRevenue - yesterdayRevenue) / yesterdayRevenue) * 100;
   }
-
-  /// Legacy method for backward compatibility
-  @Deprecated('Use getOfflineRevenueForDate instead')
-  int offlineRevenueForDate(String dateKey) => getOfflineRevenueForDate(dateKey);
 }

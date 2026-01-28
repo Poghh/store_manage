@@ -14,6 +14,7 @@ import 'package:store_manage/core/widgets/app_pill.dart';
 import 'package:store_manage/core/widgets/app_surface_card.dart';
 import 'package:store_manage/feature/money_transaction/presentation/widget/bank_search_bar.dart';
 import 'package:store_manage/feature/retail/presentation/widgets/retail_currency_input_formatter.dart';
+import 'package:store_manage/feature/transactions/presentation/widgets/transaction_field_label.dart';
 
 @RoutePage()
 class MoneyTransactionPage extends StatefulWidget {
@@ -96,10 +97,16 @@ class _MoneyTransactionPageState extends State<MoneyTransactionPage> {
                 _buildTransactionType(),
                 const SizedBox(height: AppNumbers.DOUBLE_16),
 
+                TransactionFieldLabel(text: AppStrings.amountLabel),
+                const SizedBox(height: AppNumbers.DOUBLE_8),
                 _buildAmountField(),
                 const SizedBox(height: AppNumbers.DOUBLE_16),
 
-                if (_transactionType == TransactionType.transfer) _buildBankField(),
+                if (_transactionType == TransactionType.transfer) ...[
+                  TransactionFieldLabel(text: AppStrings.bankLabel),
+                  const SizedBox(height: AppNumbers.DOUBLE_8),
+                  _buildBankField(),
+                ],
 
                 const SizedBox(height: AppNumbers.DOUBLE_24),
                 _buildSummaryCards(),
@@ -157,7 +164,7 @@ class _MoneyTransactionPageState extends State<MoneyTransactionPage> {
               decoration: const InputDecoration(
                 border: InputBorder.none,
                 isDense: true,
-                hintText: AppStrings.amountLabel,
+                hintText: AppStrings.amountHint,
                 suffixText: AppStrings.VIET_NAM_DONG_TEXT,
               ),
               onChanged: (value) {

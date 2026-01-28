@@ -3,7 +3,7 @@ import 'package:store_manage/core/DI/di.dart';
 import 'package:store_manage/core/constants/app_colors.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
-import 'package:store_manage/core/services/retail_revenue_service.dart';
+import 'package:store_manage/core/data/services/retail_revenue_service.dart';
 import 'package:store_manage/core/widgets/app_page_header.dart';
 import 'package:store_manage/feature/reports/presentation/widgets/report_ai_insight_card.dart';
 import 'package:store_manage/feature/reports/presentation/widgets/report_summary_card.dart';
@@ -30,10 +30,19 @@ class _ReportsPageState extends State<ReportsPage> {
 
   Future<void> _loadRevenueData() async {
     await _revenueService.loadApiData();
-    _todayRevenue = _revenueService.getTodayRevenue();
-    _yesterdayRevenue = _revenueService.getYesterdayRevenue();
-    _growthPercentage = _revenueService.calculateGrowthPercentage(_todayRevenue, _yesterdayRevenue);
-    if (mounted) setState(() {});
+
+    final todayRevenue = await _revenueService.getTodayRevenue();
+    final yesterdayRevenue = await _revenueService.getYesterdayRevenue();
+
+    final growthPercentage = _revenueService.calculateGrowthPercentage(todayRevenue, yesterdayRevenue);
+
+    if (!mounted) return;
+
+    setState(() {
+      _todayRevenue = todayRevenue;
+      _yesterdayRevenue = yesterdayRevenue;
+      _growthPercentage = growthPercentage;
+    });
   }
 
   @override
@@ -51,10 +60,7 @@ class _ReportsPageState extends State<ReportsPage> {
               growthPercentage: _growthPercentage,
             ),
             SizedBox(height: AppNumbers.DOUBLE_16),
-            const ReportAiInsightCard(
-              insights: [],
-              suggestions: [],
-            ),
+            const ReportAiInsightCard(insights: [], suggestions: []),
           ],
         ),
       ),

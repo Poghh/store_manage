@@ -1,14 +1,14 @@
 import 'dart:async';
 
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
 import 'package:store_manage/core/constants/app_endpoints.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/network/connectivity_service.dart';
-import 'package:store_manage/core/offline/stock_in/stock_in_sync_service.dart';
-import 'package:store_manage/core/services/inventory_adjustment_service.dart';
-import 'package:store_manage/core/services/local_product_service.dart';
+import 'package:store_manage/core/data/sync/stock_in_sync_service.dart';
+import 'package:store_manage/core/data/services/inventory_adjustment_service.dart';
+import 'package:store_manage/core/data/services/local_product_service.dart';
 import 'package:store_manage/feature/stock_in/data/repositories/stock_in_repository.dart';
 
 import 'stock_in_state.dart';
@@ -19,7 +19,7 @@ class StockInCubit extends Cubit<StockInState> {
   final ConnectivityService _connectivity;
   final InventoryAdjustmentService _inventoryService;
   final LocalProductService _localProductService;
-  late final StreamSubscription<ConnectivityResult> _connectivitySub;
+  late final StreamSubscription<InternetStatus> _connectivitySub;
 
   StockInCubit(
     this._repository,
@@ -28,8 +28,8 @@ class StockInCubit extends Cubit<StockInState> {
     this._inventoryService,
     this._localProductService,
   ) : super(const StockInInitial()) {
-    _connectivitySub = _connectivity.onChanged.listen((result) {
-      if (result != ConnectivityResult.none) {
+    _connectivitySub = _connectivity.onChanged.listen((status) {
+      if (status == InternetStatus.connected) {
         _syncService.syncPending();
       }
     });
@@ -50,7 +50,7 @@ class StockInCubit extends Cubit<StockInState> {
       await _syncService.enqueue(payload);
 
       payload['_skipInventoryIncrease'] = false;
-      _applyInventoryIncrease(payload);
+      await _applyInventoryIncrease(payload);
 
       emit(const StockInQueued(AppStrings.stockInQueued));
       return;
@@ -58,7 +58,7 @@ class StockInCubit extends Cubit<StockInState> {
 
     try {
       await _repository.submitStockIn(payload);
-      _applyInventoryIncrease(payload);
+      await _applyInventoryIncrease(payload);
 
       emit(const StockInLoaded());
       await _syncService.syncPending();
@@ -67,20 +67,20 @@ class StockInCubit extends Cubit<StockInState> {
       await _syncService.enqueue(payload);
 
       payload['_skipInventoryIncrease'] = false;
-      _applyInventoryIncrease(payload);
+      await _applyInventoryIncrease(payload);
 
       emit(const StockInQueued(AppStrings.stockInQueued));
     }
   }
 
-  void _applyInventoryIncrease(Map<String, dynamic> payload) {
+  Future<void> _applyInventoryIncrease(Map<String, dynamic> payload) async {
     final skip = payload['_skipInventoryIncrease'] == true;
     if (skip) return;
     final code = (payload['productCode'] ?? '').toString();
     final quantity = (payload['quantity'] is int)
         ? payload['quantity'] as int
         : int.tryParse('${payload['quantity']}') ?? 0;
-    _inventoryService.applyStockIn(code, quantity);
+    await _inventoryService.applyStockIn(code, quantity);
   }
 
   Future<void> _prepareOfflinePayload(Map<String, dynamic> payload) async {

@@ -1,7 +1,7 @@
 import 'package:store_manage/core/network/connectivity_service.dart';
-import 'package:store_manage/core/services/inventory_adjustment_service.dart';
-import 'package:store_manage/core/storage/offline_queue_storage.dart';
-import 'package:store_manage/core/services/local_product_service.dart';
+import 'package:store_manage/core/data/services/inventory_adjustment_service.dart';
+import 'package:store_manage/core/data/storage/interfaces/offline_queue_storage.dart';
+import 'package:store_manage/core/data/services/local_product_service.dart';
 import 'package:store_manage/feature/stock_in/data/repositories/stock_in_repository.dart';
 
 class StockInSyncService {
@@ -28,7 +28,7 @@ class StockInSyncService {
       return;
     }
 
-    final items = _queue.getAll(queueKey);
+    final items = await _queue.getAll(queueKey);
     for (var i = 0; i < items.length; i++) {
       try {
         final response = await _repository.submitStockIn(items[i]);

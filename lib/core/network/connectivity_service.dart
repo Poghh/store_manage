@@ -1,19 +1,11 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
 class ConnectivityService {
-  final Connectivity _connectivity;
+  final InternetConnection _connection;
 
-  ConnectivityService(this._connectivity);
+  ConnectivityService(this._connection);
 
-  Stream<ConnectivityResult> get onChanged => _connectivity.onConnectivityChanged.map(
-    (results) => results.contains(ConnectivityResult.none)
-        ? ConnectivityResult.none
-        : (results.isNotEmpty ? results.first : ConnectivityResult.none),
-  );
+  Stream<InternetStatus> get onChanged => _connection.onStatusChange;
 
-  Future<bool> get isOnline async {
-    final results = await _connectivity.checkConnectivity();
-    if (results.isEmpty) return false;
-    return !results.contains(ConnectivityResult.none);
-  }
+  Future<bool> get isOnline => _connection.hasInternetAccess;
 }

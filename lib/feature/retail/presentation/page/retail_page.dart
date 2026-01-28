@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
+import 'package:store_manage/core/navigation/home_tab_coordinator.dart';
 import 'package:store_manage/core/utils/app_toast.dart';
 
 import 'package:store_manage/core/DI/di.dart';
@@ -17,9 +18,9 @@ import 'package:store_manage/feature/retail/presentation/cubit/retail_cubit.dart
 import 'package:store_manage/feature/retail/presentation/cubit/retail_state.dart';
 import 'package:store_manage/feature/retail/data/repositories/retail_repository.dart';
 import 'package:store_manage/core/network/connectivity_service.dart';
-import 'package:store_manage/core/offline/retail/retail_sync_service.dart';
-import 'package:store_manage/core/services/inventory_adjustment_service.dart';
-import 'package:store_manage/core/storage/retail_transaction_storage.dart';
+import 'package:store_manage/core/data/sync/retail_sync_service.dart';
+import 'package:store_manage/core/data/services/inventory_adjustment_service.dart';
+import 'package:store_manage/core/data/storage/interfaces/retail_transaction_storage.dart';
 import 'package:store_manage/feature/retail/presentation/widgets/payment_method.dart';
 import 'package:store_manage/feature/retail/presentation/widgets/retail_page_body.dart';
 
@@ -102,10 +103,12 @@ class _RetailPageState extends State<RetailPage> {
           if (state is RetailLoaded) {
             AppToast.success(context, AppStrings.retailSubmitSuccess);
             _applyLocalSale();
+            di<HomeTabCoordinator>().triggerInventoryRefresh();
             context.maybePop();
           } else if (state is RetailQueued) {
             AppToast.warning(context, state.message);
             _applyLocalSale();
+            di<HomeTabCoordinator>().triggerInventoryRefresh();
             context.maybePop();
           } else if (state is RetailError) {
             AppToast.error(context, state.message);

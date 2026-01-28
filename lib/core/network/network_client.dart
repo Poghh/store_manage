@@ -7,7 +7,7 @@ import 'package:store_manage/config/app_config.dart';
 import 'package:store_manage/core/errors/app_exception.dart';
 import 'package:store_manage/core/models/common_response_model.dart';
 import 'package:store_manage/core/network/network_interceptor.dart';
-import 'package:store_manage/core/storage/secure_storage.dart';
+import 'package:store_manage/core/data/storage/secure_storage.dart';
 import 'package:store_manage/core/utils/common_funtion_utils.dart';
 
 class NetworkClient {

@@ -50,7 +50,7 @@ class _BankSearchBarState extends State<BankSearchBar> {
         child: TextField(
           controller: _controller,
           focusNode: _focusNode,
-          decoration: const InputDecoration(border: InputBorder.none, isDense: true, hintText: AppStrings.bankLabel),
+          decoration: const InputDecoration(border: InputBorder.none, isDense: true, hintText: AppStrings.bankHint),
           onChanged: _onChanged,
         ),
       ),

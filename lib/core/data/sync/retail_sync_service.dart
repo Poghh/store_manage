@@ -1,5 +1,5 @@
 import 'package:store_manage/core/network/connectivity_service.dart';
-import 'package:store_manage/core/storage/offline_queue_storage.dart';
+import 'package:store_manage/core/data/storage/interfaces/offline_queue_storage.dart';
 import 'package:store_manage/feature/retail/data/repositories/retail_repository.dart';
 
 class RetailSyncService {
@@ -18,7 +18,7 @@ class RetailSyncService {
       return;
     }
 
-    final items = _queue.getAll(queueKey);
+    final items = await _queue.getAll(queueKey);
     for (var i = 0; i < items.length; i++) {
       try {
         await _repository.submitRetailSale(items[i]);

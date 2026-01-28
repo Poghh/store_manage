@@ -1,14 +1,14 @@
 import 'dart:async';
 
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
 import 'package:store_manage/core/constants/app_endpoints.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/network/connectivity_service.dart';
-import 'package:store_manage/core/offline/retail/retail_sync_service.dart';
-import 'package:store_manage/core/services/inventory_adjustment_service.dart';
-import 'package:store_manage/core/storage/retail_transaction_storage.dart';
+import 'package:store_manage/core/data/sync/retail_sync_service.dart';
+import 'package:store_manage/core/data/services/inventory_adjustment_service.dart';
+import 'package:store_manage/core/data/storage/interfaces/retail_transaction_storage.dart';
 import 'package:store_manage/feature/retail/data/repositories/retail_repository.dart';
 import 'retail_state.dart';
 
@@ -18,12 +18,12 @@ class RetailCubit extends Cubit<RetailState> {
   final ConnectivityService _connectivity;
   final RetailTransactionStorage _transactionStorage;
   final InventoryAdjustmentService _inventoryService;
-  late final StreamSubscription<ConnectivityResult> _connectivitySub;
+  late final StreamSubscription<InternetStatus> _connectivitySub;
 
   RetailCubit(this._repository, this._syncService, this._connectivity, this._transactionStorage, this._inventoryService)
     : super(const RetailInitial()) {
-    _connectivitySub = _connectivity.onChanged.listen((result) {
-      if (result != ConnectivityResult.none) {
+    _connectivitySub = _connectivity.onChanged.listen((status) {
+      if (status == InternetStatus.connected) {
         _syncService.syncPending();
       }
     });
@@ -40,30 +40,30 @@ class RetailCubit extends Cubit<RetailState> {
     if (!await _connectivity.isOnline) {
       await _transactionStorage.addTransaction(payload);
       await _syncService.enqueue(payload);
-      _applyInventoryDeduction(payload);
+      await _applyInventoryDeduction(payload);
       emit(const RetailQueued(AppStrings.retailQueued));
       return;
     }
 
     try {
       await _repository.submitRetailSale(payload);
-      _applyInventoryDeduction(payload);
+      await _applyInventoryDeduction(payload);
       emit(const RetailLoaded());
       await _syncService.syncPending();
     } catch (_) {
       await _transactionStorage.addTransaction(payload);
       await _syncService.enqueue(payload);
-      _applyInventoryDeduction(payload);
+      await _applyInventoryDeduction(payload);
       emit(const RetailQueued(AppStrings.retailQueued));
     }
   }
 
-  void _applyInventoryDeduction(Map<String, dynamic> payload) {
+  Future<void> _applyInventoryDeduction(Map<String, dynamic> payload) async {
     final code = (payload['productCode'] ?? '').toString();
     final quantity = (payload['quantity'] is int)
         ? payload['quantity'] as int
         : int.tryParse('${payload['quantity']}') ?? 0;
-    _inventoryService.applySale(code, quantity);
+    await _inventoryService.applySale(code, quantity);
   }
 
   @override

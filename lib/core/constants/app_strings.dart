@@ -48,6 +48,11 @@ class AppStrings {
   static const String forgotPinOptionVerifyDesc = 'Nhập đúng số điện thoại đã đăng ký để tạo mã PIN mới';
   static const String forgotPinOptionResetTitle = 'Xóa toàn bộ dữ liệu';
   static const String forgotPinOptionResetDesc = 'Không nhớ số điện thoại? Xóa tất cả dữ liệu và bắt đầu lại';
+  static const String forgotPinOptionBiometricTitle = 'Sử dụng sinh trắc học';
+  static const String forgotPinOptionBiometricDesc = 'Xác minh bằng vân tay hoặc khuôn mặt để tạo mã PIN mới';
+  static const String forgotPinBiometricReason = 'Xác minh danh tính để đặt lại mã PIN';
+  static const String forgotPinBiometricNotAvailable = 'Thiết bị không hỗ trợ sinh trắc học';
+  static const String forgotPinBiometricFailed = 'Xác minh sinh trắc học thất bại';
   static const String forgotPinCancelButton = 'Quay lại';
   static const String forgotPinResetDialogTitle = 'Xóa toàn bộ dữ liệu?';
   static const String forgotPinResetDialogMessage =
@@ -63,7 +68,6 @@ class AppStrings {
 
   // === HOME ===
   static const String homeGreetingPrefix = 'Xin chào, ';
-  static const String homeGreetingName = 'Thanh Phong';
   static const String homeRetailTitle = 'BÁN LẺ';
   static const String homeRetailSubtitle = 'Nhập nhanh';
   static const String homeStockInTitle = 'NHẬP HÀNG';
@@ -221,7 +225,9 @@ class AppStrings {
   static const transferMoney = 'Chuyển tiền';
   static const withdrawCash = 'Rút tiền mặt';
   static const amountLabel = 'Số tiền';
+  static const amountHint = 'Nhập số tiền';
   static const bankLabel = 'Ngân hàng';
+  static const bankHint = 'Nhập ngân hàng';
   static const transactionFeeLabel = 'Phí giao dịch (0.5%)';
   static const totalAmountLabel = 'Tổng tiền';
   static const confirmTransaction = 'Xác nhận giao dịch';
