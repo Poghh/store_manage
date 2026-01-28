@@ -1,9 +1,8 @@
 import 'dart:async';
 
-import 'package:connectivity_plus/connectivity_plus.dart';
-
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:store_manage/core/network/connectivity_service.dart';
-import 'package:store_manage/core/storage/offline_queue_storage.dart';
+import 'package:store_manage/core/data/storage/interfaces/offline_queue_storage.dart';
 import 'package:store_manage/feature/product/data/repositories/product_repository.dart';
 
 class ProductDeleteSyncService {
@@ -12,11 +11,11 @@ class ProductDeleteSyncService {
   final OfflineQueueStorage _queue;
   final ProductRepository _repository;
   final ConnectivityService _connectivity;
-  late final StreamSubscription<ConnectivityResult> _connectivitySub;
+  late final StreamSubscription<InternetStatus> _connectivitySub;
 
   ProductDeleteSyncService(this._queue, this._repository, this._connectivity) {
-    _connectivitySub = _connectivity.onChanged.listen((result) {
-      if (result != ConnectivityResult.none) {
+    _connectivitySub = _connectivity.onChanged.listen((status) {
+      if (status == InternetStatus.connected) {
         syncPending();
       }
     });
@@ -31,7 +30,7 @@ class ProductDeleteSyncService {
       return;
     }
 
-    final items = _queue.getAll(queueKey);
+    final items = await _queue.getAll(queueKey);
     for (var i = 0; i < items.length; i++) {
       final code = (items[i]['productCode'] ?? '').toString();
       if (code.isEmpty) {

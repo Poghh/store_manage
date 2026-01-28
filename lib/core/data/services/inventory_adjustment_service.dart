@@ -1,19 +1,14 @@
-import 'package:flutter/foundation.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-
-import 'package:store_manage/core/storage/inventory_adjustment_storage.dart';
+import 'package:store_manage/core/data/storage/interfaces/inventory_adjustment_storage.dart';
 
 class InventoryAdjustmentService {
   final InventoryAdjustmentStorage _storage;
 
   InventoryAdjustmentService(this._storage);
 
-  ValueListenable<Box<int>> get listenable => Hive.box<int>('inventory_adjustments').listenable();
+  Future<int> getAdjustment(String productCode) => _storage.getAdjustment(productCode);
 
-  int getAdjustment(String productCode) => _storage.getAdjustment(productCode);
-
-  int adjustedQuantity({required String productCode, required int baseQuantity}) {
-    final adjustment = _storage.getAdjustment(productCode);
+  Future<int> adjustedQuantity({required String productCode, required int baseQuantity}) async {
+    final adjustment = await _storage.getAdjustment(productCode);
     return (baseQuantity + adjustment).clamp(0, 1 << 30);
   }
 
@@ -26,13 +21,12 @@ class InventoryAdjustmentService {
   Future<void> migrateProductCode({required String from, required String to}) async {
     if (from.isEmpty || to.isEmpty || from == to) return;
 
-    final value = _storage.getAdjustment(from);
+    final value = await _storage.getAdjustment(from);
     if (value == 0) return;
 
-    final currentTo = _storage.getAdjustment(to);
+    final currentTo = await _storage.getAdjustment(to);
 
     await _storage.setAdjustment(to, currentTo + value);
     await _storage.setAdjustment(from, 0);
   }
-
 }

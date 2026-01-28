@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -7,7 +6,7 @@ import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/DI/di.dart';
 import 'package:store_manage/core/navigation/home_tab_coordinator.dart';
-import 'package:store_manage/core/services/retail_revenue_service.dart';
+import 'package:store_manage/core/data/services/retail_revenue_service.dart';
 import 'package:store_manage/core/utils/common_funtion_utils.dart';
 import 'package:store_manage/feature/home/presentation/widgets/revenue_summary_card.dart';
 
@@ -22,49 +21,42 @@ class _HomeContentState extends State<HomeContent> {
   late DateTime _selectedDate;
   bool _isFetching = false;
   late final RetailRevenueService _revenueService;
-  late final ValueListenable _retailBoxListenable;
+  int _totalRevenue = 0;
+  final String _userName = '';
 
   @override
   void initState() {
     super.initState();
     _selectedDate = DateTime.now();
-    // Debug: print current system time and selected date to help diagnose incorrect date issues
-    debugPrint('HomeContent initState - DateTime.now(): ${DateTime.now().toIso8601String()}');
-    debugPrint('HomeContent initState - timezone: ${DateTime.now().timeZoneName} ${DateTime.now().timeZoneOffset}');
-    debugPrint('HomeContent initState - selectedDate init: ${_selectedDate.toIso8601String()}');
     _revenueService = di<RetailRevenueService>();
-    _retailBoxListenable = _revenueService.listenable;
-    _retailBoxListenable.addListener(_handleRetailChange);
-    _loadApiData();
+    _loadData();
   }
 
-  Future<void> _loadApiData() async {
+  Future<void> _loadData() async {
     await _revenueService.loadApiData();
-    if (mounted) setState(() {});
+    await _loadRevenueForDate();
   }
 
-  @override
-  void dispose() {
-    _retailBoxListenable.removeListener(_handleRetailChange);
-    super.dispose();
-  }
-
-  void _handleRetailChange() {
-    if (!mounted) return;
-    setState(() {});
+  Future<void> _loadRevenueForDate() async {
+    final dateKey = DateFormat('yyyy-MM-dd').format(_selectedDate);
+    final revenue = await _revenueService.getTotalRevenueForDate(dateKey);
+    if (mounted) {
+      setState(() => _totalRevenue = revenue);
+    }
   }
 
   Future<void> _changeDate(int daysDelta) async {
     if (_isFetching) return;
     final newDate = _selectedDate.add(Duration(days: daysDelta));
     if (newDate.isAfter(DateTime.now())) return;
-    setState(() => _isFetching = true);
-    await Future.delayed(const Duration(milliseconds: 200));
-    if (!mounted) return;
     setState(() {
+      _isFetching = true;
       _selectedDate = newDate;
-      _isFetching = false;
     });
+    await _loadRevenueForDate();
+    if (mounted) {
+      setState(() => _isFetching = false);
+    }
   }
 
   String _buildRevenueTitle() {
@@ -90,10 +82,9 @@ class _HomeContentState extends State<HomeContent> {
     final dateText = DateFormat('dd/MM/yyyy').format(_selectedDate);
     final canPrev = !_isFetching;
     final canNext = !_isFetching && !isToday;
-    final dateKey = DateFormat('yyyy-MM-dd').format(_selectedDate);
-    final totalRevenue = _revenueService.getTotalRevenueForDate(dateKey);
-    final revenueText = CommonFuntionUtils.formatCurrency(totalRevenue);
+    final revenueText = CommonFuntionUtils.formatCurrency(_totalRevenue);
     final revenueTitle = _buildRevenueTitle();
+
     return Container(
       color: AppColors.background,
       child: Padding(
@@ -113,7 +104,7 @@ class _HomeContentState extends State<HomeContent> {
                         style: TextStyle(color: AppColors.textSecondary),
                       ),
                       TextSpan(
-                        text: AppStrings.homeGreetingName,
+                        text: _userName,
                         style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600),
                       ),
                     ],

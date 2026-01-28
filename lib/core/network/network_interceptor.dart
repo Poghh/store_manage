@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:logger/logger.dart';
-import 'package:store_manage/core/storage/secure_storage.dart';
+import 'package:store_manage/core/data/storage/secure_storage.dart';
 
 class NetworkInterceptor extends Interceptor {
   final SecureStorageImpl secureStorageImpl;

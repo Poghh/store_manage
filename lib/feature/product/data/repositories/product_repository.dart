@@ -1,7 +1,7 @@
 import 'package:store_manage/core/constants/app_endpoints.dart';
 import 'package:store_manage/core/network/network_client.dart';
-import 'package:store_manage/core/services/inventory_adjustment_service.dart';
-import 'package:store_manage/core/storage/local_product_storage.dart';
+import 'package:store_manage/core/data/services/inventory_adjustment_service.dart';
+import 'package:store_manage/core/data/storage/interfaces/local_product_storage.dart';
 import 'package:store_manage/feature/product/data/models/product.dart';
 
 abstract class ProductRepository {
@@ -37,7 +37,8 @@ class ProductRepositoryImpl implements ProductRepository {
     }
     final deletedCodes = <String>{};
     final localItems = <Product>[];
-    for (final json in _localStorage.getAll()) {
+    final localData = await _localStorage.getAll();
+    for (final json in localData) {
       if (json['_deleted'] == true) {
         final code = (json['productCode'] ?? '').toString();
         if (code.isNotEmpty) {
@@ -83,14 +84,16 @@ class ProductRepositoryImpl implements ProductRepository {
 
     if (merged.isEmpty) return merged;
 
-    return merged.map((product) {
+    final result = <Product>[];
+    for (final product in merged) {
       final baseQuantity = product.quantity ?? 0;
-      final updatedQuantity = _inventoryService.adjustedQuantity(
+      final updatedQuantity = await _inventoryService.adjustedQuantity(
         productCode: product.productCode,
         baseQuantity: baseQuantity,
       );
-      return product.copyWith(quantity: updatedQuantity);
-    }).toList();
+      result.add(product.copyWith(quantity: updatedQuantity));
+    }
+    return result;
   }
 
   @override

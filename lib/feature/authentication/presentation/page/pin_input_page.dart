@@ -8,7 +8,7 @@ import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/navigation/app_router.dart';
-import 'package:store_manage/core/storage/secure_storage.dart';
+import 'package:store_manage/core/data/storage/secure_storage.dart';
 
 @RoutePage()
 class PinInputPage extends StatefulWidget {

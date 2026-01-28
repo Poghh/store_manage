@@ -9,10 +9,11 @@ import 'package:store_manage/core/constants/app_font_sizes.dart';
 import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
+import 'package:store_manage/core/navigation/home_tab_coordinator.dart';
 import 'package:store_manage/core/network/connectivity_service.dart';
-import 'package:store_manage/core/offline/product/product_delete_sync_service.dart';
-import 'package:store_manage/core/services/inventory_adjustment_service.dart';
-import 'package:store_manage/core/services/local_product_service.dart';
+import 'package:store_manage/core/data/sync/product_delete_sync_service.dart';
+import 'package:store_manage/core/data/services/inventory_adjustment_service.dart';
+import 'package:store_manage/core/data/services/local_product_service.dart';
 import 'package:store_manage/core/utils/common_funtion_utils.dart';
 import 'package:store_manage/feature/product/data/repositories/product_repository.dart';
 import 'package:store_manage/feature/product/presentation/page/product_edit_page.dart';
@@ -61,10 +62,14 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   late final ProductRepository _productRepository;
   late final ProductDeleteSyncService _deleteSyncService;
   late final ConnectivityService _connectivity;
+  late final HomeTabCoordinator _tabCoordinator;
   late final int _baseQuantity;
   late final bool _hasQuantity;
-  late final int _initialAdjustment;
-  late final Listenable _listenable;
+
+  bool _isLoading = true;
+  int _initialAdjustment = 0;
+  int _currentAdjustment = 0;
+  Map<String, dynamic>? _localOverride;
 
   @override
   void initState() {
@@ -74,130 +79,176 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     _productRepository = di<ProductRepository>();
     _deleteSyncService = di<ProductDeleteSyncService>();
     _connectivity = di<ConnectivityService>();
-    _listenable = Listenable.merge([_inventoryService.listenable, _localProductService.listenable]);
+    _tabCoordinator = di<HomeTabCoordinator>();
+    _tabCoordinator.inventoryRefreshTrigger.addListener(_onRefreshTriggered);
     _baseQuantity = widget.stockQuantityValue ?? int.tryParse(widget.quantity.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
     _hasQuantity = widget.quantity.isNotEmpty || widget.stockQuantityValue != null;
-    _initialAdjustment = _inventoryService.getAdjustment(widget.productCode);
+    _loadData();
+  }
+
+  @override
+  void dispose() {
+    _tabCoordinator.inventoryRefreshTrigger.removeListener(_onRefreshTriggered);
+    super.dispose();
+  }
+
+  void _onRefreshTriggered() {
+    _refreshData();
+  }
+
+  Future<void> _loadData() async {
+    final adjustment = await _inventoryService.getAdjustment(widget.productCode);
+    final localOverride = await _localProductService.getByCode(widget.productCode);
+    if (mounted) {
+      setState(() {
+        _initialAdjustment = adjustment;
+        _currentAdjustment = adjustment;
+        _localOverride = localOverride;
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _refreshData() async {
+    final adjustment = await _inventoryService.getAdjustment(widget.productCode);
+    final localOverride = await _localProductService.getByCode(widget.productCode);
+    if (mounted) {
+      setState(() {
+        _currentAdjustment = adjustment;
+        _localOverride = localOverride;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _listenable,
-      builder: (context, child) {
-        final localOverride = _localProductService.getByCode(widget.productCode);
-        final overrideName = (localOverride?['productName'] ?? '').toString();
-        final overridePrice = localOverride?['purchasePrice'];
-        final overrideDate = (localOverride?['stockInDate'] ?? '').toString();
-        final displayCode = widget.productCode.isEmpty ? '' : widget.productCode;
-        final displayName = overrideName.isNotEmpty
-            ? overrideName
-            : (widget.productName.isEmpty ? '' : widget.productName);
-        final displayCategory = widget.category.isEmpty ? '' : widget.category;
-        final displayPlatform = widget.platform.isEmpty ? '' : widget.platform;
-        final displayBrand = widget.brand.isEmpty ? '' : widget.brand;
-        final displayUnit = widget.unit.isEmpty ? '' : widget.unit;
-        final currentAdjustment = _inventoryService.getAdjustment(widget.productCode);
-        final delta = currentAdjustment - _initialAdjustment;
-        final adjustedQuantity = (_baseQuantity + delta).clamp(0, 1 << 30);
-        final displayQuantity = _hasQuantity ? adjustedQuantity.toString() : '';
-        final parsedOverridePrice = overridePrice is int ? overridePrice : int.tryParse('${overridePrice ?? ''}');
-        final displayPrice = widget.purchasePrice.isNotEmpty
-            ? widget.purchasePrice
-            : (parsedOverridePrice == null
-                  ? (widget.priceValue == null ? '' : CommonFuntionUtils.formatCurrency(widget.priceValue!))
-                  : CommonFuntionUtils.formatCurrency(parsedOverridePrice));
-        final displayDate = overrideDate.isNotEmpty
-            ? overrideDate
-            : (widget.stockInDate.isEmpty ? '' : widget.stockInDate);
-        final hasPrefill = widget.productCode.isNotEmpty || widget.productName.isNotEmpty;
-        final prefillQuantity = _hasQuantity ? adjustedQuantity : null;
-        final prefillPrice =
-            parsedOverridePrice ??
-            widget.priceValue ??
-            int.tryParse(widget.purchasePrice.replaceAll(RegExp(r'[^0-9]'), ''));
-        final infoRows = [
-          InfoRow(label: AppStrings.stockInProductCodeLabel, value: displayCode),
-          InfoRow(label: AppStrings.stockInProductNameLabel, value: displayName),
-          InfoRow(label: AppStrings.stockInCategoryLabel, value: displayCategory),
-          InfoRow(label: AppStrings.stockInPlatformLabel, value: displayPlatform),
-          InfoRow(label: AppStrings.stockInBrandLabel, value: displayBrand),
-          InfoRow(label: AppStrings.stockInUnitLabel, value: displayUnit),
-          InfoRow(label: AppStrings.stockInQuantityLabel, value: displayQuantity),
-          InfoRow(label: AppStrings.stockInPurchasePriceLabel, value: displayPrice),
-          InfoRow(label: AppStrings.stockInDateLabel, value: displayDate),
-        ];
-
-        return Scaffold(
+    if (_isLoading) {
+      return Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: AppBar(
           backgroundColor: AppColors.background,
-          appBar: AppBar(
-            backgroundColor: AppColors.background,
-            elevation: AppNumbers.DOUBLE_0,
-            scrolledUnderElevation: AppNumbers.DOUBLE_0,
-            surfaceTintColor: AppColors.background,
-            leading: IconButton(
-              onPressed: () => context.maybePop(),
-              icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
-            ),
-            title: const Text(
-              AppStrings.productDetailsTitle,
-              style: TextStyle(
-                fontSize: AppFontSizes.fontSize18,
-                fontWeight: FontWeight.w600,
-                fontFamily: AppFonts.inter,
-                color: AppColors.textPrimary,
-              ),
-            ),
+          elevation: AppNumbers.DOUBLE_0,
+          leading: IconButton(
+            onPressed: () => context.maybePop(),
+            icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
           ),
-          body: SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(AppNumbers.DOUBLE_16),
-              child: ProductDetailsBody(
-                displayName: displayName,
-                displayCode: displayCode,
-                displayQuantity: displayQuantity,
-                imageUrl: widget.imageUrl,
-                infoRows: infoRows,
-                onEdit: () => Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => ProductEditPage(
-                      productCode: widget.productCode,
-                      productName: displayName,
-                      category: widget.category,
-                      platform: widget.platform,
-                      brand: widget.brand,
-                      unit: widget.unit,
-                      purchasePrice: displayPrice,
-                      stockInDate: displayDate,
-                      imageUrl: widget.imageUrl,
-                      baseQuantity: _baseQuantity,
-                      initialAdjustment: _initialAdjustment,
-                    ),
+        ),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final overrideName = (_localOverride?['productName'] ?? '').toString();
+    final overridePrice = _localOverride?['purchasePrice'];
+    final overrideDate = (_localOverride?['stockInDate'] ?? '').toString();
+    final displayCode = widget.productCode.isEmpty ? '' : widget.productCode;
+    final displayName = overrideName.isNotEmpty
+        ? overrideName
+        : (widget.productName.isEmpty ? '' : widget.productName);
+    final displayCategory = widget.category.isEmpty ? '' : widget.category;
+    final displayPlatform = widget.platform.isEmpty ? '' : widget.platform;
+    final displayBrand = widget.brand.isEmpty ? '' : widget.brand;
+    final displayUnit = widget.unit.isEmpty ? '' : widget.unit;
+    final delta = _currentAdjustment - _initialAdjustment;
+    final adjustedQuantity = (_baseQuantity + delta).clamp(0, 1 << 30);
+    final displayQuantity = _hasQuantity ? adjustedQuantity.toString() : '';
+    final parsedOverridePrice = overridePrice is int ? overridePrice : int.tryParse('${overridePrice ?? ''}');
+    final displayPrice = widget.purchasePrice.isNotEmpty
+        ? widget.purchasePrice
+        : (parsedOverridePrice == null
+              ? (widget.priceValue == null ? '' : CommonFuntionUtils.formatCurrency(widget.priceValue!))
+              : CommonFuntionUtils.formatCurrency(parsedOverridePrice));
+    final displayDate = overrideDate.isNotEmpty
+        ? overrideDate
+        : (widget.stockInDate.isEmpty ? '' : widget.stockInDate);
+    final hasPrefill = widget.productCode.isNotEmpty || widget.productName.isNotEmpty;
+    final prefillQuantity = _hasQuantity ? adjustedQuantity : null;
+    final prefillPrice =
+        parsedOverridePrice ??
+        widget.priceValue ??
+        int.tryParse(widget.purchasePrice.replaceAll(RegExp(r'[^0-9]'), ''));
+    final infoRows = [
+      InfoRow(label: AppStrings.stockInProductCodeLabel, value: displayCode),
+      InfoRow(label: AppStrings.stockInProductNameLabel, value: displayName),
+      InfoRow(label: AppStrings.stockInCategoryLabel, value: displayCategory),
+      InfoRow(label: AppStrings.stockInPlatformLabel, value: displayPlatform),
+      InfoRow(label: AppStrings.stockInBrandLabel, value: displayBrand),
+      InfoRow(label: AppStrings.stockInUnitLabel, value: displayUnit),
+      InfoRow(label: AppStrings.stockInQuantityLabel, value: displayQuantity),
+      InfoRow(label: AppStrings.stockInPurchasePriceLabel, value: displayPrice),
+      InfoRow(label: AppStrings.stockInDateLabel, value: displayDate),
+    ];
+
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        backgroundColor: AppColors.background,
+        elevation: AppNumbers.DOUBLE_0,
+        scrolledUnderElevation: AppNumbers.DOUBLE_0,
+        surfaceTintColor: AppColors.background,
+        leading: IconButton(
+          onPressed: () => context.maybePop(),
+          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+        ),
+        title: const Text(
+          AppStrings.productDetailsTitle,
+          style: TextStyle(
+            fontSize: AppFontSizes.fontSize18,
+            fontWeight: FontWeight.w600,
+            fontFamily: AppFonts.inter,
+            color: AppColors.textPrimary,
+          ),
+        ),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppNumbers.DOUBLE_16),
+          child: ProductDetailsBody(
+            displayName: displayName,
+            displayCode: displayCode,
+            displayQuantity: displayQuantity,
+            imageUrl: widget.imageUrl,
+            infoRows: infoRows,
+            onEdit: () async {
+              await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => ProductEditPage(
+                    productCode: widget.productCode,
+                    productName: displayName,
+                    category: widget.category,
+                    platform: widget.platform,
+                    brand: widget.brand,
+                    unit: widget.unit,
+                    purchasePrice: displayPrice,
+                    stockInDate: displayDate,
+                    imageUrl: widget.imageUrl,
+                    baseQuantity: _baseQuantity,
+                    initialAdjustment: _initialAdjustment,
                   ),
                 ),
-                onDelete: () => _confirmDelete(displayCode),
-              ),
-            ),
+              );
+              _refreshData();
+            },
+            onDelete: () => _confirmDelete(displayCode),
           ),
-          bottomNavigationBar: ProductDetailActions(
-            displayCode: displayCode,
-            displayName: displayName,
-            displayQuantity: displayQuantity,
-            displayPrice: displayPrice,
-            priceValue: widget.priceValue,
-            imageUrl: widget.imageUrl,
-            productCode: hasPrefill ? widget.productCode : null,
-            productName: hasPrefill ? widget.productName : null,
-            category: widget.category.isNotEmpty ? widget.category : null,
-            platform: widget.platform.isNotEmpty ? widget.platform : null,
-            brand: widget.brand.isNotEmpty ? widget.brand : null,
-            unit: widget.unit.isNotEmpty ? widget.unit : null,
-            quantity: prefillQuantity,
-            purchasePrice: prefillPrice,
-            stockInDate: displayDate.isNotEmpty ? displayDate : null,
-          ),
-        );
-      },
+        ),
+      ),
+      bottomNavigationBar: ProductDetailActions(
+        displayCode: displayCode,
+        displayName: displayName,
+        displayQuantity: displayQuantity,
+        displayPrice: displayPrice,
+        priceValue: widget.priceValue,
+        imageUrl: widget.imageUrl,
+        productCode: hasPrefill ? widget.productCode : null,
+        productName: hasPrefill ? widget.productName : null,
+        category: widget.category.isNotEmpty ? widget.category : null,
+        platform: widget.platform.isNotEmpty ? widget.platform : null,
+        brand: widget.brand.isNotEmpty ? widget.brand : null,
+        unit: widget.unit.isNotEmpty ? widget.unit : null,
+        quantity: prefillQuantity,
+        purchasePrice: prefillPrice,
+        stockInDate: displayDate.isNotEmpty ? displayDate : null,
+      ),
     );
   }
 

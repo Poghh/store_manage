@@ -10,6 +10,6 @@ class RetailSectionLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppSectionLabel(text: text, color: AppColors.textOnPrimary);
+    return AppSectionLabel(text: text, color: AppColors.textSecondary);
   }
 }

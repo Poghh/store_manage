@@ -1,11 +1,12 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:store_manage/core/DI/di.dart';
+import 'package:store_manage/core/data/database/app_database.dart';
+import 'package:store_manage/core/data/database/daos/app_state_dao.dart';
 import 'package:store_manage/core/navigation/app_router.dart';
 import 'package:store_manage/core/navigation/route_observer.dart';
-import 'package:store_manage/core/storage/secure_storage.dart';
+import 'package:store_manage/core/data/storage/secure_storage.dart';
 import 'package:store_manage/core/theme/app_theme.dart';
 import 'package:store_manage/core/widgets/splash_screen.dart';
 import 'package:toastification/toastification.dart';
@@ -16,26 +17,25 @@ final _appRouter = AppRouter();
 Future mainCommon() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
-  await Hive.initFlutter();
   await setupDI();
   await _handleFreshInstall();
   runApp(MyApp());
 }
 
 /// iOS Keychain persists data even after app uninstall.
-/// Use Hive (which IS deleted on uninstall) to detect fresh install
-/// and clear keychain if needed.
+/// Use Drift database to detect fresh install and clear keychain if needed.
 Future<void> _handleFreshInstall() async {
-  const boxName = 'app_state';
   const installedKey = 'has_been_installed';
 
-  final box = await Hive.openBox(boxName);
-  final hasBeenInstalled = box.get(installedKey, defaultValue: false) as bool;
+  final database = di<AppDatabase>();
+  final appStateDao = AppStateDao(database);
+
+  final hasBeenInstalled = await appStateDao.hasKey(installedKey);
 
   if (!hasBeenInstalled) {
     // Fresh install - clear keychain data that may persist from previous install
     await di<SecureStorageImpl>().removeAllAsync();
-    await box.put(installedKey, true);
+    await appStateDao.setValue(installedKey, 'true');
   }
 }
 

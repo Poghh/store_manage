@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
 import 'package:store_manage/core/DI/di.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
@@ -19,7 +19,7 @@ class ConnectivityToastListener extends StatefulWidget {
 
 class _ConnectivityToastListenerState extends State<ConnectivityToastListener> {
   late final ConnectivityService _connectivity;
-  StreamSubscription<ConnectivityResult>? _subscription;
+  StreamSubscription<InternetStatus>? _subscription;
   bool? _isOnline;
   bool _initialized = false;
   bool _isReady = false;
@@ -42,8 +42,8 @@ class _ConnectivityToastListenerState extends State<ConnectivityToastListener> {
     _initialized = true;
   }
 
-  void _handleChange(ConnectivityResult result) {
-    final online = result != ConnectivityResult.none;
+  void _handleChange(InternetStatus status) {
+    final online = status == InternetStatus.connected;
     if (!_initialized || !_isReady) {
       _isOnline = online;
       _initialized = true;

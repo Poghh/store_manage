@@ -7,7 +7,7 @@ import 'package:store_manage/core/constants/app_font_sizes.dart';
 import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
-import 'package:store_manage/core/storage/secure_storage.dart';
+import 'package:store_manage/core/data/storage/secure_storage.dart';
 import 'package:store_manage/core/utils/app_image_picker.dart';
 import 'package:store_manage/core/utils/app_toast.dart';
 import 'package:store_manage/core/widgets/app_input_decoration.dart';

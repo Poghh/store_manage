@@ -1,13 +1,11 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:store_manage/core/DI/di.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
-import 'package:store_manage/core/services/inventory_adjustment_service.dart';
-import 'package:store_manage/core/services/local_product_service.dart';
+import 'package:store_manage/core/navigation/home_tab_coordinator.dart';
 import 'package:store_manage/core/widgets/app_page_header.dart';
-import 'package:store_manage/feature/product/data/repositories/product_repository.dart';
 import 'package:store_manage/feature/product/data/models/product.dart';
+import 'package:store_manage/feature/product/data/repositories/product_repository.dart';
 import 'package:store_manage/feature/product/presentation/widgets/inventory_body.dart';
 
 class InventoryPage extends StatefulWidget {
@@ -19,36 +17,28 @@ class InventoryPage extends StatefulWidget {
 
 class _InventoryPageState extends State<InventoryPage> {
   final TextEditingController _searchController = TextEditingController();
+  late final HomeTabCoordinator _tabCoordinator;
+
   List<Product> _allProducts = const [];
   List<Product> _filteredProducts = const [];
   bool _isLoading = true;
-  late final InventoryAdjustmentService _inventoryService;
-  late final ValueListenable _inventoryBoxListenable;
-  late final LocalProductService _localProductService;
-  late final ValueListenable _localProductListenable;
 
   @override
   void initState() {
     super.initState();
-    _inventoryService = di<InventoryAdjustmentService>();
-    _inventoryBoxListenable = _inventoryService.listenable;
-    _inventoryBoxListenable.addListener(_handleInventoryChange);
-    _localProductService = di<LocalProductService>();
-    _localProductListenable = _localProductService.listenable;
-    _localProductListenable.addListener(_handleInventoryChange);
+    _tabCoordinator = di<HomeTabCoordinator>();
+    _tabCoordinator.inventoryRefreshTrigger.addListener(_onRefreshTriggered);
     _loadProducts();
   }
 
   @override
   void dispose() {
-    _inventoryBoxListenable.removeListener(_handleInventoryChange);
-    _localProductListenable.removeListener(_handleInventoryChange);
+    _tabCoordinator.inventoryRefreshTrigger.removeListener(_onRefreshTriggered);
     _searchController.dispose();
     super.dispose();
   }
 
-  void _handleInventoryChange() {
-    if (!mounted) return;
+  void _onRefreshTriggered() {
     _loadProducts();
   }
 
@@ -76,6 +66,7 @@ class _InventoryPageState extends State<InventoryPage> {
       setState(() => _filteredProducts = _allProducts);
       return;
     }
+
     setState(() {
       _filteredProducts = _allProducts.where((product) {
         return product.productCode.toLowerCase().contains(keyword) ||

@@ -1,14 +1,14 @@
 import 'package:bloc_test/bloc_test.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/network/connectivity_service.dart';
-import 'package:store_manage/core/offline/stock_in/stock_in_sync_service.dart';
-import 'package:store_manage/core/services/inventory_adjustment_service.dart';
-import 'package:store_manage/core/services/local_product_service.dart';
+import 'package:store_manage/core/data/sync/stock_in_sync_service.dart';
+import 'package:store_manage/core/data/services/inventory_adjustment_service.dart';
+import 'package:store_manage/core/data/services/local_product_service.dart';
 import 'package:store_manage/feature/stock_in/data/repositories/stock_in_repository.dart';
 import 'package:store_manage/feature/stock_in/presentation/cubit/stock_in_cubit.dart';
 import 'package:store_manage/feature/stock_in/presentation/cubit/stock_in_state.dart';
@@ -41,7 +41,7 @@ void main() {
     inventoryService = MockInventoryAdjustmentService();
     localProductService = MockLocalProductService();
 
-    when(() => connectivity.onChanged).thenAnswer((_) => const Stream<ConnectivityResult>.empty());
+    when(() => connectivity.onChanged).thenAnswer((_) => const Stream<InternetStatus>.empty());
     when(() => connectivity.isOnline).thenAnswer((_) async => true);
     when(() => syncService.syncPending()).thenAnswer((_) async {});
     when(() => syncService.enqueue(any())).thenAnswer((_) async {});
