@@ -177,7 +177,7 @@ class _DialogContent extends StatelessWidget {
                     child: OutlinedButton(
                       onPressed: onCancel,
                       style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: AppColors.border, width: 1.5),
+                        side: const BorderSide(color: AppColors.textSecondary, width: 1.5),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_12),
                         ),
@@ -188,7 +188,7 @@ class _DialogContent extends StatelessWidget {
                           fontSize: AppFontSizes.fontSize14,
                           fontWeight: FontWeight.w600,
                           fontFamily: AppFonts.inter,
-                          color: AppColors.textSecondary,
+                          color: AppColors.textPrimary,
                         ),
                       ),
                     ),

@@ -1,8 +1,11 @@
 class AppStrings {
   // === CHANGE PIN ===
   static const String changePinTitle = 'Đổi mã PIN';
+  static const String changePinOldPinLabel = 'Mã PIN hiện tại';
   static const String changePinOldPin = 'Nhập mã PIN cũ';
+  static const String changePinNewPinLabel = 'Mã PIN mới';
   static const String changePinNewPin = 'Nhập mã PIN mới';
+  static const String changePinConfirmPinLabel = 'Xác nhận mã PIN';
   static const String changePinConfirmPin = 'Xác nhận mã PIN mới';
   static const String changePinButton = 'Đổi mã PIN';
   static const String changePinPinLength = 'Mã PIN phải đủ 4 số';

@@ -9,6 +9,7 @@ import 'package:store_manage/core/DI/di.dart';
 import 'package:store_manage/core/storage/secure_storage.dart';
 import 'package:store_manage/core/utils/app_toast.dart';
 import 'package:store_manage/core/widgets/app_input_decoration.dart';
+import 'package:store_manage/core/widgets/app_section_label.dart';
 
 class ChangePinPage extends StatefulWidget {
   const ChangePinPage({super.key});
@@ -98,10 +99,14 @@ class _ChangePinPageState extends State<ChangePinPage> {
       ),
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppNumbers.DOUBLE_16),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Old PIN
+              const AppSectionLabel(text: AppStrings.changePinOldPinLabel),
+              const SizedBox(height: AppNumbers.DOUBLE_8),
               TextField(
                 controller: _oldPinController,
                 focusNode: _oldPinFocusNode,
@@ -121,6 +126,10 @@ class _ChangePinPageState extends State<ChangePinPage> {
                 ),
               ),
               const SizedBox(height: AppNumbers.DOUBLE_16),
+
+              // New PIN
+              const AppSectionLabel(text: AppStrings.changePinNewPinLabel),
+              const SizedBox(height: AppNumbers.DOUBLE_8),
               TextField(
                 controller: _newPinController,
                 focusNode: _newPinFocusNode,
@@ -140,6 +149,10 @@ class _ChangePinPageState extends State<ChangePinPage> {
                 ),
               ),
               const SizedBox(height: AppNumbers.DOUBLE_16),
+
+              // Confirm PIN
+              const AppSectionLabel(text: AppStrings.changePinConfirmPinLabel),
+              const SizedBox(height: AppNumbers.DOUBLE_8),
               TextField(
                 controller: _confirmPinController,
                 focusNode: _confirmPinFocusNode,
@@ -158,6 +171,8 @@ class _ChangePinPageState extends State<ChangePinPage> {
                   letterSpacing: 8,
                 ),
               ),
+
+              // Error Box
               if (_error != null) ...[
                 const SizedBox(height: AppNumbers.DOUBLE_16),
                 Container(
@@ -185,37 +200,41 @@ class _ChangePinPageState extends State<ChangePinPage> {
                   ),
                 ),
               ],
-              const Spacer(),
-              SizedBox(
-                width: double.infinity,
-                height: AppNumbers.DOUBLE_48,
-                child: ElevatedButton(
-                  onPressed: _isFormValid && !_isLoading ? _handleChangePin : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: AppColors.textOnPrimary,
-                    disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.5),
-                    disabledForegroundColor: AppColors.textOnPrimary.withValues(alpha: 0.7),
-                    elevation: AppNumbers.DOUBLE_0,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_12)),
-                  ),
-                  child: _isLoading
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.textOnPrimary),
-                        )
-                      : const Text(
-                          AppStrings.changePinButton,
-                          style: TextStyle(
-                            fontSize: AppFontSizes.fontSize14,
-                            fontWeight: FontWeight.w600,
-                            fontFamily: AppFonts.inter,
-                          ),
-                        ),
-                ),
-              ),
             ],
+          ),
+        ),
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(AppNumbers.DOUBLE_16),
+          child: SizedBox(
+            width: double.infinity,
+            height: AppNumbers.DOUBLE_48,
+            child: ElevatedButton(
+              onPressed: _isFormValid && !_isLoading ? _handleChangePin : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: AppColors.textOnPrimary,
+                disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.5),
+                disabledForegroundColor: AppColors.textOnPrimary.withValues(alpha: 0.7),
+                elevation: AppNumbers.DOUBLE_0,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_12)),
+              ),
+              child: _isLoading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.textOnPrimary),
+                    )
+                  : const Text(
+                      AppStrings.changePinButton,
+                      style: TextStyle(
+                        fontSize: AppFontSizes.fontSize14,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: AppFonts.inter,
+                      ),
+                    ),
+            ),
           ),
         ),
       ),
