@@ -5,8 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 import 'package:store_manage/core/constants/app_colors.dart';
-import 'package:store_manage/core/constants/app_font_sizes.dart';
-import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/DI/di.dart';
@@ -99,8 +97,10 @@ class _TransactionsPageState extends State<TransactionsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     final dateDisplay = _selectedDate == null ? '' : DateFormat('dd/MM/yyyy').format(_selectedDate!);
     final totalRevenue = _items.fold<int>(0, (sum, item) => sum + item.total);
+
     return Scaffold(
       appBar: AppPageHeader(
         title: AppStrings.homeTabTransactions,
@@ -110,11 +110,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
             icon: const Icon(Icons.calendar_month, size: AppNumbers.DOUBLE_18),
             label: Text(
               dateDisplay.isEmpty ? AppStrings.transactionsSelectDate : dateDisplay,
-              style: const TextStyle(
-                fontSize: AppFontSizes.fontSize12,
-                fontWeight: FontWeight.w600,
-                fontFamily: AppFonts.inter,
-              ),
+              style: textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w600),
             ),
           ),
           const SizedBox(width: AppNumbers.DOUBLE_8),

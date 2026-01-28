@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:store_manage/core/constants/app_colors.dart';
-import 'package:store_manage/core/constants/app_font_sizes.dart';
-import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/widgets/app_pill.dart';
@@ -18,6 +16,8 @@ class InventoryProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return InkWell(
       borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_16),
       onTap: onTap,
@@ -42,37 +42,13 @@ class InventoryProductCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    product.productName,
-                    style: const TextStyle(
-                      fontSize: AppFontSizes.fontSize14,
-                      fontWeight: FontWeight.w600,
-                      fontFamily: AppFonts.inter,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
+                  Text(product.productName, style: textTheme.titleSmall),
                   const SizedBox(height: AppNumbers.DOUBLE_4),
-                  Text(
-                    product.productCode,
-                    style: const TextStyle(
-                      fontSize: AppFontSizes.fontSize12,
-                      fontWeight: FontWeight.w500,
-                      fontFamily: AppFonts.inter,
-                      color: AppColors.textMuted,
-                    ),
-                  ),
+                  Text(product.productCode, style: textTheme.labelMedium?.copyWith(color: AppColors.textMuted)),
                   const SizedBox(height: AppNumbers.DOUBLE_8),
                   Row(
                     children: [
-                      const Text(
-                        AppStrings.productDetailsStockLabel,
-                        style: TextStyle(
-                          fontSize: AppFontSizes.fontSize12,
-                          fontWeight: FontWeight.w500,
-                          fontFamily: AppFonts.inter,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
+                      Text(AppStrings.productDetailsStockLabel, style: textTheme.labelMedium),
                       const SizedBox(width: AppNumbers.DOUBLE_6),
                       AppPill(text: (product.quantity ?? 0).toString()),
                     ],

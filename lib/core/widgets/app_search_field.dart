@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:store_manage/core/constants/app_colors.dart';
-import 'package:store_manage/core/constants/app_font_sizes.dart';
-import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 
 class AppSearchField extends StatefulWidget {
@@ -61,6 +59,7 @@ class _AppSearchFieldState extends State<AppSearchField> {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     final effectiveAutovalidateMode = widget.autovalidateMode == AutovalidateMode.onUserInteraction
         ? (_hasUserInput ? AutovalidateMode.onUserInteraction : AutovalidateMode.disabled)
         : widget.autovalidateMode;
@@ -90,12 +89,7 @@ class _AppSearchFieldState extends State<AppSearchField> {
                       controller: widget.controller,
                       focusNode: widget.focusNode,
                       decoration: InputDecoration(hintText: widget.hintText, border: InputBorder.none, isDense: true),
-                      style: const TextStyle(
-                        fontSize: AppFontSizes.fontSize14,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.textPrimary,
-                        fontFamily: AppFonts.inter,
-                      ),
+                      style: textTheme.labelLarge,
                       onChanged: (value) {
                         if (!_hasUserInput && value.isNotEmpty) {
                           setState(() => _hasUserInput = true);
@@ -114,12 +108,7 @@ class _AppSearchFieldState extends State<AppSearchField> {
                 padding: const EdgeInsets.only(top: AppNumbers.DOUBLE_6, left: AppNumbers.DOUBLE_8),
                 child: Text(
                   state.errorText ?? '',
-                  style: const TextStyle(
-                    fontSize: AppFontSizes.fontSize12,
-                    fontWeight: FontWeight.w500,
-                    fontFamily: AppFonts.inter,
-                    color: AppColors.error,
-                  ),
+                  style: textTheme.labelMedium?.copyWith(color: AppColors.error),
                 ),
               ),
           ],

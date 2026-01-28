@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:store_manage/core/constants/app_colors.dart';
-import 'package:store_manage/core/constants/app_font_sizes.dart';
-import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/utils/common_funtion_utils.dart';
@@ -35,6 +33,8 @@ class PaymentRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return AppFieldContainer(
       padding: const EdgeInsets.symmetric(horizontal: AppNumbers.DOUBLE_12, vertical: AppNumbers.DOUBLE_10),
       child: Row(
@@ -51,12 +51,7 @@ class PaymentRow extends StatelessWidget {
           const Spacer(),
           Text(
             CommonFuntionUtils.formatCurrency(total),
-            style: const TextStyle(
-              fontSize: AppFontSizes.fontSize14,
-              fontWeight: FontWeight.w700,
-              fontFamily: AppFonts.inter,
-              color: AppColors.textPrimary,
-            ),
+            style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
           ),
         ],
       ),

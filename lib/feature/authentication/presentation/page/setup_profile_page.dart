@@ -2,8 +2,6 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:store_manage/core/DI/di.dart';
 import 'package:store_manage/core/constants/app_colors.dart';
-import 'package:store_manage/core/constants/app_font_sizes.dart';
-import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/navigation/app_router.dart';
@@ -50,6 +48,8 @@ class _SetupProfilePageState extends State<SetupProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -64,24 +64,9 @@ class _SetupProfilePageState extends State<SetupProfilePage> {
                 color: AppColors.primary,
               ),
               const SizedBox(height: AppNumbers.DOUBLE_24),
-              const Text(
-                AppStrings.setupProfileTitle,
-                style: TextStyle(
-                  fontSize: AppFontSizes.fontSize24,
-                  fontWeight: FontWeight.w700,
-                  fontFamily: AppFonts.inter,
-                  color: AppColors.textPrimary,
-                ),
-              ),
+              Text(AppStrings.setupProfileTitle, style: textTheme.displayMedium),
               const SizedBox(height: AppNumbers.DOUBLE_8),
-              const Text(
-                AppStrings.setupProfileSubtitle,
-                style: TextStyle(
-                  fontSize: AppFontSizes.fontSize14,
-                  fontFamily: AppFonts.inter,
-                  color: AppColors.textSecondary,
-                ),
-              ),
+              Text(AppStrings.setupProfileSubtitle, style: textTheme.bodyMedium),
               const SizedBox(height: AppNumbers.DOUBLE_32),
               TextField(
                 controller: _nameController,
@@ -92,12 +77,7 @@ class _SetupProfilePageState extends State<SetupProfilePage> {
                 decoration: AppInputDecoration.build(
                   hintText: AppStrings.setupProfileNameHint,
                 ),
-                style: const TextStyle(
-                  fontSize: AppFontSizes.fontSize14,
-                  fontWeight: FontWeight.w500,
-                  fontFamily: AppFonts.inter,
-                  color: AppColors.textPrimary,
-                ),
+                style: textTheme.labelLarge?.copyWith(color: AppColors.textPrimary),
               ),
               const SizedBox(height: AppNumbers.DOUBLE_16),
               TextField(
@@ -109,12 +89,7 @@ class _SetupProfilePageState extends State<SetupProfilePage> {
                 decoration: AppInputDecoration.build(
                   hintText: AppStrings.setupProfileStoreHint,
                 ),
-                style: const TextStyle(
-                  fontSize: AppFontSizes.fontSize14,
-                  fontWeight: FontWeight.w500,
-                  fontFamily: AppFonts.inter,
-                  color: AppColors.textPrimary,
-                ),
+                style: textTheme.labelLarge?.copyWith(color: AppColors.textPrimary),
               ),
               const SizedBox(height: AppNumbers.DOUBLE_24),
               SizedBox(
@@ -132,14 +107,7 @@ class _SetupProfilePageState extends State<SetupProfilePage> {
                       borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_12),
                     ),
                   ),
-                  child: const Text(
-                    AppStrings.setupProfileButton,
-                    style: TextStyle(
-                      fontSize: AppFontSizes.fontSize14,
-                      fontWeight: FontWeight.w600,
-                      fontFamily: AppFonts.inter,
-                    ),
-                  ),
+                  child: Text(AppStrings.setupProfileButton, style: textTheme.titleSmall?.copyWith(color: AppColors.textOnPrimary)),
                 ),
               ),
             ],

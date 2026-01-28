@@ -3,8 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 import 'package:store_manage/core/constants/app_colors.dart';
-import 'package:store_manage/core/constants/app_font_sizes.dart';
-import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/utils/common_funtion_utils.dart';
@@ -19,6 +17,8 @@ class PriceField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return AppFieldContainer(
       child: Row(
         children: [
@@ -31,30 +31,15 @@ class PriceField extends StatelessWidget {
                 FilteringTextInputFormatter.digitsOnly,
                 RetailCurrencyInputFormatter(numberFormat: NumberFormat.decimalPattern(AppStrings.VIET_NAM_LOCALE)),
               ],
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 border: InputBorder.none,
                 isDense: true,
                 hintText: AppStrings.retailPriceHint,
-                hintStyle: TextStyle(
-                  fontSize: AppFontSizes.fontSize14,
-                  fontWeight: FontWeight.w500,
-                  fontFamily: AppFonts.inter,
-                  color: AppColors.textMuted,
-                ),
+                hintStyle: textTheme.labelLarge?.copyWith(color: AppColors.textMuted),
                 suffixText: AppStrings.VIET_NAM_DONG_TEXT,
-                suffixStyle: TextStyle(
-                  fontSize: AppFontSizes.fontSize14,
-                  fontWeight: FontWeight.w600,
-                  fontFamily: AppFonts.inter,
-                  color: AppColors.textMuted,
-                ),
+                suffixStyle: textTheme.titleSmall?.copyWith(color: AppColors.textMuted),
               ),
-              style: const TextStyle(
-                fontSize: AppFontSizes.fontSize16,
-                fontWeight: FontWeight.w700,
-                fontFamily: AppFonts.inter,
-                color: AppColors.textPrimary,
-              ),
+              style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
             ),
           ),
           const Icon(Icons.edit, color: AppColors.primary, size: AppNumbers.DOUBLE_18),
@@ -71,6 +56,8 @@ class DisabledPriceField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return AppFieldContainer(
       backgroundColor: AppColors.surfaceMuted,
       child: Row(
@@ -78,10 +65,8 @@ class DisabledPriceField extends StatelessWidget {
           Expanded(
             child: Text(
               value > 0 ? CommonFuntionUtils.formatCurrency(value) : AppStrings.stockInPriceHint,
-              style: TextStyle(
-                fontSize: AppFontSizes.fontSize16,
+              style: textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
-                fontFamily: AppFonts.inter,
                 color: value > 0 ? AppColors.textPrimary : AppColors.textMuted,
               ),
             ),

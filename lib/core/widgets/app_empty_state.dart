@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:store_manage/core/constants/app_colors.dart';
-import 'package:store_manage/core/constants/app_font_sizes.dart';
-import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 
 class AppEmptyState extends StatelessWidget {
@@ -23,6 +21,8 @@ class AppEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -34,12 +34,7 @@ class AppEmptyState extends StatelessWidget {
           Text(
             message,
             textAlign: textAlign,
-            style: const TextStyle(
-              fontSize: AppFontSizes.fontSize14,
-              fontWeight: FontWeight.w500,
-              fontFamily: AppFonts.inter,
-              color: AppColors.textSecondary,
-            ),
+            style: textTheme.labelLarge?.copyWith(color: AppColors.textSecondary),
           ),
         ],
       ),

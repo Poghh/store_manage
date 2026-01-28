@@ -4,8 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:store_manage/core/DI/di.dart';
 import 'package:store_manage/core/constants/app_colors.dart';
-import 'package:store_manage/core/constants/app_font_sizes.dart';
-import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/navigation/app_router.dart';
@@ -63,6 +61,8 @@ class _VerifyPhonePageState extends State<VerifyPhonePage> {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -85,23 +85,11 @@ class _VerifyPhonePageState extends State<VerifyPhonePage> {
                 color: AppColors.primary,
               ),
               SizedBox(height: AppNumbers.DOUBLE_24),
-              Text(
-                AppStrings.verifyPhoneTitle,
-                style: TextStyle(
-                  fontSize: AppFontSizes.fontSize24,
-                  fontWeight: FontWeight.w700,
-                  fontFamily: AppFonts.inter,
-                  color: AppColors.textPrimary,
-                ),
-              ),
+              Text(AppStrings.verifyPhoneTitle, style: textTheme.displayMedium),
               SizedBox(height: AppNumbers.DOUBLE_8),
               Text(
                 AppStrings.verifyPhoneSubtitle,
-                style: TextStyle(
-                  fontSize: AppFontSizes.fontSize14,
-                  fontFamily: AppFonts.inter,
-                  color: AppColors.textSecondary,
-                ),
+                style: textTheme.bodyMedium,
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: AppNumbers.DOUBLE_32),
@@ -121,17 +109,9 @@ class _VerifyPhonePageState extends State<VerifyPhonePage> {
                     horizontal: AppNumbers.DOUBLE_16,
                     vertical: AppNumbers.DOUBLE_14,
                   ),
-                  hintStyle: TextStyle(
-                    fontSize: AppFontSizes.fontSize16,
-                    fontFamily: AppFonts.inter,
-                    color: AppColors.textMuted,
-                  ),
+                  hintStyle: textTheme.bodyLarge?.copyWith(color: AppColors.textMuted),
                   errorText: _errorText,
-                  errorStyle: TextStyle(
-                    fontSize: AppFontSizes.fontSize12,
-                    fontFamily: AppFonts.inter,
-                    color: AppColors.error,
-                  ),
+                  errorStyle: textTheme.bodySmall?.copyWith(color: AppColors.error),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_16),
                     borderSide: BorderSide(
@@ -153,11 +133,7 @@ class _VerifyPhonePageState extends State<VerifyPhonePage> {
                     borderSide: BorderSide(color: AppColors.error),
                   ),
                 ),
-                style: TextStyle(
-                  fontSize: AppFontSizes.fontSize16,
-                  fontFamily: AppFonts.inter,
-                  color: AppColors.textPrimary,
-                ),
+                style: textTheme.bodyLarge,
               ),
               SizedBox(height: AppNumbers.DOUBLE_24),
               SizedBox(
@@ -186,14 +162,7 @@ class _VerifyPhonePageState extends State<VerifyPhonePage> {
                             color: AppColors.textOnPrimary,
                           ),
                         )
-                      : Text(
-                          AppStrings.verifyPhoneButton,
-                          style: TextStyle(
-                            fontSize: AppFontSizes.fontSize16,
-                            fontWeight: FontWeight.w600,
-                            fontFamily: AppFonts.inter,
-                          ),
-                        ),
+                      : Text(AppStrings.verifyPhoneButton, style: textTheme.titleMedium?.copyWith(color: AppColors.textOnPrimary)),
                 ),
               ),
             ],

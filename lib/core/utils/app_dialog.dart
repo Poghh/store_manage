@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:store_manage/core/constants/app_colors.dart';
-import 'package:store_manage/core/constants/app_font_sizes.dart';
-import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 
 enum AppDialogType { warning, error, success, normal }
@@ -119,6 +117,8 @@ class _DialogContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Dialog(
       insetPadding: const EdgeInsets.symmetric(horizontal: AppNumbers.DOUBLE_24),
       shape: RoundedRectangleBorder(
@@ -148,24 +148,14 @@ class _DialogContent extends StatelessWidget {
             Text(
               title,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: AppFontSizes.fontSize18,
-                fontWeight: FontWeight.w700,
-                fontFamily: AppFonts.inter,
-                color: AppColors.textPrimary,
-              ),
+              style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: AppNumbers.DOUBLE_12),
             // Message
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: AppFontSizes.fontSize14,
-                fontFamily: AppFonts.inter,
-                color: AppColors.textSecondary,
-                height: 1.5,
-              ),
+              style: textTheme.bodyMedium?.copyWith(height: 1.5),
             ),
             const SizedBox(height: AppNumbers.DOUBLE_24),
             // Buttons
@@ -182,15 +172,7 @@ class _DialogContent extends StatelessWidget {
                           borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_12),
                         ),
                       ),
-                      child: Text(
-                        cancelText,
-                        style: const TextStyle(
-                          fontSize: AppFontSizes.fontSize14,
-                          fontWeight: FontWeight.w600,
-                          fontFamily: AppFonts.inter,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
+                      child: Text(cancelText, style: textTheme.titleSmall),
                     ),
                   ),
                 ),
@@ -207,15 +189,7 @@ class _DialogContent extends StatelessWidget {
                           borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_12),
                         ),
                       ),
-                      child: Text(
-                        confirmText,
-                        style: const TextStyle(
-                          fontSize: AppFontSizes.fontSize14,
-                          fontWeight: FontWeight.w600,
-                          fontFamily: AppFonts.inter,
-                          color: AppColors.textOnPrimary,
-                        ),
-                      ),
+                      child: Text(confirmText, style: textTheme.titleSmall?.copyWith(color: AppColors.textOnPrimary)),
                     ),
                   ),
                 ),

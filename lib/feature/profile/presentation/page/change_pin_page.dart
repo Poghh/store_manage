@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:store_manage/core/constants/app_colors.dart';
-import 'package:store_manage/core/constants/app_font_sizes.dart';
-import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/DI/di.dart';
@@ -91,6 +89,8 @@ class _ChangePinPageState extends State<ChangePinPage> {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(AppStrings.changePinTitle),
@@ -117,13 +117,7 @@ class _ChangePinPageState extends State<ChangePinPage> {
                 onChanged: (_) => setState(() => _error = null),
                 onSubmitted: (_) => _newPinFocusNode.requestFocus(),
                 decoration: AppInputDecoration.build(hintText: AppStrings.changePinOldPin, counterText: ''),
-                style: const TextStyle(
-                  fontSize: AppFontSizes.fontSize14,
-                  fontWeight: FontWeight.w500,
-                  fontFamily: AppFonts.inter,
-                  color: AppColors.textPrimary,
-                  letterSpacing: 8,
-                ),
+                style: textTheme.labelLarge?.copyWith(letterSpacing: 8),
               ),
               const SizedBox(height: AppNumbers.DOUBLE_16),
 
@@ -140,13 +134,7 @@ class _ChangePinPageState extends State<ChangePinPage> {
                 onChanged: (_) => setState(() => _error = null),
                 onSubmitted: (_) => _confirmPinFocusNode.requestFocus(),
                 decoration: AppInputDecoration.build(hintText: AppStrings.changePinNewPin, counterText: ''),
-                style: const TextStyle(
-                  fontSize: AppFontSizes.fontSize14,
-                  fontWeight: FontWeight.w500,
-                  fontFamily: AppFonts.inter,
-                  color: AppColors.textPrimary,
-                  letterSpacing: 8,
-                ),
+                style: textTheme.labelLarge?.copyWith(letterSpacing: 8),
               ),
               const SizedBox(height: AppNumbers.DOUBLE_16),
 
@@ -163,13 +151,7 @@ class _ChangePinPageState extends State<ChangePinPage> {
                 onChanged: (_) => setState(() => _error = null),
                 onSubmitted: (_) => _isFormValid ? _handleChangePin() : null,
                 decoration: AppInputDecoration.build(hintText: AppStrings.changePinConfirmPin, counterText: ''),
-                style: const TextStyle(
-                  fontSize: AppFontSizes.fontSize14,
-                  fontWeight: FontWeight.w500,
-                  fontFamily: AppFonts.inter,
-                  color: AppColors.textPrimary,
-                  letterSpacing: 8,
-                ),
+                style: textTheme.labelLarge?.copyWith(letterSpacing: 8),
               ),
 
               // Error Box
@@ -187,14 +169,7 @@ class _ChangePinPageState extends State<ChangePinPage> {
                       const Icon(Icons.error_outline, color: AppColors.error, size: AppNumbers.DOUBLE_20),
                       const SizedBox(width: AppNumbers.DOUBLE_8),
                       Expanded(
-                        child: Text(
-                          _error!,
-                          style: const TextStyle(
-                            fontSize: AppFontSizes.fontSize14,
-                            fontFamily: AppFonts.inter,
-                            color: AppColors.error,
-                          ),
-                        ),
+                        child: Text(_error!, style: textTheme.bodyMedium?.copyWith(color: AppColors.error)),
                       ),
                     ],
                   ),
@@ -226,14 +201,7 @@ class _ChangePinPageState extends State<ChangePinPage> {
                       height: 20,
                       child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.textOnPrimary),
                     )
-                  : const Text(
-                      AppStrings.changePinButton,
-                      style: TextStyle(
-                        fontSize: AppFontSizes.fontSize14,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: AppFonts.inter,
-                      ),
-                    ),
+                  : Text(AppStrings.changePinButton, style: textTheme.titleSmall?.copyWith(color: AppColors.textOnPrimary)),
             ),
           ),
         ),

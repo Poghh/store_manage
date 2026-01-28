@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:store_manage/core/constants/app_colors.dart';
-import 'package:store_manage/core/constants/app_font_sizes.dart';
-import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/widgets/app_surface_card.dart';
@@ -29,6 +27,8 @@ class TransactionItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return AppSurfaceCard(
       backgroundColor: AppColors.background,
       child: Column(
@@ -39,26 +39,13 @@ class TransactionItemCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   productName,
-                  style: const TextStyle(
-                    fontSize: AppFontSizes.fontSize14,
-                    fontWeight: FontWeight.w700,
-                    fontFamily: AppFonts.inter,
-                    color: AppColors.textPrimary,
-                  ),
+                  style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
                   maxLines: AppNumbers.INT_2,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
               const SizedBox(width: AppNumbers.DOUBLE_8),
-              Text(
-                productCode,
-                style: const TextStyle(
-                  fontSize: AppFontSizes.fontSize12,
-                  fontWeight: FontWeight.w600,
-                  fontFamily: AppFonts.inter,
-                  color: AppColors.textSecondary,
-                ),
-              ),
+              Text(productCode, style: textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w600)),
             ],
           ),
           const SizedBox(height: AppNumbers.DOUBLE_8),
@@ -82,15 +69,7 @@ class TransactionItemCard extends StatelessWidget {
             children: [
               const Icon(Icons.payments_outlined, size: AppNumbers.DOUBLE_16),
               const SizedBox(width: AppNumbers.DOUBLE_6),
-              Text(
-                paymentMethod,
-                style: const TextStyle(
-                  fontSize: AppFontSizes.fontSize12,
-                  fontWeight: FontWeight.w600,
-                  fontFamily: AppFonts.inter,
-                  color: AppColors.textSecondary,
-                ),
-              ),
+              Text(paymentMethod, style: textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w600)),
             ],
           ),
         ],

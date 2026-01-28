@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:store_manage/core/constants/app_colors.dart';
-import 'package:store_manage/core/constants/app_font_sizes.dart';
-import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/widgets/app_surface_card.dart';
 
@@ -22,6 +20,8 @@ class RevenueSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Material(
       color: AppColors.surface,
       borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_12),
@@ -45,10 +45,8 @@ class RevenueSummaryCard extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: TextStyle(
-                        fontSize: AppFontSizes.fontSize22,
+                      style: textTheme.headlineMedium?.copyWith(
                         fontWeight: FontWeight.w500,
-                        fontFamily: AppFonts.inter,
                         color: AppColors.primaryDark,
                       ),
                     ),
@@ -61,12 +59,7 @@ class RevenueSummaryCard extends StatelessWidget {
                           )
                         : Text(
                             revenueText,
-                            style: TextStyle(
-                              fontSize: AppFontSizes.fontSize22,
-                              fontWeight: FontWeight.w700,
-                              fontFamily: AppFonts.inter,
-                              color: AppColors.primaryDark,
-                            ),
+                            style: textTheme.displaySmall?.copyWith(color: AppColors.primaryDark),
                           ),
                   ],
                 ),

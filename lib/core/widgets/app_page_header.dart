@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:store_manage/core/constants/app_colors.dart';
-import 'package:store_manage/core/constants/app_font_sizes.dart';
-import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 
 class AppPageHeader extends StatelessWidget implements PreferredSizeWidget {
@@ -13,20 +11,14 @@ class AppPageHeader extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return AppBar(
       backgroundColor: AppColors.background,
       elevation: AppNumbers.DOUBLE_0,
       scrolledUnderElevation: AppNumbers.DOUBLE_0,
       surfaceTintColor: AppColors.background,
-      title: Text(
-        title,
-        style: const TextStyle(
-          fontSize: AppFontSizes.fontSize18,
-          fontWeight: FontWeight.w600,
-          fontFamily: AppFonts.inter,
-          color: AppColors.textPrimary,
-        ),
-      ),
+      title: Text(title, style: textTheme.titleLarge),
       actions: actions,
     );
   }

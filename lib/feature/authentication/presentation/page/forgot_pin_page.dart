@@ -1,8 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:store_manage/core/constants/app_colors.dart';
-import 'package:store_manage/core/constants/app_font_sizes.dart';
-import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/data/database/app_database.dart';
@@ -82,6 +80,8 @@ class _ForgotPinPageState extends State<ForgotPinPage> {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -101,29 +101,15 @@ class _ForgotPinPageState extends State<ForgotPinPage> {
             children: [
               Icon(Icons.lock_reset, size: AppNumbers.DOUBLE_64, color: AppColors.primary),
               SizedBox(height: AppNumbers.DOUBLE_24),
-              Text(
-                AppStrings.forgotPinPageTitle,
-                style: TextStyle(
-                  fontSize: AppFontSizes.fontSize24,
-                  fontWeight: FontWeight.w700,
-                  fontFamily: AppFonts.inter,
-                  color: AppColors.textPrimary,
-                ),
-              ),
+              Text(AppStrings.forgotPinPageTitle, style: textTheme.displayMedium),
               SizedBox(height: AppNumbers.DOUBLE_12),
-              Text(
-                AppStrings.forgotPinPageDescription,
-                style: TextStyle(
-                  fontSize: AppFontSizes.fontSize14,
-                  fontFamily: AppFonts.inter,
-                  color: AppColors.textSecondary,
-                ),
-              ),
+              Text(AppStrings.forgotPinPageDescription, style: textTheme.bodyMedium),
               SizedBox(height: AppNumbers.DOUBLE_32),
 
               // Option 1: Biometric (only show if available)
               if (_biometricAvailable) ...[
                 _buildOptionCard(
+                  context: context,
                   icon: Icons.fingerprint,
                   title: AppStrings.forgotPinOptionBiometricTitle,
                   description: AppStrings.forgotPinOptionBiometricDesc,
@@ -134,6 +120,7 @@ class _ForgotPinPageState extends State<ForgotPinPage> {
 
               // Option 2: Verify phone
               _buildOptionCard(
+                context: context,
                 icon: Icons.phone_android,
                 title: AppStrings.forgotPinOptionVerifyTitle,
                 description: AppStrings.forgotPinOptionVerifyDesc,
@@ -144,6 +131,7 @@ class _ForgotPinPageState extends State<ForgotPinPage> {
 
               // Option 3: Reset all data
               _buildOptionCard(
+                context: context,
                 icon: Icons.delete_forever,
                 title: AppStrings.forgotPinOptionResetTitle,
                 description: AppStrings.forgotPinOptionResetDesc,
@@ -161,11 +149,7 @@ class _ForgotPinPageState extends State<ForgotPinPage> {
                   onPressed: () => context.router.pop(),
                   child: Text(
                     AppStrings.forgotPinCancelButton,
-                    style: TextStyle(
-                      fontSize: AppFontSizes.fontSize16,
-                      fontFamily: AppFonts.inter,
-                      color: AppColors.textSecondary,
-                    ),
+                    style: textTheme.bodyLarge?.copyWith(color: AppColors.textSecondary),
                   ),
                 ),
               ),
@@ -177,12 +161,14 @@ class _ForgotPinPageState extends State<ForgotPinPage> {
   }
 
   Widget _buildOptionCard({
+    required BuildContext context,
     required IconData icon,
     required String title,
     required String description,
     required VoidCallback onTap,
     bool isDanger = false,
   }) {
+    final textTheme = Theme.of(context).textTheme;
     final color = isDanger ? AppColors.error : AppColors.primary;
 
     return InkWell(
@@ -210,24 +196,9 @@ class _ForgotPinPageState extends State<ForgotPinPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: AppFontSizes.fontSize16,
-                      fontWeight: FontWeight.w600,
-                      fontFamily: AppFonts.inter,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
+                  Text(title, style: textTheme.titleMedium),
                   SizedBox(height: AppNumbers.DOUBLE_4),
-                  Text(
-                    description,
-                    style: TextStyle(
-                      fontSize: AppFontSizes.fontSize12,
-                      fontFamily: AppFonts.inter,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
+                  Text(description, style: textTheme.labelMedium),
                 ],
               ),
             ),

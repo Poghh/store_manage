@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:store_manage/core/constants/app_colors.dart';
-import 'package:store_manage/core/constants/app_font_sizes.dart';
-import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/widgets/app_field_container.dart';
 
@@ -15,6 +13,8 @@ class QuantitySelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return AppFieldContainer(
       padding: const EdgeInsets.symmetric(horizontal: AppNumbers.DOUBLE_12, vertical: AppNumbers.DOUBLE_6),
       child: Row(
@@ -24,12 +24,7 @@ class QuantitySelector extends StatelessWidget {
             child: Center(
               child: Text(
                 quantity.toString(),
-                style: const TextStyle(
-                  fontSize: AppFontSizes.fontSize16,
-                  fontWeight: FontWeight.w700,
-                  fontFamily: AppFonts.inter,
-                  color: AppColors.textPrimary,
-                ),
+                style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
               ),
             ),
           ),

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:store_manage/core/constants/app_colors.dart';
-import 'package:store_manage/core/constants/app_font_sizes.dart';
-import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 
 class AppPageAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -17,6 +15,8 @@ class AppPageAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return AppBar(
       backgroundColor: AppColors.primary,
       elevation: AppNumbers.DOUBLE_0,
@@ -26,15 +26,7 @@ class AppPageAppBar extends StatelessWidget implements PreferredSizeWidget {
         onPressed: onBack,
         icon: const Icon(Icons.arrow_back, color: AppColors.textOnPrimary),
       ),
-      title: Text(
-        title,
-        style: const TextStyle(
-          fontSize: AppFontSizes.fontSize18,
-          fontWeight: FontWeight.w600,
-          fontFamily: AppFonts.inter,
-          color: AppColors.textOnPrimary,
-        ),
-      ),
+      title: Text(title, style: textTheme.titleLarge?.copyWith(color: AppColors.textOnPrimary)),
       actions: actions,
     );
   }

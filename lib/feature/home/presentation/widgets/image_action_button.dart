@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:store_manage/core/constants/app_font_sizes.dart';
-import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 
 class ImageActionButton extends StatefulWidget {
@@ -42,6 +40,8 @@ class _ImageActionButtonState extends State<ImageActionButton> {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: widget.onTap,
@@ -81,23 +81,13 @@ class _ImageActionButtonState extends State<ImageActionButton> {
                                 alignment: Alignment.centerLeft,
                                 child: Text(
                                   widget.title,
-                                  style: TextStyle(
-                                    fontSize: AppFontSizes.fontSize22,
-                                    fontWeight: FontWeight.w700,
-                                    fontFamily: AppFonts.inter,
-                                    color: widget.titleColor,
-                                  ),
+                                  style: textTheme.displaySmall?.copyWith(color: widget.titleColor),
                                 ),
                               ),
                               const SizedBox(height: AppNumbers.DOUBLE_4),
                               Text(
                                 widget.subtitle,
-                                style: TextStyle(
-                                  fontSize: AppFontSizes.fontSize14,
-                                  fontWeight: FontWeight.w500,
-                                  fontFamily: AppFonts.inter,
-                                  color: widget.subtitleColor,
-                                ),
+                                style: textTheme.labelLarge?.copyWith(color: widget.subtitleColor),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),

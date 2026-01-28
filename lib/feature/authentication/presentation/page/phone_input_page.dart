@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:store_manage/core/DI/di.dart';
 import 'package:store_manage/core/constants/app_colors.dart';
-import 'package:store_manage/core/constants/app_font_sizes.dart';
-import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/navigation/app_router.dart';
@@ -41,6 +39,8 @@ class _PhoneInputPageState extends State<PhoneInputPage> {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -55,24 +55,9 @@ class _PhoneInputPageState extends State<PhoneInputPage> {
                 color: AppColors.primary,
               ),
               SizedBox(height: AppNumbers.DOUBLE_24),
-              Text(
-                AppStrings.loginPhoneTitle,
-                style: TextStyle(
-                  fontSize: AppFontSizes.fontSize24,
-                  fontWeight: FontWeight.w700,
-                  fontFamily: AppFonts.inter,
-                  color: AppColors.textPrimary,
-                ),
-              ),
+              Text(AppStrings.loginPhoneTitle, style: textTheme.displayMedium),
               SizedBox(height: AppNumbers.DOUBLE_8),
-              Text(
-                AppStrings.loginPhoneSubtitle,
-                style: TextStyle(
-                  fontSize: AppFontSizes.fontSize14,
-                  fontFamily: AppFonts.inter,
-                  color: AppColors.textSecondary,
-                ),
-              ),
+              Text(AppStrings.loginPhoneSubtitle, style: textTheme.bodyMedium),
               SizedBox(height: AppNumbers.DOUBLE_32),
               TextField(
                 controller: _controller,
@@ -90,11 +75,7 @@ class _PhoneInputPageState extends State<PhoneInputPage> {
                     horizontal: AppNumbers.DOUBLE_16,
                     vertical: AppNumbers.DOUBLE_14,
                   ),
-                  hintStyle: TextStyle(
-                    fontSize: AppFontSizes.fontSize16,
-                    fontFamily: AppFonts.inter,
-                    color: AppColors.textMuted,
-                  ),
+                  hintStyle: textTheme.bodyLarge?.copyWith(color: AppColors.textMuted),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_16),
                     borderSide: BorderSide(color: AppColors.border),
@@ -104,11 +85,7 @@ class _PhoneInputPageState extends State<PhoneInputPage> {
                     borderSide: BorderSide(color: AppColors.primary),
                   ),
                 ),
-                style: TextStyle(
-                  fontSize: AppFontSizes.fontSize16,
-                  fontFamily: AppFonts.inter,
-                  color: AppColors.textPrimary,
-                ),
+                style: textTheme.bodyLarge,
               ),
               SizedBox(height: AppNumbers.DOUBLE_24),
               SizedBox(
@@ -119,23 +96,14 @@ class _PhoneInputPageState extends State<PhoneInputPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: AppColors.textOnPrimary,
-                    disabledBackgroundColor:
-                        AppColors.primary.withValues(alpha: 0.5),
-                    disabledForegroundColor:
-                        AppColors.textOnPrimary.withValues(alpha: 0.7),
+                    disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.5),
+                    disabledForegroundColor: AppColors.textOnPrimary.withValues(alpha: 0.7),
                     elevation: AppNumbers.DOUBLE_0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_16),
                     ),
                   ),
-                  child: Text(
-                    AppStrings.loginPhoneContinueButton,
-                    style: TextStyle(
-                      fontSize: AppFontSizes.fontSize16,
-                      fontWeight: FontWeight.w600,
-                      fontFamily: AppFonts.inter,
-                    ),
-                  ),
+                  child: Text(AppStrings.loginPhoneContinueButton, style: textTheme.titleMedium?.copyWith(color: AppColors.textOnPrimary)),
                 ),
               ),
             ],

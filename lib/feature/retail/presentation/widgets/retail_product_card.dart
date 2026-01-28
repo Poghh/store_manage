@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:store_manage/core/constants/app_colors.dart';
-import 'package:store_manage/core/constants/app_font_sizes.dart';
-import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/widgets/app_field_container.dart';
@@ -19,6 +17,8 @@ class RetailProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return AppFieldContainer(
       padding: const EdgeInsets.all(AppNumbers.DOUBLE_12),
       borderRadius: AppNumbers.DOUBLE_16,
@@ -39,25 +39,9 @@ class RetailProductCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  name,
-                  style: const TextStyle(
-                    fontSize: AppFontSizes.fontSize14,
-                    fontWeight: FontWeight.w600,
-                    fontFamily: AppFonts.inter,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
+                Text(name, style: textTheme.titleSmall),
                 const SizedBox(height: AppNumbers.DOUBLE_4),
-                Text(
-                  code,
-                  style: const TextStyle(
-                    fontSize: AppFontSizes.fontSize12,
-                    fontWeight: FontWeight.w500,
-                    fontFamily: AppFonts.inter,
-                    color: AppColors.textMuted,
-                  ),
-                ),
+                Text(code, style: textTheme.labelMedium?.copyWith(color: AppColors.textMuted)),
               ],
             ),
           ),

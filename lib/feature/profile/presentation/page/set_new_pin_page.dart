@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
 import 'package:store_manage/core/DI/di.dart';
 import 'package:store_manage/core/constants/app_colors.dart';
-import 'package:store_manage/core/constants/app_font_sizes.dart';
-import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/data/storage/secure_storage.dart';
@@ -73,15 +71,12 @@ class _SetNewPinPageState extends State<SetNewPinPage> {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     final defaultPinTheme = PinTheme(
       width: AppNumbers.DOUBLE_56,
       height: AppNumbers.DOUBLE_56,
-      textStyle: TextStyle(
-        fontSize: AppFontSizes.fontSize24,
-        fontWeight: FontWeight.w600,
-        fontFamily: AppFonts.inter,
-        color: AppColors.textPrimary,
-      ),
+      textStyle: textTheme.headlineLarge,
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_14),
@@ -135,36 +130,12 @@ class _SetNewPinPageState extends State<SetNewPinPage> {
                 color: AppColors.primary,
               ),
               SizedBox(height: AppNumbers.DOUBLE_24),
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: AppFontSizes.fontSize24,
-                  fontWeight: FontWeight.w700,
-                  fontFamily: AppFonts.inter,
-                  color: AppColors.textPrimary,
-                ),
-              ),
+              Text(title, style: textTheme.displayMedium),
               SizedBox(height: AppNumbers.DOUBLE_8),
-              Text(
-                subtitle,
-                style: TextStyle(
-                  fontSize: AppFontSizes.fontSize14,
-                  fontFamily: AppFonts.inter,
-                  color: AppColors.textSecondary,
-                ),
-                textAlign: TextAlign.center,
-              ),
+              Text(subtitle, style: textTheme.bodyMedium, textAlign: TextAlign.center),
               if (_errorText != null) ...[
                 SizedBox(height: AppNumbers.DOUBLE_8),
-                Text(
-                  _errorText!,
-                  style: TextStyle(
-                    fontSize: AppFontSizes.fontSize14,
-                    fontFamily: AppFonts.inter,
-                    color: AppColors.error,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
+                Text(_errorText!, style: textTheme.bodyMedium?.copyWith(color: AppColors.error), textAlign: TextAlign.center),
               ],
               SizedBox(height: AppNumbers.DOUBLE_32),
               Pinput(
@@ -214,11 +185,7 @@ class _SetNewPinPageState extends State<SetNewPinPage> {
                         )
                       : Text(
                           _isConfirmStep ? AppStrings.setNewPinButton : AppStrings.verifyCurrentPinButton,
-                          style: TextStyle(
-                            fontSize: AppFontSizes.fontSize16,
-                            fontWeight: FontWeight.w600,
-                            fontFamily: AppFonts.inter,
-                          ),
+                          style: textTheme.titleMedium?.copyWith(color: AppColors.textOnPrimary),
                         ),
                 ),
               ),

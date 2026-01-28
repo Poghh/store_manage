@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:store_manage/core/constants/app_colors.dart';
-import 'package:store_manage/core/constants/app_font_sizes.dart';
-import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 
 class HomeActionCard extends StatelessWidget {
@@ -33,6 +31,8 @@ class HomeActionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Container(
       padding: const EdgeInsets.all(AppNumbers.DOUBLE_16),
       decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_12)),
@@ -51,23 +51,13 @@ class HomeActionCard extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: TextStyle(
-                    fontSize: AppFontSizes.fontSize16,
+                  style: textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w700,
                     color: titleColor,
-                    fontFamily: AppFonts.inter,
                   ),
                 ),
                 const SizedBox(height: AppNumbers.DOUBLE_4),
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                    fontSize: AppFontSizes.fontSize12,
-                    fontWeight: FontWeight.w500,
-                    color: subtitleColor,
-                    fontFamily: AppFonts.inter,
-                  ),
-                ),
+                Text(subtitle, style: textTheme.labelMedium?.copyWith(color: subtitleColor)),
               ],
             ),
           ),
