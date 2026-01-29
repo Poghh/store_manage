@@ -84,15 +84,6 @@ class _ForgotPinPageState extends State<ForgotPinPage> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: AppNumbers.DOUBLE_0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: AppColors.textPrimary),
-          onPressed: () => context.router.pop(),
-        ),
-        scrolledUnderElevation: AppNumbers.DOUBLE_0,
-      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.all(AppNumbers.DOUBLE_24),
