@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:store_manage/core/constants/app_colors.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
-import 'package:store_manage/feature/home/presentation/widgets/product_search_bar.dart';
+import 'package:store_manage/feature/retail/presentation/widgets/product_search_bar.dart';
 import 'package:store_manage/feature/product/data/models/product.dart';
 import 'package:store_manage/feature/retail/presentation/widgets/payment_method.dart';
 import 'package:store_manage/feature/retail/presentation/widgets/retail_content.dart';

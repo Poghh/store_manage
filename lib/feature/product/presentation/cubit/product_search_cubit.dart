@@ -59,6 +59,25 @@ class ProductSearchCubit extends Cubit<ProductSearchState> {
     emit(const ProductSearchState());
   }
 
+  Future<void> showAll() async {
+    if (_allProducts.isNotEmpty) {
+      emit(ProductSearchState(isLoading: false, results: _allProducts));
+      return;
+    }
+
+    emit(state.copyWith(isLoading: true, error: null));
+
+    try {
+      final items = await _repository.searchProducts('');
+      _allProducts
+        ..clear()
+        ..addAll(items);
+      emit(ProductSearchState(isLoading: false, results: _allProducts));
+    } catch (e) {
+      emit(state.copyWith(isLoading: false, error: e.toString(), results: const []));
+    }
+  }
+
   void _emitFiltered(String keyword, List<Product> source) {
     final lower = keyword.toLowerCase();
     final filtered = source.where((item) {

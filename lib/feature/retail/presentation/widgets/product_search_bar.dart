@@ -68,7 +68,13 @@ class _ProductSearchBarState extends State<ProductSearchBar> {
           focusNode: _focusNode,
           hintText: widget.hintText,
           iconColor: widget.iconColor,
-          onChanged: (value) => context.read<ProductSearchCubit>().search(value),
+          onChanged: (value) {
+            if (value.trim().isEmpty) {
+              context.read<ProductSearchCubit>().showAll();
+            } else {
+              context.read<ProductSearchCubit>().search(value);
+            }
+          },
           trailing: Icon(Icons.qr_code_scanner, size: AppNumbers.DOUBLE_20, color: widget.iconColor),
         ),
       ),
@@ -80,11 +86,11 @@ class _ProductSearchBarState extends State<ProductSearchBar> {
       _hideOverlay();
       return;
     }
-    _updateOverlay(_searchCubit?.state ?? const ProductSearchState());
+    _searchCubit?.showAll();
   }
 
   void _updateOverlay(ProductSearchState state) {
-    if (!_focusNode.hasFocus || _controller.text.trim().isEmpty) {
+    if (!_focusNode.hasFocus) {
       _hideOverlay();
       return;
     }
@@ -138,7 +144,8 @@ class _ProductSearchBarState extends State<ProductSearchBar> {
                         child: ListView.separated(
                           padding: EdgeInsets.zero,
                           itemCount: state.results.length,
-                          separatorBuilder: (context, index) => Divider(height: AppNumbers.DOUBLE_1, color: AppColors.border),
+                          separatorBuilder: (context, index) =>
+                              Divider(height: AppNumbers.DOUBLE_1, color: AppColors.border),
                           itemBuilder: (context, index) {
                             final item = state.results[index];
                             return InkWell(
