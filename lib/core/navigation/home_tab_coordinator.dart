@@ -4,6 +4,7 @@ class HomeTabCoordinator {
   final ValueNotifier<int?> requestedIndex = ValueNotifier<int?>(null);
   final ValueNotifier<DateTime?> selectedTransactionDate = ValueNotifier<DateTime?>(null);
   final ValueNotifier<int> inventoryRefreshTrigger = ValueNotifier<int>(0);
+  final ValueNotifier<int> homeRefreshTrigger = ValueNotifier<int>(0);
 
   void openTransactionsForDate(DateTime date) {
     selectedTransactionDate.value = date;
@@ -12,5 +13,9 @@ class HomeTabCoordinator {
 
   void triggerInventoryRefresh() {
     inventoryRefreshTrigger.value++;
+  }
+
+  void triggerHomeRefresh() {
+    homeRefreshTrigger.value++;
   }
 }

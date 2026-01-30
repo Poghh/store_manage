@@ -23,6 +23,7 @@ class _HomeContentState extends State<HomeContent> {
   bool _isFetching = false;
   late final RetailRevenueService _revenueService;
   late final SecureStorage _secureStorage;
+  late final HomeTabCoordinator _tabCoordinator;
   int _totalRevenue = 0;
   String _userName = '';
 
@@ -32,6 +33,18 @@ class _HomeContentState extends State<HomeContent> {
     _selectedDate = DateTime.now();
     _revenueService = di<RetailRevenueService>();
     _secureStorage = di<SecureStorageImpl>();
+    _tabCoordinator = di<HomeTabCoordinator>();
+    _tabCoordinator.homeRefreshTrigger.addListener(_onHomeRefreshTriggered);
+    _loadData();
+  }
+
+  @override
+  void dispose() {
+    _tabCoordinator.homeRefreshTrigger.removeListener(_onHomeRefreshTriggered);
+    super.dispose();
+  }
+
+  void _onHomeRefreshTriggered() {
     _loadData();
   }
 

@@ -5,7 +5,7 @@ import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/data/services/retail_revenue_service.dart';
 import 'package:store_manage/core/widgets/app_page_header.dart';
-import 'package:store_manage/feature/reports/presentation/widgets/report_ai_insight_card.dart';
+// import 'package:store_manage/feature/reports/presentation/widgets/report_ai_insight_card.dart';
 import 'package:store_manage/feature/reports/presentation/widgets/report_summary_card.dart';
 
 class ReportsPage extends StatefulWidget {
@@ -59,8 +59,8 @@ class _ReportsPageState extends State<ReportsPage> {
               yesterdayRevenue: _yesterdayRevenue,
               growthPercentage: _growthPercentage,
             ),
-            SizedBox(height: AppNumbers.DOUBLE_16),
-            const ReportAiInsightCard(insights: [], suggestions: []),
+            // SizedBox(height: AppNumbers.DOUBLE_16),
+            // const ReportAiInsightCard(insights: [], suggestions: []),
           ],
         ),
       ),

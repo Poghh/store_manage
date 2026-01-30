@@ -104,11 +104,13 @@ class _RetailPageState extends State<RetailPage> {
             AppToast.success(context, AppStrings.retailSubmitSuccess);
             _applyLocalSale();
             di<HomeTabCoordinator>().triggerInventoryRefresh();
+            di<HomeTabCoordinator>().triggerHomeRefresh();
             context.maybePop();
           } else if (state is RetailQueued) {
             AppToast.warning(context, state.message);
             _applyLocalSale();
             di<HomeTabCoordinator>().triggerInventoryRefresh();
+            di<HomeTabCoordinator>().triggerHomeRefresh();
             context.maybePop();
           } else if (state is RetailError) {
             AppToast.error(context, state.message);
