@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:store_manage/core/DI/di.dart';
 import 'package:store_manage/core/data/database/app_database.dart';
 import 'package:store_manage/core/data/database/daos/app_state_dao.dart';
+import 'package:store_manage/core/data/sync/daily_sync_service.dart';
 import 'package:store_manage/core/navigation/app_router.dart';
 import 'package:store_manage/core/navigation/route_observer.dart';
 import 'package:store_manage/core/data/storage/secure_storage.dart';
@@ -46,7 +47,7 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   bool _showSplash = true;
   String? _savedPhone;
   bool _isInitialized = false;
@@ -54,7 +55,9 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _initializeApp();
+    _triggerDailySync();
   }
 
   Future<void> _initializeApp() async {
@@ -70,6 +73,30 @@ class _MyAppState extends State<MyApp> {
     if (mounted) {
       setState(() => _showSplash = false);
     }
+  }
+
+  Future<void> _triggerDailySync() async {
+    try {
+      final secureStorage = di<SecureStorageImpl>();
+      final hasToken = await secureStorage.hasToken();
+      final userId = await secureStorage.getUserId();
+      if (!hasToken || userId == null || userId.trim().isEmpty) return;
+      await di<DailySyncService>().syncPending();
+    } catch (_) {}
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _triggerDailySync();
+    }
+    super.didChangeAppLifecycleState(state);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   @override

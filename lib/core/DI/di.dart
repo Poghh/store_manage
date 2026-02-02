@@ -14,6 +14,8 @@ import 'package:store_manage/core/logger/app_logger.dart';
 import 'package:store_manage/core/navigation/home_tab_coordinator.dart';
 import 'package:store_manage/core/network/connectivity_service.dart';
 import 'package:store_manage/core/network/network_client.dart';
+import 'package:store_manage/core/data/repositories/daily_sync_repository.dart';
+import 'package:store_manage/core/data/sync/daily_sync_service.dart';
 import 'package:store_manage/core/data/sync/product_delete_sync_service.dart';
 import 'package:store_manage/core/data/sync/retail_sync_service.dart';
 import 'package:store_manage/core/data/sync/stock_in_sync_service.dart';
@@ -26,15 +28,15 @@ import 'package:store_manage/core/data/storage/interfaces/local_product_storage.
 import 'package:store_manage/core/data/storage/interfaces/retail_transaction_storage.dart';
 import 'package:store_manage/core/data/storage/secure_storage.dart';
 import 'package:store_manage/core/data/storage/interfaces/offline_queue_storage.dart';
+import 'package:store_manage/core/data/storage/local_storage.dart';
 import 'package:store_manage/feature/home/presentation/cubit/home_cubit.dart';
 import 'package:store_manage/feature/product/data/repositories/product_repository.dart';
-import 'package:store_manage/feature/retail/data/repositories/retail_repository.dart';
-import 'package:store_manage/feature/stock_in/data/repositories/stock_in_repository.dart';
 
 final GetIt di = GetIt.instance;
 
 Future<void> setupDI() async {
   final secureStorage = SecureStorageImpl();
+  final localStorage = LocalStorageImpl();
 
   // Initialize Drift database
   final database = AppDatabase();
@@ -47,6 +49,7 @@ Future<void> setupDI() async {
 
   di.registerLazySingleton<AppDatabase>(() => database);
   di.registerLazySingleton<SecureStorageImpl>(() => secureStorage);
+  di.registerLazySingleton<LocalStorage>(() => localStorage);
 
   di.registerLazySingleton<NetworkClient>(() => NetworkClient(di<SecureStorageImpl>()));
 
@@ -67,24 +70,24 @@ Future<void> setupDI() async {
     () => RetailRevenueService(di<RetailTransactionStorage>(), di<NetworkClient>()),
   );
 
-  di.registerLazySingleton<StockInRepository>(() => StockInRepositoryImpl(di<NetworkClient>()));
-  di.registerLazySingleton<RetailRepository>(() => RetailRepositoryImpl(di<NetworkClient>()));
-
-  di.registerLazySingleton<StockInSyncService>(
-    () => StockInSyncService(
+  di.registerLazySingleton<DailySyncRepository>(() => DailySyncRepository(di<NetworkClient>()));
+  di.registerLazySingleton<DailySyncService>(
+    () => DailySyncService(
       di<OfflineQueueStorage>(),
-      di<StockInRepository>(),
+      di<DailySyncRepository>(),
       di<ConnectivityService>(),
+      di<LocalStorage>(),
+      di<SecureStorageImpl>(),
       di<LocalProductService>(),
       di<InventoryAdjustmentService>(),
     ),
   );
+
+  di.registerLazySingleton<StockInSyncService>(() => StockInSyncService(di<DailySyncService>()));
   di.registerLazySingleton<ProductDeleteSyncService>(
-    () => ProductDeleteSyncService(di<OfflineQueueStorage>(), di<ProductRepository>(), di<ConnectivityService>()),
+    () => ProductDeleteSyncService(di<DailySyncService>(), di<ConnectivityService>()),
   );
-  di.registerLazySingleton<RetailSyncService>(
-    () => RetailSyncService(di<OfflineQueueStorage>(), di<RetailRepository>(), di<ConnectivityService>()),
-  );
+  di.registerLazySingleton<RetailSyncService>(() => RetailSyncService(di<DailySyncService>()));
 
   di.registerLazySingleton<ProductRepository>(
     () => ProductRepositoryImpl(di<NetworkClient>(), di<InventoryAdjustmentService>(), di<LocalProductStorage>()),

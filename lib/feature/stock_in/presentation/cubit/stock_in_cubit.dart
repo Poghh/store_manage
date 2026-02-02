@@ -9,25 +9,18 @@ import 'package:store_manage/core/network/connectivity_service.dart';
 import 'package:store_manage/core/data/sync/stock_in_sync_service.dart';
 import 'package:store_manage/core/data/services/inventory_adjustment_service.dart';
 import 'package:store_manage/core/data/services/local_product_service.dart';
-import 'package:store_manage/feature/stock_in/data/repositories/stock_in_repository.dart';
 
 import 'stock_in_state.dart';
 
 class StockInCubit extends Cubit<StockInState> {
-  final StockInRepository _repository;
   final StockInSyncService _syncService;
   final ConnectivityService _connectivity;
   final InventoryAdjustmentService _inventoryService;
   final LocalProductService _localProductService;
   late final StreamSubscription<InternetStatus> _connectivitySub;
 
-  StockInCubit(
-    this._repository,
-    this._syncService,
-    this._connectivity,
-    this._inventoryService,
-    this._localProductService,
-  ) : super(const StockInInitial()) {
+  StockInCubit(this._syncService, this._connectivity, this._inventoryService, this._localProductService)
+    : super(const StockInInitial()) {
     _connectivitySub = _connectivity.onChanged.listen((status) {
       if (status == InternetStatus.connected) {
         _syncService.syncPending();
@@ -43,34 +36,14 @@ class StockInCubit extends Cubit<StockInState> {
       return;
     }
 
-    final isOnline = await _connectivity.isOnline;
+    await _prepareOfflinePayload(payload);
+    await _syncService.enqueue(payload);
 
-    if (!isOnline) {
-      await _prepareOfflinePayload(payload);
-      await _syncService.enqueue(payload);
+    payload['_skipInventoryIncrease'] = false;
+    await _applyInventoryIncrease(payload);
 
-      payload['_skipInventoryIncrease'] = false;
-      await _applyInventoryIncrease(payload);
-
-      emit(const StockInQueued(AppStrings.stockInQueued));
-      return;
-    }
-
-    try {
-      await _repository.submitStockIn(payload);
-      await _applyInventoryIncrease(payload);
-
-      emit(const StockInLoaded());
-      await _syncService.syncPending();
-    } catch (_) {
-      await _prepareOfflinePayload(payload);
-      await _syncService.enqueue(payload);
-
-      payload['_skipInventoryIncrease'] = false;
-      await _applyInventoryIncrease(payload);
-
-      emit(const StockInQueued(AppStrings.stockInQueued));
-    }
+    emit(const StockInQueued(AppStrings.stockInQueued));
+    await _syncService.syncPending();
   }
 
   Future<void> _applyInventoryIncrease(Map<String, dynamic> payload) async {

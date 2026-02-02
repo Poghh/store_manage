@@ -9,11 +9,8 @@ import 'package:store_manage/core/network/connectivity_service.dart';
 import 'package:store_manage/core/data/sync/stock_in_sync_service.dart';
 import 'package:store_manage/core/data/services/inventory_adjustment_service.dart';
 import 'package:store_manage/core/data/services/local_product_service.dart';
-import 'package:store_manage/feature/stock_in/data/repositories/stock_in_repository.dart';
 import 'package:store_manage/feature/stock_in/presentation/cubit/stock_in_cubit.dart';
 import 'package:store_manage/feature/stock_in/presentation/cubit/stock_in_state.dart';
-
-class MockStockInRepository extends Mock implements StockInRepository {}
 
 class MockStockInSyncService extends Mock implements StockInSyncService {}
 
@@ -24,7 +21,6 @@ class MockInventoryAdjustmentService extends Mock implements InventoryAdjustment
 class MockLocalProductService extends Mock implements LocalProductService {}
 
 void main() {
-  late StockInRepository repository;
   late StockInSyncService syncService;
   late ConnectivityService connectivity;
   late InventoryAdjustmentService inventoryService;
@@ -35,7 +31,6 @@ void main() {
   });
 
   setUp(() {
-    repository = MockStockInRepository();
     syncService = MockStockInSyncService();
     connectivity = MockConnectivityService();
     inventoryService = MockInventoryAdjustmentService();
@@ -51,7 +46,7 @@ void main() {
 
   blocTest<StockInCubit, StockInState>(
     'emits error when API base URL is not configured',
-    build: () => StockInCubit(repository, syncService, connectivity, inventoryService, localProductService),
+    build: () => StockInCubit(syncService, connectivity, inventoryService, localProductService),
     setUp: () {
       dotenv.loadFromString(envString: '', isOptional: true);
     },
@@ -61,33 +56,16 @@ void main() {
       isA<StockInError>().having((state) => state.message, 'message', AppStrings.stockInApiNotConfigured),
     ],
     verify: (_) {
-      verifyNever(() => repository.submitStockIn(any()));
       verifyNever(() => syncService.enqueue(any()));
       verifyNever(() => syncService.syncPending());
     },
   );
 
   blocTest<StockInCubit, StockInState>(
-    'emits loaded when submit succeeds',
-    build: () => StockInCubit(repository, syncService, connectivity, inventoryService, localProductService),
+    'emits queued when submit succeeds',
+    build: () => StockInCubit(syncService, connectivity, inventoryService, localProductService),
     setUp: () {
       dotenv.loadFromString(envString: 'API_BASE_URL=http://localhost');
-      when(() => repository.submitStockIn(any())).thenAnswer((_) async => <String, dynamic>{});
-    },
-    act: (cubit) => cubit.submitStockIn({'name': 'demo'}),
-    expect: () => [isA<StockInLoading>(), isA<StockInLoaded>()],
-    verify: (_) {
-      verify(() => repository.submitStockIn(any())).called(1);
-      verify(() => syncService.syncPending()).called(1);
-    },
-  );
-
-  blocTest<StockInCubit, StockInState>(
-    'emits queued when submit fails',
-    build: () => StockInCubit(repository, syncService, connectivity, inventoryService, localProductService),
-    setUp: () {
-      dotenv.loadFromString(envString: 'API_BASE_URL=http://localhost');
-      when(() => repository.submitStockIn(any())).thenThrow(Exception('boom'));
     },
     act: (cubit) => cubit.submitStockIn({'name': 'demo'}),
     expect: () => [
@@ -95,7 +73,23 @@ void main() {
       isA<StockInQueued>().having((state) => state.message, 'message', AppStrings.stockInQueued),
     ],
     verify: (_) {
-      verify(() => repository.submitStockIn(any())).called(1);
+      verify(() => syncService.enqueue(any())).called(1);
+      verify(() => syncService.syncPending()).called(1);
+    },
+  );
+
+  blocTest<StockInCubit, StockInState>(
+    'emits queued when submit called',
+    build: () => StockInCubit(syncService, connectivity, inventoryService, localProductService),
+    setUp: () {
+      dotenv.loadFromString(envString: 'API_BASE_URL=http://localhost');
+    },
+    act: (cubit) => cubit.submitStockIn({'name': 'demo'}),
+    expect: () => [
+      isA<StockInLoading>(),
+      isA<StockInQueued>().having((state) => state.message, 'message', AppStrings.stockInQueued),
+    ],
+    verify: (_) {
       verify(() => syncService.enqueue(any())).called(1);
     },
   );

@@ -16,7 +16,6 @@ import 'package:store_manage/feature/product/data/repositories/product_repositor
 import 'package:store_manage/feature/product/presentation/cubit/product_search_cubit.dart';
 import 'package:store_manage/feature/retail/presentation/cubit/retail_cubit.dart';
 import 'package:store_manage/feature/retail/presentation/cubit/retail_state.dart';
-import 'package:store_manage/feature/retail/data/repositories/retail_repository.dart';
 import 'package:store_manage/core/network/connectivity_service.dart';
 import 'package:store_manage/core/data/sync/retail_sync_service.dart';
 import 'package:store_manage/core/data/services/inventory_adjustment_service.dart';
@@ -90,7 +89,6 @@ class _RetailPageState extends State<RetailPage> {
         BlocProvider<ProductSearchCubit>(create: (_) => ProductSearchCubit(di<ProductRepository>())..prime()),
         BlocProvider<RetailCubit>(
           create: (_) => RetailCubit(
-            di<RetailRepository>(),
             di<RetailSyncService>(),
             di<ConnectivityService>(),
             di<RetailTransactionStorage>(),
@@ -138,32 +136,32 @@ class _RetailPageState extends State<RetailPage> {
                     borderRadius: BorderRadius.vertical(top: Radius.circular(AppNumbers.DOUBLE_24)),
                   ),
                   child: RetailPageBody(
-                  hasProduct: hasProduct,
-                  displayName: displayName,
-                  displayCode: displayCode,
-                  displayStock: displayStock,
-                  displayImage: displayImage,
-                  quantity: _quantity,
-                  onDecrease: () => setState(() => _quantity = _quantity > 1 ? _quantity - 1 : 1),
-                  onIncrease: () => _increaseQuantity(innerContext),
-                  priceController: _priceController,
-                  onPriceChanged: _onPriceChanged,
-                  purchasePrice: _purchasePrice,
-                  total: _total,
-                  paymentMethod: _paymentMethod,
-                  paymentMethodLabel: _paymentMethodLabel,
-                  onPaymentChanged: (value) => setState(() => _paymentMethod = value),
-                  onConfirm: () => _submitRetail(innerContext),
-                  onProductSelected: _onProductSelected,
+                    hasProduct: hasProduct,
+                    displayName: displayName,
+                    displayCode: displayCode,
+                    displayStock: displayStock,
+                    displayImage: displayImage,
+                    quantity: _quantity,
+                    onDecrease: () => setState(() => _quantity = _quantity > 1 ? _quantity - 1 : 1),
+                    onIncrease: () => _increaseQuantity(innerContext),
+                    priceController: _priceController,
+                    onPriceChanged: _onPriceChanged,
+                    purchasePrice: _purchasePrice,
+                    total: _total,
+                    paymentMethod: _paymentMethod,
+                    paymentMethodLabel: _paymentMethodLabel,
+                    onPaymentChanged: (value) => setState(() => _paymentMethod = value),
+                    onConfirm: () => _submitRetail(innerContext),
+                    onProductSelected: _onProductSelected,
+                  ),
                 ),
               ),
             ),
           ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   void _submitRetail(BuildContext context) {
     if (_selectedCode.isEmpty) {

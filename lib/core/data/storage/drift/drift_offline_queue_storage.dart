@@ -21,6 +21,24 @@ class DriftOfflineQueueStorage implements OfflineQueueStorage {
   }
 
   @override
+  Future<List<Map<String, dynamic>>> getByDateRange(
+    String queueKey, {
+    required DateTime start,
+    required DateTime end,
+  }) async {
+    final items = await _dao.getByDateRange(queueKey, start: start, end: end);
+    return items.map((item) {
+      try {
+        final payload = jsonDecode(item.payload) as Map<String, dynamic>;
+        payload['_createdAt'] = item.createdAt.toIso8601String();
+        return payload;
+      } catch (_) {
+        return <String, dynamic>{};
+      }
+    }).toList();
+  }
+
+  @override
   Future<void> enqueue(String queueKey, Map<String, dynamic> payload) async {
     await _dao.enqueue(queueKey, jsonEncode(payload));
   }

@@ -9,18 +9,16 @@ import 'package:store_manage/core/network/connectivity_service.dart';
 import 'package:store_manage/core/data/sync/retail_sync_service.dart';
 import 'package:store_manage/core/data/services/inventory_adjustment_service.dart';
 import 'package:store_manage/core/data/storage/interfaces/retail_transaction_storage.dart';
-import 'package:store_manage/feature/retail/data/repositories/retail_repository.dart';
 import 'retail_state.dart';
 
 class RetailCubit extends Cubit<RetailState> {
-  final RetailRepository _repository;
   final RetailSyncService _syncService;
   final ConnectivityService _connectivity;
   final RetailTransactionStorage _transactionStorage;
   final InventoryAdjustmentService _inventoryService;
   late final StreamSubscription<InternetStatus> _connectivitySub;
 
-  RetailCubit(this._repository, this._syncService, this._connectivity, this._transactionStorage, this._inventoryService)
+  RetailCubit(this._syncService, this._connectivity, this._transactionStorage, this._inventoryService)
     : super(const RetailInitial()) {
     _connectivitySub = _connectivity.onChanged.listen((status) {
       if (status == InternetStatus.connected) {
@@ -37,25 +35,11 @@ class RetailCubit extends Cubit<RetailState> {
       return;
     }
 
-    if (!await _connectivity.isOnline) {
-      await _transactionStorage.addTransaction(payload);
-      await _syncService.enqueue(payload);
-      await _applyInventoryDeduction(payload);
-      emit(const RetailQueued(AppStrings.retailQueued));
-      return;
-    }
-
-    try {
-      await _repository.submitRetailSale(payload);
-      await _applyInventoryDeduction(payload);
-      emit(const RetailLoaded());
-      await _syncService.syncPending();
-    } catch (_) {
-      await _transactionStorage.addTransaction(payload);
-      await _syncService.enqueue(payload);
-      await _applyInventoryDeduction(payload);
-      emit(const RetailQueued(AppStrings.retailQueued));
-    }
+    await _transactionStorage.addTransaction(payload);
+    await _syncService.enqueue(payload);
+    await _applyInventoryDeduction(payload);
+    emit(const RetailQueued(AppStrings.retailQueued));
+    await _syncService.syncPending();
   }
 
   Future<void> _applyInventoryDeduction(Map<String, dynamic> payload) async {
