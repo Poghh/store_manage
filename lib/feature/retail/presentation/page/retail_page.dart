@@ -17,7 +17,7 @@ import 'package:store_manage/feature/product/presentation/cubit/product_search_c
 import 'package:store_manage/feature/retail/presentation/cubit/retail_cubit.dart';
 import 'package:store_manage/feature/retail/presentation/cubit/retail_state.dart';
 import 'package:store_manage/core/network/connectivity_service.dart';
-import 'package:store_manage/core/data/sync/retail_sync_service.dart';
+import 'package:store_manage/core/data/sync/daily_sync_service.dart';
 import 'package:store_manage/core/data/services/inventory_adjustment_service.dart';
 import 'package:store_manage/core/data/storage/interfaces/retail_transaction_storage.dart';
 import 'package:store_manage/feature/retail/presentation/widgets/payment_method.dart';
@@ -89,7 +89,7 @@ class _RetailPageState extends State<RetailPage> {
         BlocProvider<ProductSearchCubit>(create: (_) => ProductSearchCubit(di<ProductRepository>())..prime()),
         BlocProvider<RetailCubit>(
           create: (_) => RetailCubit(
-            di<RetailSyncService>(),
+            di<DailySyncService>(),
             di<ConnectivityService>(),
             di<RetailTransactionStorage>(),
             di<InventoryAdjustmentService>(),

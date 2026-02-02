@@ -6,14 +6,14 @@ import 'package:internet_connection_checker_plus/internet_connection_checker_plu
 import 'package:store_manage/core/constants/app_endpoints.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/network/connectivity_service.dart';
-import 'package:store_manage/core/data/sync/stock_in_sync_service.dart';
+import 'package:store_manage/core/data/sync/daily_sync_service.dart';
 import 'package:store_manage/core/data/services/inventory_adjustment_service.dart';
 import 'package:store_manage/core/data/services/local_product_service.dart';
 
 import 'stock_in_state.dart';
 
 class StockInCubit extends Cubit<StockInState> {
-  final StockInSyncService _syncService;
+  final DailySyncService _syncService;
   final ConnectivityService _connectivity;
   final InventoryAdjustmentService _inventoryService;
   final LocalProductService _localProductService;
@@ -37,7 +37,7 @@ class StockInCubit extends Cubit<StockInState> {
     }
 
     await _prepareOfflinePayload(payload);
-    await _syncService.enqueue(payload);
+    await _syncService.enqueueStockIn(payload);
 
     payload['_skipInventoryIncrease'] = false;
     await _applyInventoryIncrease(payload);

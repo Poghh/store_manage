@@ -10,12 +10,10 @@ import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/navigation/home_tab_coordinator.dart';
-import 'package:store_manage/core/network/connectivity_service.dart';
-import 'package:store_manage/core/data/sync/product_delete_sync_service.dart';
+import 'package:store_manage/core/data/sync/daily_sync_service.dart';
 import 'package:store_manage/core/data/services/inventory_adjustment_service.dart';
 import 'package:store_manage/core/data/services/local_product_service.dart';
 import 'package:store_manage/core/utils/common_funtion_utils.dart';
-import 'package:store_manage/feature/product/data/repositories/product_repository.dart';
 import 'package:store_manage/feature/product/presentation/page/product_edit_page.dart';
 import 'package:store_manage/feature/product/presentation/widgets/info_row.dart';
 import 'package:store_manage/feature/product/presentation/widgets/product_detail_actions.dart';
@@ -59,9 +57,7 @@ class ProductDetailsPage extends StatefulWidget {
 class _ProductDetailsPageState extends State<ProductDetailsPage> {
   late final InventoryAdjustmentService _inventoryService;
   late final LocalProductService _localProductService;
-  late final ProductRepository _productRepository;
-  late final ProductDeleteSyncService _deleteSyncService;
-  late final ConnectivityService _connectivity;
+  late final DailySyncService _dailySyncService;
   late final HomeTabCoordinator _tabCoordinator;
   late final int _baseQuantity;
   late final bool _hasQuantity;
@@ -76,9 +72,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     super.initState();
     _inventoryService = di<InventoryAdjustmentService>();
     _localProductService = di<LocalProductService>();
-    _productRepository = di<ProductRepository>();
-    _deleteSyncService = di<ProductDeleteSyncService>();
-    _connectivity = di<ConnectivityService>();
+    _dailySyncService = di<DailySyncService>();
     _tabCoordinator = di<HomeTabCoordinator>();
     _tabCoordinator.inventoryRefreshTrigger.addListener(_onRefreshTriggered);
     _baseQuantity = widget.stockQuantityValue ?? int.tryParse(widget.quantity.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
@@ -141,9 +135,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     final overridePrice = _localOverride?['purchasePrice'];
     final overrideDate = (_localOverride?['stockInDate'] ?? '').toString();
     final displayCode = widget.productCode.isEmpty ? '' : widget.productCode;
-    final displayName = overrideName.isNotEmpty
-        ? overrideName
-        : (widget.productName.isEmpty ? '' : widget.productName);
+    final displayName = overrideName.isNotEmpty ? overrideName : (widget.productName.isEmpty ? '' : widget.productName);
     final displayCategory = widget.category.isEmpty ? '' : widget.category;
     final displayPlatform = widget.platform.isEmpty ? '' : widget.platform;
     final displayBrand = widget.brand.isEmpty ? '' : widget.brand;
@@ -157,9 +149,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         : (parsedOverridePrice == null
               ? (widget.priceValue == null ? '' : CommonFuntionUtils.formatCurrency(widget.priceValue!))
               : CommonFuntionUtils.formatCurrency(parsedOverridePrice));
-    final displayDate = overrideDate.isNotEmpty
-        ? overrideDate
-        : (widget.stockInDate.isEmpty ? '' : widget.stockInDate);
+    final displayDate = overrideDate.isNotEmpty ? overrideDate : (widget.stockInDate.isEmpty ? '' : widget.stockInDate);
     final hasPrefill = widget.productCode.isNotEmpty || widget.productName.isNotEmpty;
     final prefillQuantity = _hasQuantity ? adjustedQuantity : null;
     final prefillPrice =
@@ -272,30 +262,12 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     final code = productCode.trim();
     if (code.isEmpty) return;
 
-    if (!await _connectivity.isOnline) {
-      await _deleteSyncService.enqueue(code);
-      await _localProductService.deleteProduct(code);
-      await _inventoryService.setAdjustment(code, 0);
-      if (!mounted) return;
-      AppToast.warning(context, AppStrings.productDeleteQueued);
-      context.maybePop();
-      return;
-    }
-
-    try {
-      await _productRepository.deleteProduct(code);
-      await _localProductService.deleteProduct(code);
-      await _inventoryService.setAdjustment(code, 0);
-      if (!mounted) return;
-      AppToast.success(context, AppStrings.productDeleteSuccess);
-      context.maybePop();
-    } catch (_) {
-      await _deleteSyncService.enqueue(code);
-      await _localProductService.deleteProduct(code);
-      await _inventoryService.setAdjustment(code, 0);
-      if (!mounted) return;
-      AppToast.warning(context, AppStrings.productDeleteQueued);
-      context.maybePop();
-    }
+    await _dailySyncService.enqueueProductDelete(code);
+    await _localProductService.deleteProduct(code);
+    await _inventoryService.setAdjustment(code, 0);
+    await _dailySyncService.syncPending();
+    if (!mounted) return;
+    AppToast.warning(context, AppStrings.productDeleteQueued);
+    context.maybePop();
   }
 }

@@ -9,7 +9,7 @@ import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/DI/di.dart';
 import 'package:store_manage/core/navigation/home_tab_coordinator.dart';
-import 'package:store_manage/core/data/sync/stock_in_sync_service.dart';
+import 'package:store_manage/core/data/sync/daily_sync_service.dart';
 import 'package:store_manage/core/data/services/inventory_adjustment_service.dart';
 import 'package:store_manage/core/data/services/local_product_service.dart';
 import 'package:store_manage/core/widgets/app_page_app_bar.dart';
@@ -84,7 +84,7 @@ class _StockInPageState extends State<StockInPage> {
       providers: [
         BlocProvider<StockInCubit>(
           create: (_) => StockInCubit(
-            di<StockInSyncService>(),
+            di<DailySyncService>(),
             di<ConnectivityService>(),
             di<InventoryAdjustmentService>(),
             di<LocalProductService>(),

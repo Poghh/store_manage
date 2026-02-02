@@ -6,13 +6,13 @@ import 'package:mocktail/mocktail.dart';
 
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/network/connectivity_service.dart';
-import 'package:store_manage/core/data/sync/stock_in_sync_service.dart';
+import 'package:store_manage/core/data/sync/daily_sync_service.dart';
 import 'package:store_manage/core/data/services/inventory_adjustment_service.dart';
 import 'package:store_manage/core/data/services/local_product_service.dart';
 import 'package:store_manage/feature/stock_in/presentation/cubit/stock_in_cubit.dart';
 import 'package:store_manage/feature/stock_in/presentation/cubit/stock_in_state.dart';
 
-class MockStockInSyncService extends Mock implements StockInSyncService {}
+class MockDailySyncService extends Mock implements DailySyncService {}
 
 class MockConnectivityService extends Mock implements ConnectivityService {}
 
@@ -21,7 +21,7 @@ class MockInventoryAdjustmentService extends Mock implements InventoryAdjustment
 class MockLocalProductService extends Mock implements LocalProductService {}
 
 void main() {
-  late StockInSyncService syncService;
+  late DailySyncService syncService;
   late ConnectivityService connectivity;
   late InventoryAdjustmentService inventoryService;
   late LocalProductService localProductService;
@@ -31,7 +31,7 @@ void main() {
   });
 
   setUp(() {
-    syncService = MockStockInSyncService();
+    syncService = MockDailySyncService();
     connectivity = MockConnectivityService();
     inventoryService = MockInventoryAdjustmentService();
     localProductService = MockLocalProductService();
@@ -39,7 +39,7 @@ void main() {
     when(() => connectivity.onChanged).thenAnswer((_) => const Stream<InternetStatus>.empty());
     when(() => connectivity.isOnline).thenAnswer((_) async => true);
     when(() => syncService.syncPending()).thenAnswer((_) async {});
-    when(() => syncService.enqueue(any())).thenAnswer((_) async {});
+    when(() => syncService.enqueueStockIn(any())).thenAnswer((_) async {});
     when(() => inventoryService.applyStockIn(any(), any())).thenAnswer((_) async {});
     when(() => localProductService.addFromStockInPayload(any())).thenAnswer((_) async {});
   });
@@ -56,7 +56,7 @@ void main() {
       isA<StockInError>().having((state) => state.message, 'message', AppStrings.stockInApiNotConfigured),
     ],
     verify: (_) {
-      verifyNever(() => syncService.enqueue(any()));
+      verifyNever(() => syncService.enqueueStockIn(any()));
       verifyNever(() => syncService.syncPending());
     },
   );
@@ -73,7 +73,7 @@ void main() {
       isA<StockInQueued>().having((state) => state.message, 'message', AppStrings.stockInQueued),
     ],
     verify: (_) {
-      verify(() => syncService.enqueue(any())).called(1);
+      verify(() => syncService.enqueueStockIn(any())).called(1);
       verify(() => syncService.syncPending()).called(1);
     },
   );
@@ -90,7 +90,7 @@ void main() {
       isA<StockInQueued>().having((state) => state.message, 'message', AppStrings.stockInQueued),
     ],
     verify: (_) {
-      verify(() => syncService.enqueue(any())).called(1);
+      verify(() => syncService.enqueueStockIn(any())).called(1);
     },
   );
 }

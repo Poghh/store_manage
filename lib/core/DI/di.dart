@@ -16,9 +16,6 @@ import 'package:store_manage/core/network/connectivity_service.dart';
 import 'package:store_manage/core/network/network_client.dart';
 import 'package:store_manage/core/data/repositories/daily_sync_repository.dart';
 import 'package:store_manage/core/data/sync/daily_sync_service.dart';
-import 'package:store_manage/core/data/sync/product_delete_sync_service.dart';
-import 'package:store_manage/core/data/sync/retail_sync_service.dart';
-import 'package:store_manage/core/data/sync/stock_in_sync_service.dart';
 import 'package:store_manage/core/platform/biometric_service.dart';
 import 'package:store_manage/core/data/services/inventory_adjustment_service.dart';
 import 'package:store_manage/core/data/services/local_product_service.dart';
@@ -82,12 +79,6 @@ Future<void> setupDI() async {
       di<InventoryAdjustmentService>(),
     ),
   );
-
-  di.registerLazySingleton<StockInSyncService>(() => StockInSyncService(di<DailySyncService>()));
-  di.registerLazySingleton<ProductDeleteSyncService>(
-    () => ProductDeleteSyncService(di<DailySyncService>(), di<ConnectivityService>()),
-  );
-  di.registerLazySingleton<RetailSyncService>(() => RetailSyncService(di<DailySyncService>()));
 
   di.registerLazySingleton<ProductRepository>(
     () => ProductRepositoryImpl(di<NetworkClient>(), di<InventoryAdjustmentService>(), di<LocalProductStorage>()),

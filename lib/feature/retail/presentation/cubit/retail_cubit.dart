@@ -6,13 +6,13 @@ import 'package:internet_connection_checker_plus/internet_connection_checker_plu
 import 'package:store_manage/core/constants/app_endpoints.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/network/connectivity_service.dart';
-import 'package:store_manage/core/data/sync/retail_sync_service.dart';
+import 'package:store_manage/core/data/sync/daily_sync_service.dart';
 import 'package:store_manage/core/data/services/inventory_adjustment_service.dart';
 import 'package:store_manage/core/data/storage/interfaces/retail_transaction_storage.dart';
 import 'retail_state.dart';
 
 class RetailCubit extends Cubit<RetailState> {
-  final RetailSyncService _syncService;
+  final DailySyncService _syncService;
   final ConnectivityService _connectivity;
   final RetailTransactionStorage _transactionStorage;
   final InventoryAdjustmentService _inventoryService;
@@ -36,7 +36,7 @@ class RetailCubit extends Cubit<RetailState> {
     }
 
     await _transactionStorage.addTransaction(payload);
-    await _syncService.enqueue(payload);
+    await _syncService.enqueueRetailSale(payload);
     await _applyInventoryDeduction(payload);
     emit(const RetailQueued(AppStrings.retailQueued));
     await _syncService.syncPending();

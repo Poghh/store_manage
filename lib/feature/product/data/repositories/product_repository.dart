@@ -6,7 +6,6 @@ import 'package:store_manage/feature/product/data/models/product.dart';
 
 abstract class ProductRepository {
   Future<List<Product>> searchProducts(String query);
-  Future<void> deleteProduct(String productCode);
 }
 
 class ProductRepositoryImpl implements ProductRepository {
@@ -94,14 +93,5 @@ class ProductRepositoryImpl implements ProductRepository {
       result.add(product.copyWith(quantity: updatedQuantity));
     }
     return result;
-  }
-
-  @override
-  Future<void> deleteProduct(String productCode) async {
-    await _client.invoke<Map<String, dynamic>>(
-      AppEndpoints.productDelete(productCode),
-      RequestType.delete,
-      fromJsonT: (json) => (json as Map<String, dynamic>?) ?? <String, dynamic>{},
-    );
   }
 }
