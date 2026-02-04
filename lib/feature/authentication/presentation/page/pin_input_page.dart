@@ -5,6 +5,7 @@ import 'package:store_manage/core/DI/di.dart';
 import 'package:store_manage/core/constants/app_colors.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
+import 'package:store_manage/core/data/repositories/app_credentials_repository.dart';
 import 'package:store_manage/core/navigation/app_router.dart';
 import 'package:store_manage/core/data/services/auth_token_service.dart';
 import 'package:store_manage/core/data/storage/secure_storage.dart';
@@ -57,42 +58,68 @@ class _PinInputPageState extends State<PinInputPage> {
     });
 
     final secureStorage = di<SecureStorageImpl>();
+    final pin = _controller.text;
 
-    if (_isCreatingPin) {
-      // Creating new PIN
-      await secureStorage.savePin(_controller.text);
+    // Luôn gọi API check phone exists trước
+    final phoneExists = await _checkPhoneExistsOnServer();
+
+    if (phoneExists == null) {
+      // Network error → yêu cầu kết nối
       if (mounted) {
-        await _navigateAfterLogin(secureStorage, _controller.text);
+        setState(() => _isLoading = false);
+        _showConnectivityRequiredDialog();
       }
+      return;
+    }
+
+    // Lưu PIN và phone local
+    await secureStorage.savePin(pin);
+    await secureStorage.savePhoneNumber(widget.phoneNumber);
+
+    if (!mounted) return;
+
+    if (phoneExists) {
+      // Account đã có trên server → lấy token và vào Home
+      await di<AuthTokenService>().requestAppSecretAndToken(
+        phone: widget.phoneNumber,
+        pin: pin,
+      );
+      if (!mounted) return;
+      context.router.replaceAll([const HomeTabsRoute()]);
     } else {
-      // Verifying existing PIN
-      final storedPin = await secureStorage.getPin();
-      if (storedPin == _controller.text) {
-        if (mounted) {
-          await _navigateAfterLogin(secureStorage, _controller.text);
-        }
-      } else {
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-            _errorText = AppStrings.loginPinError;
-            _controller.clear();
-          });
-        }
-      }
+      // Account chưa có → vào SetupProfile để nhập thông tin và tạo credentials
+      context.router.replaceAll([const SetupProfileRoute()]);
     }
   }
 
-  Future<void> _navigateAfterLogin(SecureStorageImpl secureStorage, String pin) async {
-    await di<AuthTokenService>().requestAppSecretAndToken(phone: widget.phoneNumber, pin: pin);
-    final hasProfile = await secureStorage.hasProfileSetup();
-    if (mounted) {
-      if (hasProfile) {
-        context.router.replaceAll([const HomeTabsRoute()]);
-      } else {
-        context.router.replaceAll([const SetupProfileRoute()]);
-      }
+  /// Check if phone exists on server
+  /// Returns: true (exists), false (not exists), null (network error)
+  Future<bool?> _checkPhoneExistsOnServer() async {
+    try {
+      final exists = await di<AppCredentialsRepository>().checkPhoneExists(
+        phone: widget.phoneNumber,
+      );
+      return exists;
+    } catch (e) {
+      // Network error or other exception
+      return null;
     }
+  }
+
+  void _showConnectivityRequiredDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(AppStrings.connectivityRequiredTitle),
+        content: Text(AppStrings.connectivityRequiredMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(AppStrings.connectivityRequiredButton),
+          ),
+        ],
+      ),
+    );
   }
 
   void _onForgotPin() {

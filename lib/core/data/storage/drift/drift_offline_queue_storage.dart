@@ -31,6 +31,7 @@ class DriftOfflineQueueStorage implements OfflineQueueStorage {
       try {
         final payload = jsonDecode(item.payload) as Map<String, dynamic>;
         payload['_createdAt'] = item.createdAt.toIso8601String();
+        payload['_queueId'] = item.id;
         return payload;
       } catch (_) {
         return <String, dynamic>{};
@@ -54,5 +55,25 @@ class DriftOfflineQueueStorage implements OfflineQueueStorage {
   @override
   Future<void> clear(String queueKey) async {
     await _dao.clearQueue(queueKey);
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getUnsynced(String queueKey) async {
+    final items = await _dao.getUnsynced(queueKey);
+    return items.map((item) {
+      try {
+        final payload = jsonDecode(item.payload) as Map<String, dynamic>;
+        payload['_createdAt'] = item.createdAt.toIso8601String();
+        payload['_queueId'] = item.id;
+        return payload;
+      } catch (_) {
+        return <String, dynamic>{};
+      }
+    }).toList();
+  }
+
+  @override
+  Future<void> markSynced(int id) async {
+    await _dao.markSynced(id);
   }
 }

@@ -39,7 +39,7 @@ class _ProfilePageState extends State<ProfilePage> {
     final avatarPath = await storage.getAvatarPath();
     if (mounted) {
       setState(() {
-        _userName = userName ?? AppStrings.profileName;
+        _userName = userName ?? '';
         _storeName = storeName ?? '';
         _avatarPath = avatarPath;
       });

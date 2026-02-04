@@ -200,7 +200,6 @@ class AppStrings {
   static const String reportBulletPrefix = '• ';
 
   // === PROFILE ===
-  static const String profileName = 'Thanh Phong';
   static const String profileSectionAccount = 'Tài khoản';
   static const String profileSectionSettings = 'Cài đặt';
   static const String profileSectionSupport = 'Hỗ trợ';
@@ -216,6 +215,10 @@ class AppStrings {
   // === CONNECTIVITY ===
   static const String connectivityOnline = 'Đã kết nối internet';
   static const String connectivityOffline = 'Mất kết nối internet';
+  static const String connectivityRequiredTitle = 'Cần kết nối internet';
+  static const String connectivityRequiredMessage =
+      'Vui lòng kết nối internet để đăng ký tài khoản mới. Sau khi đăng ký, bạn có thể sử dụng app offline.';
+  static const String connectivityRequiredButton = 'Đã hiểu';
 
   // === PERMISSIONS ===
   static const String photoPermissionDenied = 'Không có quyền truy cập ảnh';

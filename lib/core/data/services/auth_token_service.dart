@@ -9,10 +9,32 @@ class AuthTokenService {
 
   AuthTokenService(this._appCredentialsRepository, this._repository, this._secureStorage);
 
+  /// Gọi API lấy token cho user đã có account
   Future<void> requestAppSecretAndToken({required String phone, required String pin}) async {
     if (phone.trim().isEmpty || pin.trim().isEmpty) return;
     try {
-      final data = await _appCredentialsRepository.requestAppSecret(phone: phone);
+      // Lấy appSecret từ server cho user đã có tài khoản
+      final secret = await _appCredentialsRepository.getAppSecret(phone: phone);
+      if (secret != null && secret.isNotEmpty) {
+        await _secureStorage.saveAppSecret(secret);
+      }
+      await requestAndSaveToken(phone: phone);
+    } catch (_) {}
+  }
+
+  /// Tạo credentials mới và lấy token cho user mới
+  Future<void> createCredentialsAndGetToken({
+    required String phone,
+    required String storeName,
+    required String userName,
+  }) async {
+    if (phone.trim().isEmpty) return;
+    try {
+      final data = await _appCredentialsRepository.requestAppSecret(
+        phone: phone,
+        storeName: storeName,
+        userName: userName,
+      );
       final secret = _extractAppSecret(data);
       if (secret != null && secret.isNotEmpty) {
         await _secureStorage.saveAppSecret(secret);

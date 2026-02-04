@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:store_manage/core/data/repositories/daily_sync_repository.dart';
+import 'package:store_manage/core/data/repositories/store_repository.dart';
 import 'package:store_manage/core/data/services/inventory_adjustment_service.dart';
 import 'package:store_manage/core/data/services/local_product_service.dart';
 import 'package:store_manage/core/data/storage/interfaces/offline_queue_storage.dart';
@@ -15,9 +16,12 @@ class DailySyncService {
   static const String productDeleteQueueKey = 'product_delete_queue';
   static const String _lastSyncKey = 'last_sync';
   static const String _runSyncKey = 'run_sync';
+  static const String _storeRunSyncKey = 'run_store_sync';
+  static const String _storeLastSyncKey = 'last_store_sync';
 
   final OfflineQueueStorage _queue;
   final DailySyncRepository _repository;
+  final StoreRepository _storeRepository;
   final ConnectivityService _connectivity;
   final LocalStorage _localStorage;
   final SecureStorageImpl _secureStorage;
@@ -27,6 +31,7 @@ class DailySyncService {
   DailySyncService(
     this._queue,
     this._repository,
+    this._storeRepository,
     this._connectivity,
     this._localStorage,
     this._secureStorage,
@@ -34,12 +39,18 @@ class DailySyncService {
     this._inventoryAdjustmentService,
   );
 
-  Future<void> enqueueStockIn(Map<String, dynamic> payload) => _queue.enqueue(stockInQueueKey, payload);
+  Future<void> enqueueStockIn(Map<String, dynamic> payload) {
+    payload.putIfAbsent('syncFlag', () => 'C');
+    return _queue.enqueue(stockInQueueKey, payload);
+  }
 
-  Future<void> enqueueRetailSale(Map<String, dynamic> payload) => _queue.enqueue(retailQueueKey, payload);
+  Future<void> enqueueRetailSale(Map<String, dynamic> payload) {
+    payload.putIfAbsent('syncFlag', () => 'C');
+    return _queue.enqueue(retailQueueKey, payload);
+  }
 
   Future<void> enqueueProductDelete(String productCode) {
-    return _queue.enqueue(productDeleteQueueKey, {'productCode': productCode});
+    return _queue.enqueue(productDeleteQueueKey, {'productCode': productCode, 'syncFlag': 'D'});
   }
 
   Future<void> syncPending({DateTime? now}) async {
@@ -110,5 +121,82 @@ class DailySyncService {
       await _localProductService.updateProductCode(tempCode, newCode);
       await _inventoryAdjustmentService.migrateProductCode(from: tempCode, to: newCode);
     }
+  }
+
+  /// Sync store data to server
+  Future<void> syncStore() async {
+    if (!await _connectivity.isOnline) return;
+
+    final phone = await _secureStorage.getSavedPhoneNumber();
+    if (phone == null || phone.isEmpty) return;
+
+    final syncTime = DateTime.now();
+
+    // Allow store sync only after 20:00 local time
+    if (syncTime.hour < 20) {
+      return;
+    }
+
+    final lastStoreSyncIso = await _localStorage.read(_storeLastSyncKey);
+    final lastStoreSync = DateTime.tryParse(lastStoreSyncIso ?? '');
+    if (_isSameDay(lastStoreSync, syncTime)) {
+      return;
+    }
+
+    // Collect only unsynced items (keep unsynced records for future days)
+    final stockIns = await _queue.getUnsynced(stockInQueueKey);
+    final retailSales = await _queue.getUnsynced(retailQueueKey);
+    final productDeletes = await _queue.getUnsynced(productDeleteQueueKey);
+
+    if (stockIns.isEmpty && retailSales.isEmpty && productDeletes.isEmpty) {
+      return;
+    }
+
+    final syncDataMap = <String, dynamic>{
+      'stockIns': _withSyncFlag(stockIns, 'C'),
+      'retailSales': _withSyncFlag(retailSales, 'C'),
+      'productDeletes': _withSyncFlag(productDeletes, 'D'),
+    };
+
+    final syncData = jsonEncode(syncDataMap);
+
+    try {
+      final response = await _storeRepository.syncStore(phone: phone, syncTime: syncTime, syncData: syncData);
+
+      // Apply any product code mappings returned by the server
+      await _applyProductCodeMappings(response);
+
+      // Mark individual queue rows as synced (use _queueId added by Drift implementation)
+      for (final item in stockIns) {
+        final id = (item['_queueId'] ?? item['queueId']) as int?;
+        if (id != null) await _queue.markSynced(id);
+      }
+      for (final item in retailSales) {
+        final id = (item['_queueId'] ?? item['queueId']) as int?;
+        if (id != null) await _queue.markSynced(id);
+      }
+      for (final item in productDeletes) {
+        final id = (item['_queueId'] ?? item['queueId']) as int?;
+        if (id != null) await _queue.markSynced(id);
+      }
+
+      // Record store sync timestamps
+      final syncIso = syncTime.toIso8601String();
+      await _localStorage.write(_storeRunSyncKey, syncIso);
+      await _localStorage.write(_storeLastSyncKey, syncIso);
+    } catch (_) {}
+  }
+
+  List<Map<String, dynamic>> _withSyncFlag(List<Map<String, dynamic>> items, String flag) {
+    return items.map((item) {
+      final copy = Map<String, dynamic>.from(item);
+      copy.putIfAbsent('syncFlag', () => flag);
+      return copy;
+    }).toList();
+  }
+
+  bool _isSameDay(DateTime? a, DateTime b) {
+    if (a == null) return false;
+    return a.year == b.year && a.month == b.month && a.day == b.day;
   }
 }

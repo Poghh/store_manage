@@ -4,6 +4,7 @@ import 'package:store_manage/core/DI/di.dart';
 import 'package:store_manage/core/constants/app_colors.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
+import 'package:store_manage/core/data/services/auth_token_service.dart';
 import 'package:store_manage/core/navigation/app_router.dart';
 import 'package:store_manage/core/data/storage/secure_storage.dart';
 import 'package:store_manage/core/widgets/app_input_decoration.dart';
@@ -21,6 +22,7 @@ class _SetupProfilePageState extends State<SetupProfilePage> {
   final _storeController = TextEditingController();
   final _nameFocusNode = FocusNode();
   final _storeFocusNode = FocusNode();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -35,11 +37,33 @@ class _SetupProfilePageState extends State<SetupProfilePage> {
       _nameController.text.trim().isNotEmpty && _storeController.text.trim().isNotEmpty;
 
   Future<void> _onComplete() async {
-    if (!_isFormValid) return;
+    if (!_isFormValid || _isLoading) return;
+
+    setState(() => _isLoading = true);
 
     final secureStorage = di<SecureStorageImpl>();
-    await secureStorage.saveUserName(_nameController.text.trim());
-    await secureStorage.saveStoreName(_storeController.text.trim());
+    final userName = _nameController.text.trim();
+    final storeName = _storeController.text.trim();
+
+    // Lấy phone đã lưu từ PinInputPage
+    final phone = await secureStorage.getSavedPhoneNumber();
+    if (phone == null || phone.isEmpty) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+      return;
+    }
+
+    // Tạo credentials và lấy token từ server
+    await di<AuthTokenService>().createCredentialsAndGetToken(
+      phone: phone,
+      storeName: storeName,
+      userName: userName,
+    );
+
+    // Lưu thông tin local
+    await secureStorage.saveUserName(userName);
+    await secureStorage.saveStoreName(storeName);
 
     if (mounted) {
       context.router.replaceAll([const HomeTabsRoute()]);
@@ -96,7 +120,7 @@ class _SetupProfilePageState extends State<SetupProfilePage> {
                 width: double.infinity,
                 height: AppNumbers.DOUBLE_48,
                 child: ElevatedButton(
-                  onPressed: _isFormValid ? _onComplete : null,
+                  onPressed: (_isFormValid && !_isLoading) ? _onComplete : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: AppColors.textOnPrimary,
@@ -107,7 +131,16 @@ class _SetupProfilePageState extends State<SetupProfilePage> {
                       borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_12),
                     ),
                   ),
-                  child: Text(AppStrings.setupProfileButton, style: textTheme.titleSmall?.copyWith(color: AppColors.textOnPrimary)),
+                  child: _isLoading
+                      ? const SizedBox(
+                          width: AppNumbers.DOUBLE_20,
+                          height: AppNumbers.DOUBLE_20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: AppNumbers.DOUBLE_2,
+                            color: AppColors.textOnPrimary,
+                          ),
+                        )
+                      : Text(AppStrings.setupProfileButton, style: textTheme.titleSmall?.copyWith(color: AppColors.textOnPrimary)),
                 ),
               ),
             ],
