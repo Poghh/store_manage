@@ -14,12 +14,15 @@ import 'package:store_manage/core/logger/app_logger.dart';
 import 'package:store_manage/core/navigation/home_tab_coordinator.dart';
 import 'package:store_manage/core/network/connectivity_service.dart';
 import 'package:store_manage/core/network/network_client.dart';
+import 'package:store_manage/core/data/repositories/app_credentials_repository.dart';
+import 'package:store_manage/core/data/repositories/auth_token_repository.dart';
 import 'package:store_manage/core/data/repositories/daily_sync_repository.dart';
 import 'package:store_manage/core/data/sync/daily_sync_service.dart';
 import 'package:store_manage/core/platform/biometric_service.dart';
 import 'package:store_manage/core/data/services/inventory_adjustment_service.dart';
 import 'package:store_manage/core/data/services/local_product_service.dart';
 import 'package:store_manage/core/data/services/retail_revenue_service.dart';
+import 'package:store_manage/core/data/services/auth_token_service.dart';
 import 'package:store_manage/core/data/storage/interfaces/inventory_adjustment_storage.dart';
 import 'package:store_manage/core/data/storage/interfaces/local_product_storage.dart';
 import 'package:store_manage/core/data/storage/interfaces/retail_transaction_storage.dart';
@@ -63,8 +66,16 @@ Future<void> setupDI() async {
     () => InventoryAdjustmentService(di<InventoryAdjustmentStorage>()),
   );
   di.registerLazySingleton<LocalProductService>(() => LocalProductService(di<LocalProductStorage>()));
+  di.registerLazySingleton<AuthTokenService>(
+    () => AuthTokenService(di<AppCredentialsRepository>(), di<AuthTokenRepository>(), di<SecureStorageImpl>()),
+  );
   di.registerLazySingleton<RetailRevenueService>(
     () => RetailRevenueService(di<RetailTransactionStorage>(), di<NetworkClient>()),
+  );
+
+  di.registerLazySingleton<AppCredentialsRepository>(() => AppCredentialsRepository(di<NetworkClient>()));
+  di.registerLazySingleton<AuthTokenRepository>(
+    () => AuthTokenRepository(di<NetworkClient>(), di<SecureStorageImpl>()),
   );
 
   di.registerLazySingleton<DailySyncRepository>(() => DailySyncRepository(di<NetworkClient>()));

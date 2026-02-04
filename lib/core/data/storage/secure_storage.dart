@@ -7,6 +7,9 @@ abstract class SecureStorage {
   Future<bool> hasToken();
   Future<void> saveUserId(dynamic value);
   Future<String?> getUserId();
+  Future<void> saveAppSecret(String value);
+  Future<String?> getAppSecret();
+  Future<void> clearAppSecret();
   Future<void> savePhoneNumber(String phone);
   Future<String?> getSavedPhoneNumber();
   Future<bool> hasValidPhoneNumber();
@@ -34,6 +37,7 @@ class SecureStorageImpl implements SecureStorage {
   static const String _userNameKey = 'user_name';
   static const String _storeNameKey = 'store_name';
   static const String _avatarPathKey = 'avatar_path';
+  static const String _appSecretKey = 'app_secret';
   static const int _expirationDays = 30;
 
   final secureStorage = const FlutterSecureStorage();
@@ -65,12 +69,24 @@ class SecureStorageImpl implements SecureStorage {
   }
 
   @override
+  Future<void> saveAppSecret(String value) async {
+    await secureStorage.write(key: _appSecretKey, value: value);
+  }
+
+  @override
+  Future<String?> getAppSecret() {
+    return secureStorage.read(key: _appSecretKey);
+  }
+
+  @override
+  Future<void> clearAppSecret() async {
+    await secureStorage.delete(key: _appSecretKey);
+  }
+
+  @override
   Future<void> savePhoneNumber(String phone) async {
     await secureStorage.write(key: _phoneNumberKey, value: phone);
-    await secureStorage.write(
-      key: _phoneTimestampKey,
-      value: DateTime.now().millisecondsSinceEpoch.toString(),
-    );
+    await secureStorage.write(key: _phoneTimestampKey, value: DateTime.now().millisecondsSinceEpoch.toString());
   }
 
   @override

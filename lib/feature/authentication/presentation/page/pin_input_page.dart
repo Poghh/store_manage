@@ -6,6 +6,7 @@ import 'package:store_manage/core/constants/app_colors.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
 import 'package:store_manage/core/navigation/app_router.dart';
+import 'package:store_manage/core/data/services/auth_token_service.dart';
 import 'package:store_manage/core/data/storage/secure_storage.dart';
 
 @RoutePage()
@@ -61,14 +62,14 @@ class _PinInputPageState extends State<PinInputPage> {
       // Creating new PIN
       await secureStorage.savePin(_controller.text);
       if (mounted) {
-        await _navigateAfterLogin(secureStorage);
+        await _navigateAfterLogin(secureStorage, _controller.text);
       }
     } else {
       // Verifying existing PIN
       final storedPin = await secureStorage.getPin();
       if (storedPin == _controller.text) {
         if (mounted) {
-          await _navigateAfterLogin(secureStorage);
+          await _navigateAfterLogin(secureStorage, _controller.text);
         }
       } else {
         if (mounted) {
@@ -82,7 +83,8 @@ class _PinInputPageState extends State<PinInputPage> {
     }
   }
 
-  Future<void> _navigateAfterLogin(SecureStorageImpl secureStorage) async {
+  Future<void> _navigateAfterLogin(SecureStorageImpl secureStorage, String pin) async {
+    await di<AuthTokenService>().requestAppSecretAndToken(phone: widget.phoneNumber, pin: pin);
     final hasProfile = await secureStorage.hasProfileSetup();
     if (mounted) {
       if (hasProfile) {
@@ -144,11 +146,7 @@ class _PinInputPageState extends State<PinInputPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.lock_outline,
-                size: AppNumbers.DOUBLE_64,
-                color: AppColors.primary,
-              ),
+              Icon(Icons.lock_outline, size: AppNumbers.DOUBLE_64, color: AppColors.primary),
               SizedBox(height: AppNumbers.DOUBLE_24),
               Text(AppStrings.loginPinTitle, style: textTheme.displayMedium),
               SizedBox(height: AppNumbers.DOUBLE_8),
@@ -193,9 +191,7 @@ class _PinInputPageState extends State<PinInputPage> {
                     disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.5),
                     disabledForegroundColor: AppColors.textOnPrimary.withValues(alpha: 0.7),
                     elevation: AppNumbers.DOUBLE_0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_16),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppNumbers.DOUBLE_16)),
                   ),
                   child: _isLoading
                       ? SizedBox(
@@ -206,7 +202,10 @@ class _PinInputPageState extends State<PinInputPage> {
                             color: AppColors.textOnPrimary,
                           ),
                         )
-                      : Text(AppStrings.loginPinButton, style: textTheme.titleMedium?.copyWith(color: AppColors.textOnPrimary)),
+                      : Text(
+                          AppStrings.loginPinButton,
+                          style: textTheme.titleMedium?.copyWith(color: AppColors.textOnPrimary),
+                        ),
                 ),
               ),
               SizedBox(height: AppNumbers.DOUBLE_16),
