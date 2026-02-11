@@ -58,13 +58,37 @@ class _PinInputPageState extends State<PinInputPage> {
     });
 
     final secureStorage = di<SecureStorageImpl>();
+    final authService = di<AuthTokenService>();
     final pin = _controller.text;
 
-    // Luôn gọi API check phone exists trước
+    // Returning user: verify PIN
+    if (!_isCreatingPin) {
+      final storedPin = await secureStorage.getPin();
+      if (storedPin != null && storedPin != pin) {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+            _errorText = AppStrings.loginPinError;
+          });
+          _controller.clear();
+        }
+        return;
+      }
+    }
+
+    // Đã có credentials hợp lệ → vào Home luôn, không gọi API
+    if (await authService.hasValidCredentials()) {
+      await secureStorage.savePin(pin);
+      await secureStorage.savePhoneNumber(widget.phoneNumber);
+      if (!mounted) return;
+      context.router.replaceAll([const HomeTabsRoute()]);
+      return;
+    }
+
+    // Chưa có đủ credentials → cần kết nối mạng
     final phoneExists = await _checkPhoneExistsOnServer();
 
     if (phoneExists == null) {
-      // Network error → yêu cầu kết nối
       if (mounted) {
         setState(() => _isLoading = false);
         _showConnectivityRequiredDialog();
@@ -72,22 +96,16 @@ class _PinInputPageState extends State<PinInputPage> {
       return;
     }
 
-    // Lưu PIN và phone local
     await secureStorage.savePin(pin);
     await secureStorage.savePhoneNumber(widget.phoneNumber);
 
     if (!mounted) return;
 
     if (phoneExists) {
-      // Account đã có trên server → lấy token và vào Home
-      await di<AuthTokenService>().requestAppSecretAndToken(
-        phone: widget.phoneNumber,
-        pin: pin,
-      );
+      await authService.ensureValidCredentials(phone: widget.phoneNumber);
       if (!mounted) return;
       context.router.replaceAll([const HomeTabsRoute()]);
     } else {
-      // Account chưa có → vào SetupProfile để nhập thông tin và tạo credentials
       context.router.replaceAll([const SetupProfileRoute()]);
     }
   }

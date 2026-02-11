@@ -265,7 +265,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     await _dailySyncService.enqueueProductDelete(code);
     await _localProductService.deleteProduct(code);
     await _inventoryService.setAdjustment(code, 0);
-    await _dailySyncService.syncPending();
     if (!mounted) return;
     AppToast.warning(context, AppStrings.productDeleteQueued);
     context.maybePop();

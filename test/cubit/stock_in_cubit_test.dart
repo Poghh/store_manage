@@ -38,7 +38,7 @@ void main() {
 
     when(() => connectivity.onChanged).thenAnswer((_) => const Stream<InternetStatus>.empty());
     when(() => connectivity.isOnline).thenAnswer((_) async => true);
-    when(() => syncService.syncPending()).thenAnswer((_) async {});
+    when(() => syncService.syncAll()).thenAnswer((_) async {});
     when(() => syncService.enqueueStockIn(any())).thenAnswer((_) async {});
     when(() => inventoryService.applyStockIn(any(), any())).thenAnswer((_) async {});
     when(() => localProductService.addFromStockInPayload(any())).thenAnswer((_) async {});
@@ -46,7 +46,7 @@ void main() {
 
   blocTest<StockInCubit, StockInState>(
     'emits error when API base URL is not configured',
-    build: () => StockInCubit(syncService, connectivity, inventoryService, localProductService),
+    build: () => StockInCubit(syncService, inventoryService, localProductService),
     setUp: () {
       dotenv.loadFromString(envString: '', isOptional: true);
     },
@@ -57,13 +57,13 @@ void main() {
     ],
     verify: (_) {
       verifyNever(() => syncService.enqueueStockIn(any()));
-      verifyNever(() => syncService.syncPending());
+      verifyNever(() => syncService.syncAll());
     },
   );
 
   blocTest<StockInCubit, StockInState>(
     'emits queued when submit succeeds',
-    build: () => StockInCubit(syncService, connectivity, inventoryService, localProductService),
+    build: () => StockInCubit(syncService, inventoryService, localProductService),
     setUp: () {
       dotenv.loadFromString(envString: 'API_BASE_URL=http://localhost');
     },
@@ -74,13 +74,13 @@ void main() {
     ],
     verify: (_) {
       verify(() => syncService.enqueueStockIn(any())).called(1);
-      verify(() => syncService.syncPending()).called(1);
+      verify(() => syncService.syncAll()).called(1);
     },
   );
 
   blocTest<StockInCubit, StockInState>(
     'emits queued when submit called',
-    build: () => StockInCubit(syncService, connectivity, inventoryService, localProductService),
+    build: () => StockInCubit(syncService, inventoryService, localProductService),
     setUp: () {
       dotenv.loadFromString(envString: 'API_BASE_URL=http://localhost');
     },

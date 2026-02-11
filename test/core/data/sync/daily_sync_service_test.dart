@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-import 'package:store_manage/core/data/repositories/daily_sync_repository.dart';
+import 'package:store_manage/core/data/repositories/media_repository.dart';
 import 'package:store_manage/core/data/repositories/store_repository.dart';
 import 'package:store_manage/core/data/services/inventory_adjustment_service.dart';
 import 'package:store_manage/core/data/services/local_product_service.dart';
@@ -13,7 +13,7 @@ import 'package:store_manage/core/network/connectivity_service.dart';
 
 class MockOfflineQueueStorage extends Mock implements OfflineQueueStorage {}
 
-class MockDailySyncRepository extends Mock implements DailySyncRepository {}
+class MockMediaRepository extends Mock implements MediaRepository {}
 
 class MockStoreRepository extends Mock implements StoreRepository {}
 
@@ -29,8 +29,8 @@ class MockInventoryAdjustmentService extends Mock implements InventoryAdjustment
 
 void main() {
   late OfflineQueueStorage queue;
-  late DailySyncRepository dailyRepo;
   late StoreRepository storeRepo;
+  late MediaRepository mediaRepo;
   late ConnectivityService connectivity;
   late LocalStorage localStorage;
   late SecureStorageImpl secureStorage;
@@ -43,8 +43,8 @@ void main() {
 
   setUp(() {
     queue = MockOfflineQueueStorage();
-    dailyRepo = MockDailySyncRepository();
     storeRepo = MockStoreRepository();
+    mediaRepo = MockMediaRepository();
     connectivity = MockConnectivityService();
     localStorage = MockLocalStorage();
     secureStorage = MockSecureStorage();
@@ -68,8 +68,8 @@ void main() {
   DailySyncService buildService() {
     return DailySyncService(
       queue,
-      dailyRepo,
       storeRepo,
+      mediaRepo,
       connectivity,
       localStorage,
       secureStorage,
@@ -93,13 +93,8 @@ void main() {
           {'_queueId': 2, 'productCode': 'B'},
         ],
       );
-      when(() => queue.getUnsynced(DailySyncService.productDeleteQueueKey)).thenAnswer(
-        (_) async => [
-          {'_queueId': 3, 'productCode': 'C'},
-        ],
-      );
 
-      await service.syncStore();
+      await service.syncAll();
 
       if (now.hour < 20) {
         verifyNever(
@@ -120,7 +115,6 @@ void main() {
         ).called(1);
         verify(() => queue.markSynced(1)).called(1);
         verify(() => queue.markSynced(2)).called(1);
-        verify(() => queue.markSynced(3)).called(1);
       }
     });
 
@@ -129,7 +123,7 @@ void main() {
       final now = DateTime.now();
 
       when(
-        () => localStorage.read('last_store_sync'),
+        () => localStorage.read('last_sync'),
       ).thenAnswer((_) async => DateTime(now.year, now.month, now.day, 20, 5).toIso8601String());
       when(() => queue.getUnsynced(any())).thenAnswer(
         (_) async => [
@@ -137,7 +131,7 @@ void main() {
         ],
       );
 
-      await service.syncStore();
+      await service.syncAll();
 
       verifyNever(
         () => storeRepo.syncStore(

@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:store_manage/core/data/repositories/daily_sync_repository.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+import 'package:store_manage/core/data/repositories/media_repository.dart';
 import 'package:store_manage/core/data/repositories/store_repository.dart';
 import 'package:store_manage/core/data/services/inventory_adjustment_service.dart';
 import 'package:store_manage/core/data/services/local_product_service.dart';
@@ -13,31 +15,49 @@ import 'package:store_manage/core/network/connectivity_service.dart';
 class DailySyncService {
   static const String stockInQueueKey = 'stock_in_queue';
   static const String retailQueueKey = 'retail_sale_queue';
-  static const String productDeleteQueueKey = 'product_delete_queue';
   static const String _lastSyncKey = 'last_sync';
-  static const String _runSyncKey = 'run_sync';
-  static const String _storeRunSyncKey = 'run_store_sync';
-  static const String _storeLastSyncKey = 'last_store_sync';
 
   final OfflineQueueStorage _queue;
-  final DailySyncRepository _repository;
   final StoreRepository _storeRepository;
+  final MediaRepository _mediaRepository;
   final ConnectivityService _connectivity;
   final LocalStorage _localStorage;
   final SecureStorageImpl _secureStorage;
   final LocalProductService _localProductService;
   final InventoryAdjustmentService _inventoryAdjustmentService;
 
+  StreamSubscription<InternetStatus>? _connectivitySub;
+
   DailySyncService(
     this._queue,
-    this._repository,
     this._storeRepository,
+    this._mediaRepository,
     this._connectivity,
     this._localStorage,
     this._secureStorage,
     this._localProductService,
     this._inventoryAdjustmentService,
   );
+
+  /// Bắt đầu lắng nghe kết nối mạng để tự động sync
+  /// Chỉ sync sau 20:00 và 1 lần/ngày
+  void startListening() {
+    if (_connectivitySub != null) return;
+
+    // Thử sync ngay khi khởi động (phòng trường hợp mạng đã ổn định)
+    syncAll();
+
+    _connectivitySub = _connectivity.onChanged.listen((status) {
+      if (status == InternetStatus.connected) {
+        syncAll();
+      }
+    });
+  }
+
+  void dispose() {
+    _connectivitySub?.cancel();
+    _connectivitySub = null;
+  }
 
   Future<void> enqueueStockIn(Map<String, dynamic> payload) {
     payload.putIfAbsent('syncFlag', () => 'C');
@@ -50,62 +70,82 @@ class DailySyncService {
   }
 
   Future<void> enqueueProductDelete(String productCode) {
-    return _queue.enqueue(productDeleteQueueKey, {'productCode': productCode, 'syncFlag': 'D'});
+    return _queue.enqueue(stockInQueueKey, {'productCode': productCode, 'syncFlag': 'D'});
   }
 
-  Future<void> syncPending({DateTime? now}) async {
+  /// Sync tất cả dữ liệu — chỉ chạy sau 20:00, 1 lần/ngày
+  Future<void> syncAll() async {
     if (!await _connectivity.isOnline) return;
 
-    final runSync = now ?? DateTime.now();
-    final runSyncIso = runSync.toIso8601String();
+    final now = DateTime.now();
+    if (now.hour < 12) return;
 
     final lastSyncIso = await _localStorage.read(_lastSyncKey);
     final lastSync = DateTime.tryParse(lastSyncIso ?? '');
-    final start = lastSync ?? DateTime(runSync.year, runSync.month, runSync.day);
+    if (_isSameDay(lastSync, now)) return;
 
-    if (!runSync.isAfter(start)) return;
+    final phone = await _secureStorage.getSavedPhoneNumber();
+    if (phone == null || phone.isEmpty) return;
 
-    final stockIns = await _queue.getByDateRange(stockInQueueKey, start: start, end: runSync);
-    final retailSales = await _queue.getByDateRange(retailQueueKey, start: start, end: runSync);
-    final productDeletes = await _queue.getByDateRange(productDeleteQueueKey, start: start, end: runSync);
+    final stockIns = await _queue.getUnsynced(stockInQueueKey);
+    final retailSales = await _queue.getUnsynced(retailQueueKey);
 
-    if (stockIns.isEmpty && retailSales.isEmpty && productDeletes.isEmpty) {
-      await _localStorage.write(_runSyncKey, runSyncIso);
-      await _localStorage.write(_lastSyncKey, runSyncIso);
+    if (stockIns.isEmpty && retailSales.isEmpty) {
+      await _localStorage.write(_lastSyncKey, now.toIso8601String());
       return;
     }
 
-    final dataBody = <String, dynamic>{
-      'stockIns': stockIns,
-      'retailSales': retailSales,
-      'productDeletes': productDeletes,
-    };
+    // Upload ảnh local trước, tách items thành công và thất bại
+    final readyStockIns = await _uploadLocalImages(stockIns);
 
-    final gzipData = _gzipBase64(jsonEncode(dataBody));
-    final userId = await _secureStorage.getUserId();
-    final payload = <String, dynamic>{
-      'userId': userId,
-      'runSync': runSyncIso,
-      'lastSync': lastSyncIso,
-      'gzipData': gzipData,
-      'gzipType': 'base64',
-      'contentEncoding': 'gzip',
-    };
+    final syncDataMap = <String, dynamic>{'stockIns': readyStockIns, 'retailSales': _withSyncFlag(retailSales, 'C')};
 
-    final response = await _repository.submitDailySync(payload);
-    await _applyProductCodeMappings(response);
+    try {
+      final response = await _storeRepository.syncStore(phone: phone, syncTime: now, syncData: jsonEncode(syncDataMap));
 
-    await _queue.clear(stockInQueueKey);
-    await _queue.clear(retailQueueKey);
-    await _queue.clear(productDeleteQueueKey);
-    await _localStorage.write(_runSyncKey, runSyncIso);
-    await _localStorage.write(_lastSyncKey, runSyncIso);
+      await _applyProductCodeMappings(response);
+
+      // Đánh dấu đã sync (chỉ items thành công)
+      for (final item in [...readyStockIns, ...retailSales]) {
+        final id = (item['_queueId'] ?? item['queueId']) as int?;
+        if (id != null) await _queue.markSynced(id);
+      }
+
+      await _localStorage.write(_lastSyncKey, now.toIso8601String());
+    } catch (_) {}
   }
 
-  String _gzipBase64(String value) {
-    final bytes = utf8.encode(value);
-    final gzipped = GZipCodec().encode(bytes);
-    return base64Encode(gzipped);
+  /// Upload ảnh local lên server, trả về danh sách items sẵn sàng sync
+  /// Items có ảnh upload fail sẽ bị loại (giữ unsynced cho lần sau)
+  Future<List<Map<String, dynamic>>> _uploadLocalImages(List<Map<String, dynamic>> items) async {
+    final ready = <Map<String, dynamic>>[];
+
+    for (final item in items) {
+      final image = (item['image'] ?? '').toString();
+
+      if (image.isEmpty || image.startsWith('http')) {
+        // Không có ảnh hoặc đã là URL → sẵn sàng
+        ready.add(item);
+        continue;
+      }
+
+      // Local file path → upload
+      if (!File(image).existsSync()) {
+        // File không tồn tại → sync không có ảnh
+        item['image'] = null;
+        ready.add(item);
+        continue;
+      }
+
+      final url = await _mediaRepository.uploadImage(image);
+      if (url != null && url.isNotEmpty) {
+        item['image'] = url;
+        ready.add(item);
+      }
+      // Upload fail → không thêm vào ready → giữ unsynced cho retry
+    }
+
+    return ready;
   }
 
   Future<void> _applyProductCodeMappings(Map<String, dynamic> response) async {
@@ -121,70 +161,6 @@ class DailySyncService {
       await _localProductService.updateProductCode(tempCode, newCode);
       await _inventoryAdjustmentService.migrateProductCode(from: tempCode, to: newCode);
     }
-  }
-
-  /// Sync store data to server
-  Future<void> syncStore() async {
-    if (!await _connectivity.isOnline) return;
-
-    final phone = await _secureStorage.getSavedPhoneNumber();
-    if (phone == null || phone.isEmpty) return;
-
-    final syncTime = DateTime.now();
-
-    // Allow store sync only after 20:00 local time
-    if (syncTime.hour < 20) {
-      return;
-    }
-
-    final lastStoreSyncIso = await _localStorage.read(_storeLastSyncKey);
-    final lastStoreSync = DateTime.tryParse(lastStoreSyncIso ?? '');
-    if (_isSameDay(lastStoreSync, syncTime)) {
-      return;
-    }
-
-    // Collect only unsynced items (keep unsynced records for future days)
-    final stockIns = await _queue.getUnsynced(stockInQueueKey);
-    final retailSales = await _queue.getUnsynced(retailQueueKey);
-    final productDeletes = await _queue.getUnsynced(productDeleteQueueKey);
-
-    if (stockIns.isEmpty && retailSales.isEmpty && productDeletes.isEmpty) {
-      return;
-    }
-
-    final syncDataMap = <String, dynamic>{
-      'stockIns': _withSyncFlag(stockIns, 'C'),
-      'retailSales': _withSyncFlag(retailSales, 'C'),
-      'productDeletes': _withSyncFlag(productDeletes, 'D'),
-    };
-
-    final syncData = jsonEncode(syncDataMap);
-
-    try {
-      final response = await _storeRepository.syncStore(phone: phone, syncTime: syncTime, syncData: syncData);
-
-      // Apply any product code mappings returned by the server
-      await _applyProductCodeMappings(response);
-
-      // Mark individual queue rows as synced (use _queueId added by Drift implementation)
-      for (final item in stockIns) {
-        final id = (item['_queueId'] ?? item['queueId']) as int?;
-        if (id != null) await _queue.markSynced(id);
-      }
-      for (final item in retailSales) {
-        final id = (item['_queueId'] ?? item['queueId']) as int?;
-        if (id != null) await _queue.markSynced(id);
-      }
-      for (final item in productDeletes) {
-        final id = (item['_queueId'] ?? item['queueId']) as int?;
-        if (id != null) await _queue.markSynced(id);
-      }
-
-      // Record store sync timestamps
-      final syncIso = syncTime.toIso8601String();
-      await _localStorage.write(_storeRunSyncKey, syncIso);
-      await _localStorage.write(_storeLastSyncKey, syncIso);
-    } catch (_) {}
   }
 
   List<Map<String, dynamic>> _withSyncFlag(List<Map<String, dynamic>> items, String flag) {

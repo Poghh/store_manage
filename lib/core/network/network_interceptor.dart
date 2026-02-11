@@ -4,7 +4,9 @@ import 'package:store_manage/core/data/storage/secure_storage.dart';
 
 class NetworkInterceptor extends Interceptor {
   final SecureStorageImpl secureStorageImpl;
-  final Logger _logger = Logger();
+  final Logger _logger = Logger(
+    printer: PrettyPrinter(methodCount: 0),
+  );
 
   NetworkInterceptor(this.secureStorageImpl);
 

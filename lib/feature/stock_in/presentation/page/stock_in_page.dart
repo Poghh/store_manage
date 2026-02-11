@@ -15,7 +15,6 @@ import 'package:store_manage/core/data/services/local_product_service.dart';
 import 'package:store_manage/core/widgets/app_page_app_bar.dart';
 import 'package:store_manage/feature/product/data/repositories/product_repository.dart';
 import 'package:store_manage/feature/product/presentation/cubit/product_search_cubit.dart';
-import 'package:store_manage/core/network/connectivity_service.dart';
 import 'package:store_manage/feature/stock_in/presentation/cubit/stock_in_cubit.dart';
 import 'package:store_manage/feature/stock_in/presentation/cubit/stock_in_state.dart';
 import 'package:store_manage/feature/stock_in/presentation/widgets/stock_in_form_controller.dart';
@@ -85,7 +84,6 @@ class _StockInPageState extends State<StockInPage> {
         BlocProvider<StockInCubit>(
           create: (_) => StockInCubit(
             di<DailySyncService>(),
-            di<ConnectivityService>(),
             di<InventoryAdjustmentService>(),
             di<LocalProductService>(),
           ),

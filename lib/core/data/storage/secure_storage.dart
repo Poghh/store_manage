@@ -5,6 +5,8 @@ abstract class SecureStorage {
   Future<void> saveAccessToken(dynamic value);
   Future<String?> getAccessToken();
   Future<bool> hasToken();
+  Future<void> saveTokenExpiry(String expiresAt);
+  Future<bool> isTokenValid();
   Future<void> saveUserId(dynamic value);
   Future<String?> getUserId();
   Future<void> saveAppSecret(String value);
@@ -38,6 +40,7 @@ class SecureStorageImpl implements SecureStorage {
   static const String _storeNameKey = 'store_name';
   static const String _avatarPathKey = 'avatar_path';
   static const String _appSecretKey = 'app_secret';
+  static const String _tokenExpiryKey = 'token_expiry';
   static const int _expirationDays = 30;
 
   final secureStorage = const FlutterSecureStorage();
@@ -56,6 +59,26 @@ class SecureStorageImpl implements SecureStorage {
   Future<bool> hasToken() async {
     bool hasToken = await secureStorage.containsKey(key: AppStrings.ACCESSTOKEN);
     return hasToken;
+  }
+
+  @override
+  Future<void> saveTokenExpiry(String expiresAt) async {
+    await secureStorage.write(key: _tokenExpiryKey, value: expiresAt);
+  }
+
+  @override
+  Future<bool> isTokenValid() async {
+    final token = await secureStorage.read(key: AppStrings.ACCESSTOKEN);
+    if (token == null || token.isEmpty) return false;
+
+    final expiryStr = await secureStorage.read(key: _tokenExpiryKey);
+    if (expiryStr == null) return false;
+
+    final expiry = DateTime.tryParse(expiryStr);
+    if (expiry == null) return false;
+
+    // Còn hạn nếu chưa quá thời gian hết hạn (trừ 1 phút buffer)
+    return DateTime.now().toUtc().isBefore(expiry.subtract(const Duration(minutes: 1)));
   }
 
   @override

@@ -7,6 +7,7 @@ import 'package:store_manage/core/constants/app_font_sizes.dart';
 import 'package:store_manage/core/constants/app_fonts.dart';
 import 'package:store_manage/core/constants/app_numbers.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
+import 'package:store_manage/core/data/sync/daily_sync_service.dart';
 import 'package:store_manage/core/navigation/home_tab_coordinator.dart';
 import 'package:store_manage/feature/home/presentation/page/home_page.dart';
 import 'package:store_manage/feature/profile/presentation/page/profile_page.dart';
@@ -32,6 +33,7 @@ class _HomeTabsPageState extends State<HomeTabsPage> {
     _controller = PersistentTabController();
     _tabCoordinator = di<HomeTabCoordinator>();
     _tabCoordinator.requestedIndex.addListener(_handleTabRequest);
+    di<DailySyncService>().startListening();
   }
 
   @override

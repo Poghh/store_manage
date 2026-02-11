@@ -68,6 +68,22 @@ class NetworkClient {
       rethrow;
     }
   }
+  Future<CommonResponseModel<T>> uploadFile<T>(
+    String url,
+    String filePath, {
+    required T Function(Object?) fromJsonT,
+  }) async {
+    try {
+      final formData = FormData.fromMap({
+        'file': await MultipartFile.fromFile(filePath),
+      });
+
+      final response = await _dio.post(url, data: formData);
+      return CommonResponseModel<T>.fromJson(response.data, fromJsonT);
+    } on DioException catch (e) {
+      throw ServerException(dioError: e);
+    }
+  }
 }
 
 enum RequestType { get, post, put, delete, patch }

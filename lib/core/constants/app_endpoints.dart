@@ -6,10 +6,10 @@ class AppEndpoints {
   static String APP_CREDENTIALS_EXISTS(String phone) =>
       '$BASE_URL/app-credentials/exists?phone=$phone&appName=$STORE_NAME';
   static String APP_CREDENTIALS_SECRET(String phone) =>
-      '$BASE_URL/app-credentials/secret?phone=$phone';
+      '$BASE_URL/app-credentials/secret?phone=$phone&appName=$STORE_NAME';
   static String get AUTH_TOKEN => '$BASE_URL/auth/token';
-  static String get DAILY_SYNC => '$BASE_URL/daily-sync';
   static String get PRODUCT_SEARCH => '$BASE_URL/products';
+  static String get MEDIA_UPLOAD => '$BASE_URL/media/upload';
 
   // Store endpoints
   static String get STORE_CREATE_INFORMATION => '$BASE_URL/store/create-information';

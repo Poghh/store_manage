@@ -9,17 +9,44 @@ class AuthTokenService {
 
   AuthTokenService(this._appCredentialsRepository, this._repository, this._secureStorage);
 
+  /// Kiểm tra credentials local còn hợp lệ không
+  Future<bool> hasValidCredentials() async {
+    final appSecret = await _secureStorage.getAppSecret();
+    if (appSecret == null || appSecret.isEmpty) return false;
+    return _secureStorage.isTokenValid();
+  }
+
+  /// Đảm bảo có credentials hợp lệ, chỉ gọi API khi cần
+  Future<void> ensureValidCredentials({required String phone}) async {
+    if (phone.trim().isEmpty) return;
+    try {
+      final appSecret = await _secureStorage.getAppSecret();
+      final tokenValid = await _secureStorage.isTokenValid();
+
+      if (appSecret != null && appSecret.isNotEmpty && tokenValid) {
+        // Đã có đủ credentials hợp lệ → không cần gọi API
+        return;
+      }
+
+      if (appSecret == null || appSecret.isEmpty) {
+        // Chưa có appSecret → lấy từ server
+        final secret = await _appCredentialsRepository.getAppSecret(phone: phone);
+        if (secret != null && secret.isNotEmpty) {
+          await _secureStorage.saveAppSecret(secret);
+        }
+      }
+
+      if (!tokenValid) {
+        // Token hết hạn hoặc chưa có → lấy mới
+        await requestAndSaveToken(phone: phone);
+      }
+    } catch (_) {}
+  }
+
   /// Gọi API lấy token cho user đã có account
   Future<void> requestAppSecretAndToken({required String phone, required String pin}) async {
     if (phone.trim().isEmpty || pin.trim().isEmpty) return;
-    try {
-      // Lấy appSecret từ server cho user đã có tài khoản
-      final secret = await _appCredentialsRepository.getAppSecret(phone: phone);
-      if (secret != null && secret.isNotEmpty) {
-        await _secureStorage.saveAppSecret(secret);
-      }
-      await requestAndSaveToken(phone: phone);
-    } catch (_) {}
+    await ensureValidCredentials(phone: phone);
   }
 
   /// Tạo credentials mới và lấy token cho user mới
@@ -50,6 +77,12 @@ class AuthTokenService {
       final token = _extractToken(data);
       if (token != null && token.isNotEmpty) {
         await _secureStorage.saveAccessToken(token);
+      }
+
+      final expiresAt = _readString(data, ['expiresAt']) ??
+          _readString(data['data'] is Map<String, dynamic> ? data['data'] : {}, ['expiresAt']);
+      if (expiresAt != null && expiresAt.isNotEmpty) {
+        await _secureStorage.saveTokenExpiry(expiresAt);
       }
 
       final userId = _extractUserId(data);

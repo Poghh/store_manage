@@ -8,7 +8,7 @@ class DailySyncRepository {
 
   Future<Map<String, dynamic>> submitDailySync(Map<String, dynamic> payload) async {
     final response = await _client.invoke<Map<String, dynamic>>(
-      AppEndpoints.DAILY_SYNC,
+      AppEndpoints.STORE_SYNC,
       RequestType.post,
       requestBody: payload,
       fromJsonT: (json) => (json as Map<String, dynamic>?) ?? <String, dynamic>{},

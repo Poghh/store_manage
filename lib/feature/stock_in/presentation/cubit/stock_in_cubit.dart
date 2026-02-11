@@ -1,11 +1,7 @@
-import 'dart:async';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
 import 'package:store_manage/core/constants/app_endpoints.dart';
 import 'package:store_manage/core/constants/app_strings.dart';
-import 'package:store_manage/core/network/connectivity_service.dart';
 import 'package:store_manage/core/data/sync/daily_sync_service.dart';
 import 'package:store_manage/core/data/services/inventory_adjustment_service.dart';
 import 'package:store_manage/core/data/services/local_product_service.dart';
@@ -14,19 +10,11 @@ import 'stock_in_state.dart';
 
 class StockInCubit extends Cubit<StockInState> {
   final DailySyncService _syncService;
-  final ConnectivityService _connectivity;
   final InventoryAdjustmentService _inventoryService;
   final LocalProductService _localProductService;
-  late final StreamSubscription<InternetStatus> _connectivitySub;
 
-  StockInCubit(this._syncService, this._connectivity, this._inventoryService, this._localProductService)
-    : super(const StockInInitial()) {
-    _connectivitySub = _connectivity.onChanged.listen((status) {
-      if (status == InternetStatus.connected) {
-        _syncService.syncPending();
-      }
-    });
-  }
+  StockInCubit(this._syncService, this._inventoryService, this._localProductService)
+    : super(const StockInInitial());
 
   Future<void> submitStockIn(Map<String, dynamic> payload) async {
     emit(const StockInLoading());
@@ -43,7 +31,6 @@ class StockInCubit extends Cubit<StockInState> {
     await _applyInventoryIncrease(payload);
 
     emit(const StockInQueued(AppStrings.stockInQueued));
-    await _syncService.syncPending();
   }
 
   Future<void> _applyInventoryIncrease(Map<String, dynamic> payload) async {
@@ -74,9 +61,4 @@ class StockInCubit extends Cubit<StockInState> {
     await _localProductService.addFromStockInPayload(localPayload);
   }
 
-  @override
-  Future<void> close() {
-    _connectivitySub.cancel();
-    return super.close();
-  }
 }

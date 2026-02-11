@@ -21,6 +21,7 @@
       "name": "store_manage (stg - fvm)",
       "request": "launch",
       "type": "dart",
+      "program": "lib/main_stg.dart",
       "toolArgs": ["-t", "lib/main_stg.dart"]
     },
     {

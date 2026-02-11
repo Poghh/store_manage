@@ -16,7 +16,7 @@ import 'package:store_manage/core/network/connectivity_service.dart';
 import 'package:store_manage/core/network/network_client.dart';
 import 'package:store_manage/core/data/repositories/app_credentials_repository.dart';
 import 'package:store_manage/core/data/repositories/auth_token_repository.dart';
-import 'package:store_manage/core/data/repositories/daily_sync_repository.dart';
+import 'package:store_manage/core/data/repositories/media_repository.dart';
 import 'package:store_manage/core/data/repositories/store_repository.dart';
 import 'package:store_manage/core/data/sync/daily_sync_service.dart';
 import 'package:store_manage/core/platform/biometric_service.dart';
@@ -79,13 +79,13 @@ Future<void> setupDI() async {
     () => AuthTokenRepository(di<NetworkClient>(), di<SecureStorageImpl>()),
   );
 
-  di.registerLazySingleton<DailySyncRepository>(() => DailySyncRepository(di<NetworkClient>()));
   di.registerLazySingleton<StoreRepository>(() => StoreRepository(di<NetworkClient>()));
+  di.registerLazySingleton<MediaRepository>(() => MediaRepository(di<NetworkClient>()));
   di.registerLazySingleton<DailySyncService>(
     () => DailySyncService(
       di<OfflineQueueStorage>(),
-      di<DailySyncRepository>(),
       di<StoreRepository>(),
+      di<MediaRepository>(),
       di<ConnectivityService>(),
       di<LocalStorage>(),
       di<SecureStorageImpl>(),
